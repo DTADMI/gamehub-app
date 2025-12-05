@@ -1,6 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import {useEffect, useRef} from "react";
+import {enableGameKeyCapture} from "@games/shared";
 
 const MemoryGame = dynamic(() => import("@games/memory").then((m) => m.MemoryGame), {
   ssr: false,
@@ -12,5 +14,24 @@ const MemoryGame = dynamic(() => import("@games/memory").then((m) => m.MemoryGam
 });
 
 export default function MemoryGamePage() {
-  return <MemoryGame />;
+    const rootRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        const el = rootRef.current;
+        el?.focus();
+        const cleanup = enableGameKeyCapture({rootEl: el ?? undefined});
+        return () => cleanup();
+    }, []);
+
+    return (
+        <div
+            ref={rootRef}
+            className="relative min-h-[80vh] outline-none focus:outline-none"
+            tabIndex={0}
+            role="application"
+            aria-label="Memory game"
+        >
+            <MemoryGame/>
+        </div>
+    );
 }

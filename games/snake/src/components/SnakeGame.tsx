@@ -1,16 +1,16 @@
 // games/snake/src/components/SnakeGame.tsx
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { GameContainer, soundManager } from "@games/shared";
+import React, {useCallback, useEffect, useRef, useState} from "react";
+import {GameContainer, soundManager} from "@games/shared";
 import {
-  CELL_SIZE,
-  Direction,
-  GAME_SPEED,
-  GameConfig,
-  GameMode,
-  GRID_SIZE,
-  Obstacle,
-  Portal,
-  Position,
+    CELL_SIZE,
+    Direction,
+    GAME_SPEED,
+    GameConfig,
+    GameMode,
+    GRID_SIZE,
+    Obstacle,
+    Portal,
+    Position,
 } from "../types/game";
 
 export const SnakeGame: React.FC = () => {
@@ -164,6 +164,16 @@ export const SnakeGame: React.FC = () => {
   // Handle keyboard input
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
+        // If game over: Space should restart a fresh game
+        if (gameOver) {
+            if (e.code === "Space") {
+                setIsPaused(false);
+                setGameStarted(true);
+                initGame();
+            }
+            return;
+        }
+
       if (!gameStarted) {
         if (e.code === "Space") {
           setGameStarted(true);
@@ -200,7 +210,7 @@ export const SnakeGame: React.FC = () => {
           break;
       }
     },
-    [direction, gameStarted, initGame],
+      [direction, gameStarted, gameOver, initGame],
   );
 
   // Game loop
@@ -549,31 +559,55 @@ export const SnakeGame: React.FC = () => {
 
   // Handle game mode changes
   const handleModeChange = (mode: GameMode) => {
-    setConfig((prev) => {
-      const newConfig = { ...prev, mode };
+      const proceed = () => {
+          setIsPaused(false);
+          setGameStarted(true);
+          setConfig((prev) => {
+              const newConfig = {...prev, mode} as GameConfig;
 
-      switch (mode) {
-        case "obstacles":
-          newConfig.hasObstacles = true;
-          newConfig.hasPortals = false;
-          break;
-        case "portal":
-          newConfig.hasPortals = true;
-          newConfig.hasObstacles = false;
-          break;
-        case "speed":
-          newConfig.speed = GAME_SPEED / 2;
-          newConfig.hasObstacles = false;
-          newConfig.hasPortals = false;
-          break;
-        default: // classic
-          newConfig.hasObstacles = false;
-          newConfig.hasPortals = false;
-          newConfig.speed = GAME_SPEED;
+              switch (mode) {
+                  case "obstacles":
+                      newConfig.hasObstacles = true;
+                      newConfig.hasPortals = false;
+                      newConfig.speed = GAME_SPEED;
+                      break;
+                  case "portal":
+                      newConfig.hasPortals = true;
+                      newConfig.hasObstacles = false;
+                      newConfig.speed = GAME_SPEED;
+                      break;
+                  case "speed":
+                      newConfig.speed = Math.max(60, GAME_SPEED / 2);
+                      newConfig.hasObstacles = false;
+                      newConfig.hasPortals = false;
+                      break;
+                  default: // classic
+                      newConfig.hasObstacles = false;
+                      newConfig.hasPortals = false;
+                      newConfig.speed = GAME_SPEED;
+              }
+
+              return newConfig;
+          });
+          // Reinitialize the game in the selected mode
+          initGame();
+      };
+
+      // If a game is ongoing and not over, confirm before resetting
+      if (gameStarted && !gameOver) {
+          setIsPaused(true);
+          const ok = typeof window !== "undefined" ? window.confirm("Restart the game in this mode? Your current progress will be lost.") : true;
+          if (ok) {
+              proceed();
+          } else {
+              // Unpause if user cancelled
+              setIsPaused(false);
+          }
+          return;
       }
 
-      return newConfig;
-    });
+      // If not started or already over, just proceed
+      proceed();
   };
 
   return (

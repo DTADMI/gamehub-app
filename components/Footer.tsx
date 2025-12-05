@@ -2,11 +2,11 @@
 "use client";
 
 import Link from "next/link";
-import { Gamepad2, Github, Linkedin, Mail } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { ModeToggle } from "@/components/mode-toggle";
-import { useState, useEffect } from "react";
-import { CONTACT_EMAIL, GITHUB_URL, LINKEDIN_URL, mailto } from "@/lib/env";
+import {Gamepad2, Github, Linkedin, Mail} from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {ModeToggle} from "@/components/ModeToggle";
+import {useState} from "react";
+import {CONTACT_EMAIL, GITHUB_URL, LINKEDIN_URL, mailto} from "@/lib/env";
 
 const footerLinks = [
   {
@@ -48,11 +48,6 @@ const footerLinks = [
 
 export function Footer() {
   const [email, setEmail] = useState("");
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -127,7 +122,7 @@ export function Footer() {
           })}
 
           <div className="space-y-4">
-            <h4 className="text-sm font-medium">Subscribe to our newsletter</h4>
+              <h4 className="text-sm font-semibold">Subscribe to our newsletter</h4>
             <p id="newsletter-help" className="text-sm text-muted-foreground">Get the latest updates and news.</p>
             <form onSubmit={handleSubmit} className="flex space-x-2" aria-describedby="newsletter-help">
               <label htmlFor="newsletter-email" className="sr-only">Email address</label>
@@ -140,7 +135,6 @@ export function Footer() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 aria-required="true"
-                disabled={!isMounted}
                 suppressHydrationWarning
               />
               <Button type="submit" size="sm" className="bg-primary hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-primary/60">

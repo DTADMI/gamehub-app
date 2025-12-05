@@ -1,8 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect } from "react";
-import { soundManager } from "@games/shared";
+import {useEffect, useRef} from "react";
+import {enableGameKeyCapture, soundManager} from "@games/shared";
 
 const BreakoutGame = dynamic(() => import("@games/breakout").then((m) => m.BreakoutGame), {
   ssr: false,
@@ -14,7 +14,13 @@ const BreakoutGame = dynamic(() => import("@games/breakout").then((m) => m.Break
 });
 
 export default function BreakoutGamePage() {
+    const rootRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
+      const el = rootRef.current;
+      el?.focus();
+      const cleanupCapture = enableGameKeyCapture({rootEl: el ?? undefined});
+
     const preloadSounds = async () => {
       try {
         //await Promise.all([
@@ -37,8 +43,19 @@ export default function BreakoutGamePage() {
 
     return () => {
       soundManager.stopMusic();
+        cleanupCapture();
     };
   }, []);
 
-  return <BreakoutGame />;
+    return (
+        <div
+            ref={rootRef}
+            className="relative min-h-[80vh] outline-none focus:outline-none"
+            tabIndex={0}
+            role="application"
+            aria-label="Breakout game"
+        >
+            <BreakoutGame/>
+        </div>
+    );
 }

@@ -1,11 +1,11 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { soundManager } from "@games/shared";
-import { PresenceBadge } from "@/components/PresenceBadge";
-import { useStomp } from "@/lib/realtime/useStomp";
-import { useFeature } from "@/lib/flags";
+import {useCallback, useEffect, useMemo, useRef, useState} from "react";
+import {enableGameKeyCapture, soundManager} from "@games/shared";
+import {PresenceBadge} from "@/components/PresenceBadge";
+import {useStomp} from "@/lib/realtime/useStomp";
+import {useFeature} from "@/lib/flags";
 
 const SnakeGame = dynamic(() => import("@games/snake").then((m) => m.SnakeGame), {
   ssr: false,
@@ -152,6 +152,7 @@ function LeaderboardPanel() {
 }
 
 export default function SnakeGamePage() {
+    const rootRef = useRef<HTMLDivElement | null>(null);
   const realtimeEnabled = useFeature("realtime_enabled", true, { preferBackend: true });
   const threeDEnabled = useFeature("snake_3d_mode", false, { preferBackend: true });
   const [use3D, setUse3D] = useState(
@@ -159,6 +160,11 @@ export default function SnakeGamePage() {
   );
   const { publish, connected } = useStomp({ enabled: realtimeEnabled });
   useEffect(() => {
+      // Focus the game region for accessibility and to scope key capture
+      const el = rootRef.current;
+      el?.focus();
+      const cleanupCapture = enableGameKeyCapture({rootEl: el ?? undefined});
+
     const preloadSounds = async () => {
       try {
         await Promise.all([
@@ -197,11 +203,18 @@ export default function SnakeGamePage() {
     return () => {
       window.removeEventListener("snake:gameover", onGameOver as EventListener);
       soundManager.stopMusic();
+        cleanupCapture();
     };
   }, [publish, realtimeEnabled]);
 
   return (
-    <div className="relative min-h-[80vh]">
+      <div
+          ref={rootRef}
+          className="relative min-h-[80vh] outline-none focus:outline-none"
+          tabIndex={0}
+          role="application"
+          aria-label="Snake game"
+      >
       <div className="pt-4">
         <DifficultySelector />
       </div>
