@@ -1,7 +1,8 @@
-import { GameCard } from "@/components/GameCard";
-import { Button } from "@/components/ui/button";
+import {GameCard} from "@/components/GameCard";
+import {Button} from "@/components/ui/button";
 import Link from "next/link";
-import { ExternalLink } from "lucide-react";
+import {ExternalLink} from "lucide-react";
+import {Carousel} from "@/components/Carousel";
 
 type HomeGame = {
   id: number;
@@ -108,21 +109,21 @@ export default function HomePage() {
             {/* Featured Games */}
             <section className="mb-12">
               <h2 className="text-2xl font-semibold text-foreground mb-6">Featured Games</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Carousel>
                 {featured.map((game) => (
                   <GameCard key={game.id} game={game} featured />
                 ))}
-              </div>
+              </Carousel>
             </section>
 
             {/* Upcoming Games */}
             <section>
               <h2 className="text-2xl font-semibold text-foreground mb-6">Upcoming Games</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <Carousel>
                 {upcoming.map((game) => (
                   <GameCard key={game.id} game={game} />
                 ))}
-              </div>
+              </Carousel>
             </section>
         </div>
       </main>

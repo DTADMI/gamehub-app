@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import {useEffect, useRef, useState} from "react";
+import {Button} from "@/components/ui/button";
+import {enableGameKeyCapture, GameHUD} from "@games/shared";
 
 // Extremely small MVP for a 10x10 board Block Blast style game.
 // Pieces are tiny presets; scoring = +10 per cleared row/col.
@@ -101,10 +102,18 @@ function randomRack(): Piece[] {
 }
 
 export default function BlockBlastPage() {
+  const rootRef = useRef<HTMLDivElement | null>(null);
   const [board, setBoard] = useState<Cell[][]>(emptyBoard);
   const [rack, setRack] = useState<Piece[]>(() => randomRack());
   const [selected, setSelected] = useState<number | null>(null);
   const [score, setScore] = useState(0);
+
+  useEffect(() => {
+    const el = rootRef.current;
+    el?.focus();
+    const cleanup = enableGameKeyCapture({rootEl: el ?? undefined});
+    return () => cleanup();
+  }, []);
 
   function handlePlace(r: number, c: number) {
     if (selected === null) {
@@ -141,7 +150,13 @@ export default function BlockBlastPage() {
   }
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
+      <div
+          ref={rootRef}
+          className="p-6 max-w-5xl mx-auto outline-none"
+          tabIndex={0}
+          role="application"
+          aria-label="Block Blast game"
+      >
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-semibold">Block Blast (MVP)</h1>
         <div className="flex items-center gap-3">
@@ -193,6 +208,11 @@ export default function BlockBlastPage() {
           ))}
         </div>
       </div>
+        <GameHUD
+            onPauseToggle={() => void 0}
+            onRestart={reset}
+            tips="Click a rack piece, then click a cell to place • Clear rows/cols for points"
+        />
     </div>
   );
 }

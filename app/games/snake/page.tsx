@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import {useCallback, useEffect, useMemo, useRef, useState} from "react";
-import {enableGameKeyCapture, soundManager} from "@games/shared";
+import {enableGameKeyCapture, GameHUD, soundManager} from "@games/shared";
 import {PresenceBadge} from "@/components/PresenceBadge";
 import {useStomp} from "@/lib/realtime/useStomp";
 import {useFeature} from "@/lib/flags";
@@ -246,6 +246,15 @@ export default function SnakeGamePage() {
       <LeaderboardPanel />
       {/* On-screen touch controls for mobile and desktop */}
       <TouchControls />
+        <GameHUD
+            onPauseToggle={() => {
+              window.dispatchEvent(new Event("snake:pauseToggle"));
+            }}
+            onRestart={() => {
+              window.dispatchEvent(new Event("snake:restart"));
+            }}
+            tips="Arrows to move • Space to pause/resume • Space after Game Over to restart"
+        />
     </div>
   );
 }

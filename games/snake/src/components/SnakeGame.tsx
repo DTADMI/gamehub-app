@@ -21,6 +21,7 @@ export const SnakeGame: React.FC = () => {
   const [highScore, setHighScore] = useState(0);
   const [_leaderboard, setLeaderboard] = useState<number[]>([]);
   const [gameStarted, setGameStarted] = useState(false);
+  const [pendingMode, setPendingMode] = useState<GameMode | null>(null);
   const [config, setConfig] = useState<GameConfig>({
     mode: "classic",
     speed: GAME_SPEED,
@@ -69,16 +70,50 @@ export const SnakeGame: React.FC = () => {
 
     if (config.hasObstacles) {
       setObstacles(generateObstacles(initialSnake));
+    } else {
+      setObstacles([]);
     }
 
     if (config.hasPortals) {
       setPortals(generatePortals());
+    } else {
+      setPortals([]);
     }
 
     soundManager.playMusic("background");
     // The helpers are stable for the game boot; intentionally not adding them as deps
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.hasObstacles, config.hasPortals]);
+
+  // Restart helper that applies a provided configuration immediately
+  const restartWithConfig = useCallback((nextCfg: GameConfig) => {
+    setConfig(nextCfg);
+    // Initialize with nextCfg settings explicitly
+    const initialSnake = [
+      {x: 5, y: 10},
+      {x: 4, y: 10},
+      {x: 3, y: 10},
+    ];
+    setSnake(initialSnake);
+    setDirection("RIGHT");
+    setNextDirection("RIGHT");
+    setScore(0);
+    setGameOver(false);
+    setFood(generateFood(initialSnake));
+    if (nextCfg.hasObstacles) {
+      setObstacles(generateObstacles(initialSnake));
+    } else {
+      setObstacles([]);
+    }
+    if (nextCfg.hasPortals) {
+      setPortals(generatePortals());
+    } else {
+      setPortals([]);
+    }
+    setGameStarted(true);
+    setIsPaused(false);
+    soundManager.playMusic("background");
+  }, []);
 
   // Generate random position
   const getRandomPosition = (exclude: Position[] = []): Position => {
@@ -169,7 +204,7 @@ export const SnakeGame: React.FC = () => {
             if (e.code === "Space") {
                 setIsPaused(false);
                 setGameStarted(true);
-                initGame();
+              restartWithConfig(config);
             }
             return;
         }
@@ -557,57 +592,57 @@ export const SnakeGame: React.FC = () => {
     };
   }, []);
 
+  // Support external HUD controls (restart/pause) via custom events
+  useEffect(() => {
+    const onRestart = () => {
+      restartWithConfig(config);
+    };
+    const onPauseToggle = () => {
+      setIsPaused((p) => !p);
+    };
+    window.addEventListener("snake:restart", onRestart as EventListener);
+    window.addEventListener("snake:pauseToggle", onPauseToggle as EventListener);
+    return () => {
+      window.removeEventListener("snake:restart", onRestart as EventListener);
+      window.removeEventListener("snake:pauseToggle", onPauseToggle as EventListener);
+    };
+  }, [config, restartWithConfig]);
+
   // Handle game mode changes
+  const buildConfigForMode = (base: GameConfig, mode: GameMode): GameConfig => {
+    const next: GameConfig = {...base, mode};
+    switch (mode) {
+      case "obstacles":
+        next.hasObstacles = true;
+        next.hasPortals = false;
+        next.speed = GAME_SPEED;
+        break;
+      case "portal":
+        next.hasPortals = true;
+        next.hasObstacles = false;
+        next.speed = GAME_SPEED;
+        break;
+      case "speed":
+        next.speed = Math.max(60, GAME_SPEED / 2);
+        next.hasObstacles = false;
+        next.hasPortals = false;
+        break;
+      default:
+        next.hasObstacles = false;
+        next.hasPortals = false;
+        next.speed = GAME_SPEED;
+    }
+    return next;
+  };
+
   const handleModeChange = (mode: GameMode) => {
-      const proceed = () => {
-          setIsPaused(false);
-          setGameStarted(true);
-          setConfig((prev) => {
-              const newConfig = {...prev, mode} as GameConfig;
-
-              switch (mode) {
-                  case "obstacles":
-                      newConfig.hasObstacles = true;
-                      newConfig.hasPortals = false;
-                      newConfig.speed = GAME_SPEED;
-                      break;
-                  case "portal":
-                      newConfig.hasPortals = true;
-                      newConfig.hasObstacles = false;
-                      newConfig.speed = GAME_SPEED;
-                      break;
-                  case "speed":
-                      newConfig.speed = Math.max(60, GAME_SPEED / 2);
-                      newConfig.hasObstacles = false;
-                      newConfig.hasPortals = false;
-                      break;
-                  default: // classic
-                      newConfig.hasObstacles = false;
-                      newConfig.hasPortals = false;
-                      newConfig.speed = GAME_SPEED;
-              }
-
-              return newConfig;
-          });
-          // Reinitialize the game in the selected mode
-          initGame();
-      };
-
-      // If a game is ongoing and not over, confirm before resetting
-      if (gameStarted && !gameOver) {
-          setIsPaused(true);
-          const ok = typeof window !== "undefined" ? window.confirm("Restart the game in this mode? Your current progress will be lost.") : true;
-          if (ok) {
-              proceed();
-          } else {
-              // Unpause if user cancelled
-              setIsPaused(false);
-          }
-          return;
-      }
-
-      // If not started or already over, just proceed
-      proceed();
+    if (gameStarted && !gameOver) {
+      setIsPaused(true);
+      setPendingMode(mode);
+      return;
+    }
+    const nextCfg = buildConfigForMode(config, mode);
+    restartWithConfig(nextCfg);
   };
 
   return (
@@ -632,6 +667,35 @@ export const SnakeGame: React.FC = () => {
             </button>
           ))}
         </div>
+
+        {/* Inline confirm for mode change */}
+        {pendingMode && (
+            <div className="mx-auto mb-4 max-w-md rounded-md border bg-card text-card-foreground p-3 shadow-sm">
+              <p className="text-sm mb-2">Restart the game in <b>{pendingMode}</b> mode? Current progress will be
+                lost.</p>
+              <div className="flex gap-2 justify-end">
+                <button
+                    className="px-3 py-1.5 text-sm rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                    onClick={() => {
+                      setPendingMode(null);
+                      setIsPaused(false);
+                    }}
+                >
+                  Cancel
+                </button>
+                <button
+                    className="px-3 py-1.5 text-sm rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
+                    onClick={() => {
+                      const nextCfg = buildConfigForMode(config, pendingMode);
+                      setPendingMode(null);
+                      restartWithConfig(nextCfg);
+                    }}
+                >
+                  Restart
+                </button>
+              </div>
+            </div>
+        )}
 
         {/* Game Canvas */}
         <div className="flex justify-center">

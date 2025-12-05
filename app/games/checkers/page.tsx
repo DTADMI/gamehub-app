@@ -1,8 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import {useEffect, useRef} from "react";
-import {enableGameKeyCapture} from "@games/shared";
+import {useEffect, useRef, useState} from "react";
+import {enableGameKeyCapture, GameHUD} from "@games/shared";
 
 const CheckersGame = dynamic(() => import("@games/checkers").then((m) => m.CheckersGame), {
   ssr: false,
@@ -15,6 +15,7 @@ const CheckersGame = dynamic(() => import("@games/checkers").then((m) => m.Check
 
 export default function CheckersPage() {
     const rootRef = useRef<HTMLDivElement | null>(null);
+    const [seed, setSeed] = useState(0);
 
     useEffect(() => {
         const el = rootRef.current;
@@ -31,7 +32,15 @@ export default function CheckersPage() {
             role="application"
             aria-label="Checkers game"
         >
-            <CheckersGame/>
+            <CheckersGame key={seed}/>
+            <GameHUD
+                onPauseToggle={() => {
+                    // Some board UIs toggle hints with Space; we dispatch it here if the game listens to keyboard
+                    window.dispatchEvent(new KeyboardEvent("keydown", {key: " ", code: "Space"}));
+                }}
+                onRestart={() => setSeed((s) => s + 1)}
+                tips="Click a piece then a target tile • Follow legal moves to capture"
+            />
         </div>
     );
 }

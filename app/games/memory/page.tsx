@@ -1,8 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import {useEffect, useRef} from "react";
-import {enableGameKeyCapture} from "@games/shared";
+import {useEffect, useRef, useState} from "react";
+import {enableGameKeyCapture, GameHUD} from "@games/shared";
 
 const MemoryGame = dynamic(() => import("@games/memory").then((m) => m.MemoryGame), {
   ssr: false,
@@ -15,6 +15,7 @@ const MemoryGame = dynamic(() => import("@games/memory").then((m) => m.MemoryGam
 
 export default function MemoryGamePage() {
     const rootRef = useRef<HTMLDivElement | null>(null);
+    const [seed, setSeed] = useState(0);
 
     useEffect(() => {
         const el = rootRef.current;
@@ -31,7 +32,14 @@ export default function MemoryGamePage() {
             role="application"
             aria-label="Memory game"
         >
-            <MemoryGame/>
+            <MemoryGame key={seed}/>
+            <GameHUD
+                onPauseToggle={() => {
+                    window.dispatchEvent(new KeyboardEvent("keydown", {key: " ", code: "Space"}));
+                }}
+                onRestart={() => setSeed((s) => s + 1)}
+                tips="Click cards to match pairs • Try to remember positions"
+            />
         </div>
     );
 }

@@ -1,6 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import {useEffect, useRef, useState} from "react";
+import {enableGameKeyCapture, GameHUD} from "@games/shared";
 
 const TowerDefenseGame = dynamic(
   () => import("@games/tower-defense").then((m) => m.TowerDefenseGame),
@@ -15,5 +17,32 @@ const TowerDefenseGame = dynamic(
 );
 
 export default function TowerDefensePage() {
-  return <TowerDefenseGame />;
+    const rootRef = useRef<HTMLDivElement | null>(null);
+    const [seed, setSeed] = useState(0);
+
+    useEffect(() => {
+        const el = rootRef.current;
+        el?.focus();
+        const cleanup = enableGameKeyCapture({rootEl: el ?? undefined});
+        return () => cleanup();
+    }, []);
+
+    return (
+        <div
+            ref={rootRef}
+            className="relative min-h-[80vh] outline-none focus:outline-none"
+            tabIndex={0}
+            role="application"
+            aria-label="Tower Defense game"
+        >
+            <TowerDefenseGame key={seed}/>
+            <GameHUD
+                onPauseToggle={() => {
+                    window.dispatchEvent(new KeyboardEvent("keydown", {key: " ", code: "Space"}));
+                }}
+                onRestart={() => setSeed((s) => s + 1)}
+                tips="Click to place towers • Defend the path against waves"
+            />
+        </div>
+    );
 }

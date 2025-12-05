@@ -1,8 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import {useEffect, useRef} from "react";
-import {enableGameKeyCapture} from "@games/shared";
+import {useEffect, useRef, useState} from "react";
+import {enableGameKeyCapture, GameHUD} from "@games/shared";
 
 const TetrisGame = dynamic(() => import("@games/tetris").then((m) => m.TetrisGame), {
   ssr: false,
@@ -15,6 +15,7 @@ const TetrisGame = dynamic(() => import("@games/tetris").then((m) => m.TetrisGam
 
 export default function TetrisGamePage() {
     const rootRef = useRef<HTMLDivElement | null>(null);
+    const [seed, setSeed] = useState(0);
 
     useEffect(() => {
         const el = rootRef.current;
@@ -31,7 +32,14 @@ export default function TetrisGamePage() {
             role="application"
             aria-label="Tetris game"
         >
-            <TetrisGame/>
+            <TetrisGame key={seed}/>
+            <GameHUD
+                onPauseToggle={() => {
+                    window.dispatchEvent(new KeyboardEvent("keydown", {key: " ", code: "Space"}));
+                }}
+                onRestart={() => setSeed((s) => s + 1)}
+                tips="Arrows to move • Up to rotate • Space to drop/pause (game dependent)"
+            />
         </div>
     );
 }

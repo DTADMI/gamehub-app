@@ -1,8 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import {useEffect, useRef} from "react";
-import {enableGameKeyCapture, soundManager} from "@games/shared";
+import {useEffect, useRef, useState} from "react";
+import {enableGameKeyCapture, GameHUD, soundManager} from "@games/shared";
 
 const BreakoutGame = dynamic(() => import("@games/breakout").then((m) => m.BreakoutGame), {
   ssr: false,
@@ -15,6 +15,7 @@ const BreakoutGame = dynamic(() => import("@games/breakout").then((m) => m.Break
 
 export default function BreakoutGamePage() {
     const rootRef = useRef<HTMLDivElement | null>(null);
+    const [seed, setSeed] = useState(0);
 
   useEffect(() => {
       const el = rootRef.current;
@@ -55,7 +56,14 @@ export default function BreakoutGamePage() {
             role="application"
             aria-label="Breakout game"
         >
-            <BreakoutGame/>
+            <BreakoutGame key={seed}/>
+            <GameHUD
+                onPauseToggle={() => {
+                    window.dispatchEvent(new KeyboardEvent("keydown", {key: " ", code: "Space"}));
+                }}
+                onRestart={() => setSeed((s) => s + 1)}
+                tips="Move with mouse or arrows • Space to pause/resume"
+            />
         </div>
     );
 }
