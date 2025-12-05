@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { soundManager } from "@games/shared";
-import { PresenceBadge } from "@/components/presence-badge";
+import { PresenceBadge } from "@/components/PresenceBadge";
 import { useStomp } from "@/lib/realtime/useStomp";
 import { useFeature } from "@/lib/flags";
 

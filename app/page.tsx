@@ -1,17 +1,27 @@
-import { GameCard } from "@/components/game-card";
+import { GameCard } from "@/components/GameCard";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Github, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 
-const featuredGames = [
+type HomeGame = {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+  tags: string[];
+  slug: string;
+  featured?: boolean;
+  upcoming?: boolean;
+};
+
+const games: HomeGame[] = [
   {
     id: 1,
     title: "Snake Game",
     description: "Classic snake game with modern twist and smooth animations",
     image: "/retro-snake-game-with-neon-colors.jpg",
     tags: ["Canvas", "Game Logic", "Animation"],
-    demoUrl: "#",
-    codeUrl: "#",
+    slug: "snake",
     featured: true,
   },
   {
@@ -20,9 +30,9 @@ const featuredGames = [
     description: "Full-featured Tetris implementation with scoring and levels",
     image: "/colorful-tetris-blocks-falling.jpg",
     tags: ["JavaScript", "DOM", "Game State"],
-    demoUrl: "#",
-    codeUrl: "#",
+    slug: "tetris",
     featured: true,
+    upcoming: true,
   },
   {
     id: 3,
@@ -30,9 +40,9 @@ const featuredGames = [
     description: "Interactive memory game with multiple difficulty levels",
     image: "/colorful-memory-cards-game-interface.jpg",
     tags: ["React", "State Management", "Animation"],
-    demoUrl: "#",
-    codeUrl: "#",
+    slug: "memory",
     featured: false,
+    upcoming: true,
   },
   {
     id: 4,
@@ -40,8 +50,7 @@ const featuredGames = [
     description: "Classic brick-breaking game with power-ups and effects",
     image: "/breakout-game-with-paddle-and-colorful-bricks.jpg",
     tags: ["Canvas", "Physics", "Collision Detection"],
-    demoUrl: "#",
-    codeUrl: "#",
+    slug: "breakout",
     featured: false,
   },
   {
@@ -50,9 +59,9 @@ const featuredGames = [
     description: "2D platformer with physics-based puzzles and smooth controls",
     image: "/2d-platformer-game-with-character-and-obstacles.jpg",
     tags: ["Game Engine", "Physics", "Level Design"],
-    demoUrl: "#",
-    codeUrl: "#",
+    slug: "platformer",
     featured: false,
+    upcoming: true,
   },
   {
     id: 6,
@@ -60,15 +69,15 @@ const featuredGames = [
     description: "Strategic tower defense game with multiple tower types",
     image: "/tower-defense-game-with-towers-and-enemies.jpg",
     tags: ["Strategy", "Pathfinding", "Game Balance"],
-    demoUrl: "#",
-    codeUrl: "#",
+    slug: "tower-defense",
     featured: false,
+    upcoming: true,
   },
 ];
 
 export default function HomePage() {
-  const featuredProjects = featuredGames.filter((game) => game.featured);
-  const allProjects = featuredGames;
+  const featured = games.filter((g) => g.featured);
+  const upcoming = games.filter((g) => g.upcoming);
 
   return (
     <div className="min-h-screen bg-background">
@@ -87,36 +96,30 @@ export default function HomePage() {
                 </p>
                 <div className="flex gap-4">
                   <Button asChild size="lg" className="gap-2">
-                    <Link href="/projects">
+                    <Link href="/explore">
                       <ExternalLink className="w-4 h-4" />
-                      View All Projects
+                      Explore All
                     </Link>
-                  </Button>
-                  <Button asChild variant="outline" size="lg" className="gap-2 bg-transparent">
-                    <a href={process.env.NEXT_PUBLIC_GITHUB_URL ?? "#"} target="_blank" rel="noopener noreferrer">
-                      <Github className="w-4 h-4" />
-                      GitHub Profile
-                    </a>
                   </Button>
                 </div>
               </div>
             </section>
 
-            {/* Featured Projects */}
+            {/* Featured Games */}
             <section className="mb-12">
-              <h2 className="text-2xl font-semibold text-foreground mb-6">Featured Projects</h2>
+              <h2 className="text-2xl font-semibold text-foreground mb-6">Featured Games</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {featuredProjects.map((game) => (
+                {featured.map((game) => (
                   <GameCard key={game.id} game={game} featured />
                 ))}
               </div>
             </section>
 
-            {/* All Projects Grid */}
+            {/* Upcoming Games */}
             <section>
-              <h2 className="text-2xl font-semibold text-foreground mb-6">All Projects</h2>
+              <h2 className="text-2xl font-semibold text-foreground mb-6">Upcoming Games</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {allProjects.map((game) => (
+                {upcoming.map((game) => (
                   <GameCard key={game.id} game={game} />
                 ))}
               </div>

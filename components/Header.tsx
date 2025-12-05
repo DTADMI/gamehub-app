@@ -2,13 +2,11 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun } from "lucide-react";
+import { LogIn } from "lucide-react";
 import { useFeature } from "@/lib/flags";
+import { ModeToggle } from "@/components/ModeToggle";
 
 export function Header() {
-  const github = process.env.NEXT_PUBLIC_GITHUB_URL ?? "#";
-  const linkedin = process.env.NEXT_PUBLIC_LINKEDIN_URL ?? "#";
-  const email = process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "";
   const showAdmin = useFeature("ADMIN", false);
 
   return (
@@ -30,26 +28,12 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-2">
-          {github && (
-            <Button asChild variant="ghost" size="sm">
-              <a href={github} target="_blank" rel="noopener noreferrer">GitHub</a>
-            </Button>
-          )}
-          {linkedin && (
-            <Button asChild variant="ghost" size="sm">
-              <a href={linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>
-            </Button>
-          )}
-          {email && (
-            <Button asChild variant="outline" size="sm">
-              <a href={`mailto:${email}`}>Email</a>
-            </Button>
-          )}
-
-          <Button variant="ghost" size="icon" aria-label="Toggle theme">
-            <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            <span className="sr-only">Toggle theme</span>
+          <ModeToggle />
+          <Button asChild size="sm" variant="ghost">
+            <Link href="/login" className="flex items-center gap-2">
+              <LogIn className="h-4 w-4" />
+              <span>Sign In</span>
+            </Link>
           </Button>
         </div>
       </div>

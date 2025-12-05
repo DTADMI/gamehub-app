@@ -1,4 +1,4 @@
-// frontend/components/footer.tsx
+// frontend/components/Footer.tsx
 "use client";
 
 import Link from "next/link";

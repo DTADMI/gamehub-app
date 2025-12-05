@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
 import axios from "axios";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface Score {
   id: number;
@@ -20,7 +21,15 @@ export default function LeaderboardPage() {
   const [scores, setScores] = useState<Record<string, Score[]>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const { user } = useAuth();
+  const { status, data } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      const target = encodeURIComponent("/leaderboard");
+      router.push(`/login?callbackUrl=${target}`);
+    }
+  }, [status, router]);
 
   useEffect(() => {
     const fetchScores = async () => {
@@ -49,21 +58,7 @@ export default function LeaderboardPage() {
     return <div className="text-center py-8 text-red-500">{error}</div>;
   }
 
-  type UserWithName = {
-    name?: string;
-    email?: string;
-  };
-
-  // Safely get user identifier
-  const getCurrentIdentifier = (): string => {
-    if (!user) {
-      return "";
-    }
-    const userWithName = user as UserWithName;
-    return (userWithName.email || userWithName.name || "").toLowerCase();
-  };
-
-  const currentIdentifier = getCurrentIdentifier();
+  const currentIdentifier = (data?.user?.email || data?.user?.name || "").toLowerCase();
 
   return (
     <div className="container mx-auto px-4 py-8">
