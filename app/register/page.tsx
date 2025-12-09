@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import {useState} from "react";
 import Link from "next/link";
-import { signIn } from "next-auth/react";
+import {signIn} from "next-auth/react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "http://localhost:3000/api";
 
@@ -10,6 +10,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -17,6 +18,21 @@ export default function RegisterPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    if (password.length < 8) {
+      setLoading(false);
+      setError("Password must be at least 8 characters long.");
+      return;
+    }
+    if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\d/.test(password)) {
+      setLoading(false);
+      setError("Password must include upper, lower case letters and a number.");
+      return;
+    }
+    if (password !== confirm) {
+      setLoading(false);
+      setError("Passwords do not match.");
+      return;
+    }
     try {
       const res = await fetch(`${API_URL}/auth/signup`, {
         method: "POST",
@@ -27,13 +43,8 @@ export default function RegisterPage() {
         const txt = await res.text();
         throw new Error(txt || "Registration failed");
       }
-      // After signup, sign in with credentials
-      const signin = await signIn("credentials", { redirect: false, email, password });
-      if (signin?.ok) {
-        window.location.href = "/games";
-      } else {
-        window.location.href = "/login";
-      }
+      // After signup, sign in with credentials and let NextAuth handle the redirect
+      await signIn("credentials", {redirect: true, email, password, callbackUrl: "/"});
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Registration failed";
       setError(errorMessage);
@@ -49,7 +60,7 @@ export default function RegisterPage() {
         <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
           Sign up to save progress, post scores and access more features.
         </p>
-        <form onSubmit={onSubmit} className="space-y-4">
+        <form onSubmit={onSubmit} className="space-y-4" autoComplete="on">
           <div>
             <label className="block text-sm mb-1 text-gray-700 dark:text-gray-200">Email</label>
             <input
@@ -78,6 +89,16 @@ export default function RegisterPage() {
               required
               type="password"
               className="w-full rounded-md border px-3 py-2 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+          </div>
+          <div>
+            <label className="block text-sm mb-1 text-gray-700 dark:text-gray-200">Confirm Password</label>
+            <input
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+                required
+                type="password"
+                className="w-full rounded-md border px-3 py-2 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
           {error && <p className="text-sm text-red-600">{error}</p>}

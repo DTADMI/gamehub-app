@@ -33,7 +33,6 @@ const games: HomeGame[] = [
     tags: ["JavaScript", "DOM", "Game State"],
     slug: "tetris",
     featured: true,
-    upcoming: true,
   },
   {
     id: 3,

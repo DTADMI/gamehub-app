@@ -1,6 +1,8 @@
-import NextAuth, { NextAuthOptions, Session, User } from "next-auth";
+import NextAuth, {NextAuthOptions, Session, User} from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { JWT } from "next-auth/jwt";
+import GoogleProvider from "next-auth/providers/google";
+import GitHubProvider from "next-auth/providers/github";
+import {JWT} from "next-auth/jwt";
 
 interface AuthUser extends User {
   accessToken?: string;
@@ -34,7 +36,7 @@ interface UserData {
 }
 
 const BACKEND_URL =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "http://localhost:8080/api";
+    process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "http://localhost:3000/api";
 
 function safeJson<T = any>(input: Response | string | null): T | null {
   try {
@@ -56,7 +58,20 @@ function safeJson<T = any>(input: Response | string | null): T | null {
 }
 
 const authOptions: NextAuthOptions = {
+    secret: process.env.NEXTAUTH_SECRET || "dev-secret",
   session: { strategy: "jwt" as const },
+    // Keep cookie settings explicit in dev to avoid host/port mismatches
+    cookies: {
+        sessionToken: {
+            name: process.env.NODE_ENV === "production" ? "__Secure-next-auth.session-token" : "next-auth.session-token",
+            options: {
+                httpOnly: true,
+                sameSite: "lax",
+                path: "/",
+                secure: process.env.NODE_ENV === "production",
+            },
+        },
+    },
   providers: [
     Credentials({
       name: "Credentials",
@@ -72,10 +87,21 @@ const authOptions: NextAuthOptions = {
         try {
           const res = await fetch(`${BACKEND_URL}/auth/login`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(credentials),
+              headers: {
+                  "Content-Type": "application/json",
+                  "Accept": "application/json"
+              },
+              body: JSON.stringify({
+                  email: credentials.email,
+                  password: credentials.password
+              }),
           });
           if (!res.ok) {
+              try {
+                  const errText = await res.text();
+                  console.warn("[auth] login failed", res.status, errText);
+              } catch {
+              }
             return null;
           }
           // Prefer JSON but guard against non-JSON error bodies
@@ -84,6 +110,7 @@ const authOptions: NextAuthOptions = {
             return null;
           }
         } catch {
+            console.error("[auth] /auth/login network error");
           return null;
         }
 
@@ -114,8 +141,39 @@ const authOptions: NextAuthOptions = {
         } as AuthUser;
       },
     }),
+      // Optional OAuth providers (enabled only if env vars are present)
+      ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+          ? [
+              GoogleProvider({
+                  clientId: process.env.GOOGLE_CLIENT_ID!,
+                  clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+              }),
+          ]
+          : []),
+      ...(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET
+          ? [
+              GitHubProvider({
+                  clientId: process.env.GITHUB_CLIENT_ID!,
+                  clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+              }),
+          ]
+          : []),
   ],
   callbacks: {
+      // Prevent redirects to external origins (e.g., backend) — always bring back to frontend base URL.
+      async redirect({url, baseUrl}) {
+          // Always redirect to the frontend origin (NEXTAUTH_URL or computed baseUrl)
+          const frontendBase = (process.env.NEXTAUTH_URL || baseUrl).replace(/\/$/, "");
+          try {
+              // Normalize incoming url to a URL object using frontendBase as base
+              const normalized = new URL(url, `${frontendBase}/`);
+              const targetPath = normalized.pathname + normalized.search + normalized.hash;
+              // Only ever return same-origin URLs
+              return `${frontendBase}${targetPath}`;
+          } catch {
+              return frontendBase;
+          }
+      },
     async jwt({ token, user }) {
       const authToken = token as AuthToken;
 

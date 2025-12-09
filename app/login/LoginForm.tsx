@@ -1,14 +1,14 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Icons } from "@/components/icons";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useToast } from "@/components/ui/use-toast";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {Icons} from "@/components/icons";
+import {useRouter, useSearchParams} from "next/navigation";
+import {useToast} from "@/components/ui/use-toast";
 
-import { signIn } from "next-auth/react";
-import { useState } from "react";
+import {signIn} from "next-auth/react";
+import {useState} from "react";
 import Link from "next/link";
 
 export default function LoginForm() {
@@ -19,7 +19,9 @@ export default function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
+    // Sanitize callbackUrl: enforce same-origin relative path to avoid cross-origin redirects
+    const rawCb = searchParams.get("callbackUrl") || "/";
+    const callbackUrl = rawCb.startsWith("/") ? rawCb : "/";
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,17 +30,12 @@ export default function LoginForm() {
 
     try {
       const result = await signIn("credentials", {
-        redirect: false,
+          redirect: true,
         email,
         password,
         callbackUrl,
       });
-
-      if (result?.error) {
-        setError(result?.error || "Invalid credentials");
-      }
-
-      router.push(callbackUrl);
+        // When redirect=true NextAuth will navigate; no manual push required
     } catch (error) {
       toast({
         title: "Error",
@@ -51,9 +48,9 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="container flex h-[calc(100vh-4rem)] flex-col items-center justify-center">
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-10">
-        <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border border-gray-100 dark:border-gray-700">
+          <div
+              className="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border border-gray-100 dark:border-gray-700">
           <h1 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">Welcome back</h1>
           <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
             Sign in to track scores, compete on leaderboards, and unlock extra features.
@@ -151,6 +148,14 @@ export default function LoginForm() {
               type="button"
               disabled={loading}
               className="border-gray-300 dark:border-gray-600"
+              onClick={async () => {
+                  setLoading(true);
+                  try {
+                      await signIn("google", {callbackUrl});
+                  } finally {
+                      setLoading(false);
+                  }
+              }}
             >
               {loading ? (
                 <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
@@ -164,6 +169,14 @@ export default function LoginForm() {
               type="button"
               disabled={loading}
               className="border-gray-300 dark:border-gray-600"
+              onClick={async () => {
+                  setLoading(true);
+                  try {
+                      await signIn("github", {callbackUrl});
+                  } finally {
+                      setLoading(false);
+                  }
+              }}
             >
               {loading ? (
                 <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
@@ -191,7 +204,6 @@ export default function LoginForm() {
               Play as guest
             </Link>
           </div>
-        </div>
       </div>
     </div>
   );

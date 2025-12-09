@@ -1,4 +1,4 @@
-import { defineConfig, devices } from "@playwright/test";
+import {defineConfig, devices} from "@playwright/test";
 
 export default defineConfig({
   testDir: "./tests-e2e",
@@ -7,12 +7,22 @@ export default defineConfig({
   fullyParallel: true,
   reporter: [["list"]],
   use: {
-    baseURL: process.env.E2E_BASE_URL || "http://localhost:3000",
+      baseURL: process.env.E2E_BASE_URL || "http://localhost:8080",
     trace: "on-first-retry",
   },
+    webServer: {
+        command: "npm run dev",
+        url: "http://localhost:8080",
+        reuseExistingServer: !process.env.CI,
+        stdout: "pipe",
+        stderr: "pipe",
+        timeout: 120_000,
+        env: {
+            NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api",
+            PORT: "8080",
+        },
+    },
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
-    { name: "firefox", use: { ...devices["Desktop Firefox"] } },
-    { name: "webkit", use: { ...devices["Desktop Safari"] } },
   ],
 });

@@ -30,7 +30,7 @@ Table of contents
 1) Prerequisites
 
 - Node.js 20+
-- npm (or pnpm/yarn, but examples use npm)
+- pnpm (recommended; Corepack can enable it automatically) or npm
 - Docker and `gcloud` CLI (for Cloud Run)
 - A Google Cloud project with Artifact Registry and Cloud Run enabled
 
@@ -55,8 +55,8 @@ Notes:
 Install and run the frontend on port 8080:
 
 ```
-npm install
-npm run dev
+pnpm i
+pnpm dev
 # → http://localhost:8080
 ```
 
@@ -77,16 +77,44 @@ We include Playwright in devDependencies and a smoke test suite that:
 Run e2e tests:
 
 ```
-npx playwright install --with-deps
-npm run test:e2e
+pnpm exec playwright install --with-deps
+pnpm test:e2e
 ```
 
 5) Build & production run
 
 ```
-npm run build
-npm start  # starts on port 8080
+pnpm build
+pnpm start  # starts on port 8080
 ```
+
+### Game controls (quick reference)
+
+- Snake: Arrows to move; Space to pause/resume; Space after Game Over to restart.
+- Breakout: Move with mouse or arrows; Space to pause/resume.
+- Tetris: Arrows to move; Up to rotate; Space may drop/pause depending on variant.
+- Block‑Blast: Click a rack piece, then click a cell to place; clear rows/cols for points.
+- Memory: Click cards to match pairs.
+- Checkers/Chess: Click a piece, then the target square; follow legal moves.
+- Platformer: WASD/Arrows to move; Space to jump.
+- Tower‑Defense: Click to place towers; defend the path.
+- Knitzy: Mouse interactions per puzzle; follow on‑screen hints.
+
+All games use a focusable application region and shared key capture so Space/Arrows never scroll the page.
+
+### Feature flags (Explore examples)
+
+These can be set in `.env.local` (or Cloud Run service env):
+
+```
+NEXT_PUBLIC_FEATURE_EXPLORE_CAROUSELS=true
+NEXT_PUBLIC_FEATURE_EXPLORE_SHOW_FEATURED=true
+NEXT_PUBLIC_FEATURE_EXPLORE_SHOW_UPCOMING=true
+NEXT_PUBLIC_FEATURE_EXPLORE_SHOW_PROJECTS_FEATURED=true
+NEXT_PUBLIC_FEATURE_EXPLORE_SHOW_PROJECTS_COMING_SOON=true
+```
+
+Set a flag to `false` to hide that section or disable carousels (grids will be used instead).
 
 6) Deploy to Google Cloud Run (manual)
 

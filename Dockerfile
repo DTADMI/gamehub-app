@@ -1,56 +1,31 @@
-# Development stage
-FROM oven/bun:1.1.20-alpine AS development
+# Multi-stage Dockerfile using Node + pnpm for Next.js 16
 
+FROM node:20-alpine AS deps
 WORKDIR /app
+# Enable Corepack and prepare pnpm
+RUN corepack enable && corepack prepare pnpm@10.24.0 --activate
+COPY package.json pnpm-lock.yaml* ./
+RUN pnpm i --frozen-lockfile
 
-# Copy source code first so we can conditionally use a lockfile if present
+FROM node:20-alpine AS builder
+WORKDIR /app
+RUN corepack enable && corepack prepare pnpm@10.24.0 --activate
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+ENV NEXT_TELEMETRY_DISABLED=1
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+RUN pnpm build
 
-# Install dependencies
-# If bun.lockb exists in the context, use it with --frozen-lockfile; otherwise do a best-effort install
-RUN if [ -f bun.lockb ]; then \
-      echo "Using bun.lockb for deterministic install"; \
-      bun install --frozen-lockfile; \
-    else \
-      echo "bun.lockb not found; running non-frozen install (consider committing frontend/bun.lockb)"; \
-      bun install; \
-    fi
-
-# Expose port
-EXPOSE 8080
-
-# Start development server
-CMD ["bun", "run", "dev"]
-
-# Production stage
-FROM oven/bun:1.1.20-alpine AS production
-
+FROM node:20-alpine AS runner
 WORKDIR /app
-
-# Set environment variables
 ENV NODE_ENV=production
-ENV PORT=8080
-
-# Copy package files first for better layer caching
-COPY package.json bun.lock* ./
-
-# Install production dependencies only
-RUN if [ -f bun.lock ]; then \
-      echo "Using bun.lock for deterministic install"; \
-      bun install --frozen-lockfile --production; \
-    else \
-      echo "bun.lock not found; running non-frozen install"; \
-      bun install --production; \
-    fi
-
-# Copy the rest of the application
-COPY . .
-
-# Build the application
-RUN bun run build
-
-# Expose port
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN adduser -D nextjs
+USER nextjs
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/node_modules ./node_modules
 EXPOSE 8080
-
-# Start production server
-CMD ["bun", "run", "start", "--hostname", "0.0.0.0", "--port", "8080"]
+CMD ["node", "./node_modules/next/dist/bin/next", "start", "-p", "8080"]
