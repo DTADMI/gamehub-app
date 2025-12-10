@@ -7,19 +7,19 @@ export default defineConfig({
   fullyParallel: true,
   reporter: [["list"]],
   use: {
-      baseURL: process.env.E2E_BASE_URL || "http://localhost:8080",
+      baseURL: process.env.E2E_BASE_URL || "http://localhost:3000",
     trace: "on-first-retry",
   },
     webServer: {
         command: "npm run dev",
-        url: "http://localhost:8080",
+        url: "http://localhost:3000",
         reuseExistingServer: !process.env.CI,
         stdout: "pipe",
         stderr: "pipe",
         timeout: 120_000,
         env: {
-            NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api",
-            PORT: "8080",
+            NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api",
+            PORT: "3000",
         },
     },
   projects: [

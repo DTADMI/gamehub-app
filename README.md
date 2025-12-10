@@ -8,8 +8,8 @@ GitHub Actions. It also documents the technological choices and trade‑offs mad
 
 Important defaults used here:
 
-- Backend listens on port 3000 locally.
-- Frontend listens on port 8080 locally.
+- Backend listens on port 8080 locally.
+- Frontend listens on port 3000 locally.
 
 — — —
 
@@ -52,12 +52,12 @@ Notes:
 
 3) Local development
 
-Install and run the frontend on port 8080:
+Install and run the frontend on port 3000:
 
 ```
 pnpm i
 pnpm dev
-# → http://localhost:8080
+# → http://localhost:3000
 ```
 
 Point it to a running backend (port 3000 preferred):
@@ -85,7 +85,7 @@ pnpm test:e2e
 
 ```
 pnpm build
-pnpm start  # starts on port 8080
+pnpm start  # starts on port 3000
 ```
 
 ### Game controls (quick reference)
@@ -139,7 +139,7 @@ gcloud run deploy gamehub \
   --region=$REGION \
   --platform=managed \
   --allow-unauthenticated \
-  --port=8080 \
+  --port=3000 \
   --set-env-vars=NEXT_PUBLIC_API_URL=https://<your-backend-domain>/api
 ```
 
@@ -188,8 +188,8 @@ Alternatives considered:
 - 404 importing `@games/*`
     - Check `tsconfig.json` `paths` and `next.config.ts` webpack aliases. Games live under `games/<id>/src`.
 - Cloud Run shows a 404 on nested routes
-    - Ensure the container serves on `PORT=8080` and that you haven’t configured a basePath/assetPrefix incorrectly.
-      This repo serves with `next start -p 8080`.
+    - Ensure the container serves on `PORT=3000` and that you haven’t configured a basePath/assetPrefix incorrectly.
+      This repo serves with `next start -p 3000`.
 
 Deploy to Cloud Run:
 
@@ -218,12 +218,12 @@ NEXT_FIREBASE_CREDS_CLIENT_X509_CERT_URL=NEXT_FIREBASE_CREDS_CLIENT_X509_CERT_UR
 NEXT_FIREBASE_CREDS_UNIVERSE_DOMAIN=NEXT_FIREBASE_CREDS_UNIVERSE_DOMAIN:latest"
 
 # Frontend (SSR)
-# Next.js listens on PORT provided by Cloud Run; we deploy the service listening on 8080.
-gcloud run deploy games-frontend \
+# Next.js listens on PORT provided by Cloud Run; we deploy the service listening on 3000.
+gcloud run deploy gamehub-app \
   --region=$REGION \
-  --image=${REGION}-docker.pkg.dev/${PROJECT}/games/games-frontend:${SHA} \
+  --image=${REGION}-docker.pkg.dev/${PROJECT}/gamehub/gamehub-app:${SHA} \
   --allow-unauthenticated \
-  --port=8080 \
+  --port=3000 \
   --set-env-vars NEXT_PUBLIC_API_URL=https://<backend-domain>/api
 ```
 
@@ -247,17 +247,17 @@ PROJECT=<your-project>
 SHA=$(git rev-parse --short HEAD)
 
 docker build \
-  -t ${REGION}-docker.pkg.dev/${PROJECT}/games/games-frontend:${SHA} \
-  -f frontend/Dockerfile.monorepo \
+  -t ${REGION}-docker.pkg.dev/${PROJECT}/gamehub/gamehub-app:${SHA} \
+  -f frontend/Dockerfile \
   .
 
-docker push ${REGION}-docker.pkg.dev/${PROJECT}/games/games-frontend:${SHA}
+docker push ${REGION}-docker.pkg.dev/${PROJECT}/gamehub/gamehub-app:${SHA}
 
-gcloud run deploy games-frontend \
+gcloud run deploy gamehub-app \
   --region=$REGION \
-  --image=${REGION}-docker.pkg.dev/${PROJECT}/games/games-frontend:${SHA} \
+  --image=${REGION}-docker.pkg.dev/${PROJECT}/gamehub/gamehub-app:${SHA} \
   --allow-unauthenticated \
-  --port=8080 \
+  --port=3000 \
   --set-env-vars NEXT_PUBLIC_API_URL=https://<backend-domain>/api
 ```
 
@@ -268,24 +268,24 @@ Notes:
 - The existing `frontend/Dockerfile` remains useful for local iteration when you copy or publish dependencies into the
   frontend, but for the current monorepo layout prefer `frontend/Dockerfile.monorepo`.
 
-#### Troubleshooting: Cloud Run container didn’t listen on the expected port (frontend 8080)
+#### Troubleshooting: Cloud Run container didn’t listen on the expected port (frontend 3000)
 
 Next.js `next start` listens on port 3000 by default. Cloud Run health checks expect your container to listen on the
-port provided in the `PORT` environment variable (we deploy the frontend on 8080). You can fix this in one of two ways:
+port provided in the `PORT` environment variable (we deploy the frontend on 3000). You can fix this in one of two ways:
 
-- Easiest: deploy the frontend with `--port=8080` (as shown above) so Cloud Run targets 8080 for health checks and
+- Easiest: deploy the frontend with `--port=3000` (as shown above) so Cloud Run targets 3000 for health checks and
   traffic.
 - Alternatively: change the frontend start script to bind to the `PORT` env automatically so no `--port` flag is needed:
 
   ```json
   {
     "scripts": {
-      "start": "next start -p ${PORT:-8080}"
+      "start": "next start -p ${PORT:-3000}"
     }
   }
   ```
 
-With the script change, Cloud Run will set `PORT` and the app will listen on it (8080 in our deployment).
+With the script change, Cloud Run will set `PORT` and the app will listen on it (3000 in our deployment).
 
 ---
 
@@ -394,8 +394,8 @@ curl -sS "$SERVICE_URL/actuator/health"
 
 - Repository secrets (Settings → Secrets and variables → Actions):
     - `GCP_PROJECT_ID`, `GCP_REGION`, `GCP_SA_KEY` (JSON). Prefer WIF for keyless in production.
-    - Optional variables: `AR_REPO` (default `games`), `BACKEND_SERVICE` (default `games-backend`), `FRONTEND_SERVICE` (
-      default `games-frontend`), `NEXT_PUBLIC_API_URL`.
+  - Optional variables: `AR_REPO` (default `gamehub`), `BACKEND_SERVICE` (default `gamehub-api`), `FRONTEND_SERVICE` (
+    default `gamehub-app`), `NEXT_PUBLIC_API_URL`.
 - The workflow `.github/workflows/ci-cd.yml` builds images, pushes to AR, and deploys to Cloud Run on pushes to `main`
   when secrets exist.
 
@@ -559,10 +559,10 @@ Build and push (Artifact Registry):
 
 ```
 docker build --no-cache \
-  -t ${REGION}-docker.pkg.dev/${PROJECT}/games/games-frontend:${SHA} \
-  -f frontend/Dockerfile.monorepo .
+  -t ${REGION}-docker.pkg.dev/${PROJECT}/gamehub/gamehub-app:${SHA} \
+  -f frontend/Dockerfile .
 
-docker push ${REGION}-docker.pkg.dev/${PROJECT}/games/games-frontend:${SHA}
+docker push ${REGION}-docker.pkg.dev/${PROJECT}/gamehub/gamehub-app:${SHA}
 ```
 
 Deploy to Cloud Run:
@@ -570,9 +570,9 @@ Deploy to Cloud Run:
 ```
 gcloud run deploy ${SERVICE_FRONT} \
   --region=${REGION} \
-  --image=${REGION}-docker.pkg.dev/${PROJECT}/games/games-frontend:${SHA} \
+  --image=${REGION}-docker.pkg.dev/${PROJECT}/gamehub/gamehub-app:${SHA} \
   --allow-unauthenticated \
-  --port=8080 \
+  --port=3000 \
   --set-env-vars NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 ```
 
@@ -590,7 +590,7 @@ Troubleshooting (frontend):
   `[launcher]` messages:
     - `Found standalone entry: ...` → standalone startup.
     - `Falling back to Next CLI from: ...` → `next start` fallback.
-- Verify you deployed the frontend with `--port=8080` and that `NEXT_PUBLIC_API_URL` points at a reachable backend URL (
+- Verify you deployed the frontend with `--port=3000` and that `NEXT_PUBLIC_API_URL` points at a reachable backend URL (
   ending with `/api`).
 - Ensure you built from the repository root; otherwise, the monorepo workspaces won’t resolve.
 
@@ -600,15 +600,15 @@ This repo ships a single workflow at `.github/workflows/ci-cd.yml` which:
 
 - Runs backend tests (Maven) and frontend lint/tests/build
 - Builds and pushes images to Artifact Registry
-- Deploys `games-backend` and `games-frontend` to Cloud Run
+- Deploys `gamehub-api` and `gamehub-app` to Cloud Run
 
 Provide these repository variables and secrets:
 
 - Secrets: `GCP_PROJECT_ID`, `GCP_REGION`, `GCP_SA_KEY` (JSON), and DB secret names used in the backend deploy step
-- Vars: `AR_REPO=games`, `BACKEND_SERVICE=games-backend`, `FRONTEND_SERVICE=games-frontend`,
-  `NEXT_PUBLIC_API_URL=https://games-backend-245231653364.northamerica-northeast1.run.app/api`
+- Vars: `AR_REPO=gamehub`, `BACKEND_SERVICE=gamehub-api`, `FRONTEND_SERVICE=gamehub-app`,
+  `NEXT_PUBLIC_API_URL=https://gamehub-api-245231653364.northamerica-northeast1.run.app/api`
 
-On a push to `main`, the workflow will build, push, and deploy. The frontend step sets `--port=8080` and passes
+On a push to `main`, the workflow will build, push, and deploy. The frontend step sets `--port=3000` and passes
 `NEXT_PUBLIC_API_URL` to the container.
 
 ## Testing (frontend)
