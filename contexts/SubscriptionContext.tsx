@@ -2,13 +2,11 @@
 
 import React, {createContext, useCallback, useContext, useEffect, useMemo, useState} from "react";
 import {useAuth} from "@/contexts/AuthContext";
-import {gqlFetch} from "@/lib/graphql/client";
-
-export type Plan = "FREE" | "WEEKLY" | "MONTHLY" | "YEARLY" | "LIFETIME";
+import {fetchViewer, type Plan} from "@/lib/graphql/queries";
 
 type Subscription = {
     id: string;
-    plan: Plan;
+    plan: Plan; // FREE | PRO
     status: string; // active, past_due, canceled
     currentPeriodEnd?: string;
 };
@@ -48,25 +46,19 @@ export function SubscriptionProvider({children}: { children: React.ReactNode }) 
         }
         setLoading(true);
         try {
-            // Temporary GraphQL query until backend exposes viewer.subscription/premium
-            const data = await gqlFetch<{ userStats: { totalGames: number } }>({
-                // noop query to verify connectivity; replace with viewerSubscription when available
-                query: `query Ping($gameType: String!) { userStats(userId: "me", gameType: $gameType) { totalGames } }`,
-                variables: {gameType: "snake"},
-            }).catch(() => ({userStats: {totalGames: 0}} as any));
-
-            // For now, derive FREE plan; to be replaced by real viewer.subscription
-            const derived: Subscription = {
-                id: user.uid,
-                plan: "FREE",
-                status: "active",
-            };
-            setSubscription(derived);
-            setEntitlements({
-                advancedLeaderboards: derived.plan !== "FREE",
-                cosmetics: derived.plan !== "FREE",
-                earlyAccess: derived.plan !== "FREE",
-            });
+            const data = await fetchViewer();
+            const v = data.viewer;
+            if (v && v.subscription) {
+                setSubscription({
+                    id: v.subscription.id,
+                    plan: v.subscription.plan,
+                    status: v.subscription.status,
+                    currentPeriodEnd: v.subscription.currentPeriodEnd,
+                });
+            } else {
+                setSubscription(null);
+            }
+            setEntitlements(v?.premium ?? defaultEntitlements);
         } finally {
             setLoading(false);
         }
