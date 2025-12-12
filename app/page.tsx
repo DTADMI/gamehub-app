@@ -3,6 +3,7 @@ import {Button} from "@/components/ui/button";
 import Link from "next/link";
 import {ExternalLink} from "lucide-react";
 import {Carousel} from "@/components/Carousel";
+import {GAMES} from "@/lib/games";
 
 type HomeGame = {
   id: number;
@@ -15,65 +16,16 @@ type HomeGame = {
   upcoming?: boolean;
 };
 
-const games: HomeGame[] = [
-  {
-    id: 1,
-    title: "Snake Game",
-    description: "Classic snake game with modern twist and smooth animations",
-    image: "/retro-snake-game-with-neon-colors.jpg",
-    tags: ["Canvas", "Game Logic", "Animation"],
-    slug: "snake",
-    featured: true,
-  },
-  {
-    id: 2,
-    title: "Tetris Clone",
-    description: "Full-featured Tetris implementation with scoring and levels",
-    image: "/colorful-tetris-blocks-falling.jpg",
-    tags: ["JavaScript", "DOM", "Game State"],
-    slug: "tetris",
-    featured: true,
-  },
-  {
-    id: 3,
-    title: "Memory Card Game",
-    description: "Interactive memory game with multiple difficulty levels",
-    image: "/colorful-memory-cards-game-interface.jpg",
-    tags: ["React", "State Management", "Animation"],
-    slug: "memory",
-    featured: false,
-    upcoming: true,
-  },
-  {
-    id: 4,
-    title: "Breakout Game",
-    description: "Classic brick-breaking game with power-ups and effects",
-    image: "/breakout-game-with-paddle-and-colorful-bricks.jpg",
-    tags: ["Canvas", "Physics", "Collision Detection"],
-    slug: "breakout",
-    featured: false,
-  },
-  {
-    id: 5,
-    title: "Puzzle Platformer",
-    description: "2D platformer with physics-based puzzles and smooth controls",
-    image: "/2d-platformer-game-with-character-and-obstacles.jpg",
-    tags: ["Game Engine", "Physics", "Level Design"],
-    slug: "platformer",
-    featured: false,
-    upcoming: true,
-  },
-  {
-    id: 6,
-    title: "Tower Defense",
-    description: "Strategic tower defense game with multiple tower types",
-    image: "/tower-defense-game-with-towers-and-enemies.jpg",
-    tags: ["Strategy", "Pathfinding", "Game Balance"],
-    slug: "tower-defense",
-    featured: false,
-    upcoming: true,
-  },
-];
+const games: HomeGame[] = GAMES.map((g, idx) => ({
+    id: idx + 1,
+    title: g.title,
+    description: g.description,
+    image: g.image,
+    tags: g.tags,
+    slug: g.id,
+    featured: !!g.featured,
+    upcoming: !!g.comingSoon,
+}));
 
 export default function HomePage() {
   const featured = games.filter((g) => g.featured);

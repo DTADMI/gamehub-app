@@ -2,112 +2,10 @@
 "use client";
 
 import dynamic from "next/dynamic";
-
-// Define the game type
-type Game = {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-  tags: string[];
-  featured?: boolean;
-  comingSoon?: boolean;
-};
-
-// Define the games data
-const GAMES: Game[] = [
-  {
-    id: "snake",
-    title: "Snake Game",
-    description: "Classic snake game with modern twist and smooth animations",
-    image: "/images/games/snake-preview.jpg",
-    tags: ["Classic", "Arcade"],
-    featured: true,
-  },
-  {
-    id: "memory",
-    title: "Memory Card Game",
-    description: "Test your memory with this fun card matching game",
-    image: "/images/games/memory-preview.jpg",
-    tags: ["Puzzle", "Memory"],
-    featured: true,
-  },
-  {
-    id: "breakout",
-    title: "Breakout",
-    description: "Break all the bricks with the ball and avoid missing it",
-    image: "/images/games/breakout-preview.jpg",
-    tags: ["Arcade", "Action"],
-    featured: true,
-  },
-  {
-    id: "tetris",
-    title: "Tetris",
-    description: "Classic tile-matching puzzle game",
-    image: "/images/games/tetris-preview.jpg",
-    tags: ["Puzzle", "Arcade"],
-      // Playable now
-      comingSoon: false,
-  },
-    {
-        id: "block-blast",
-        title: "Block‑Blast",
-        description: "Place pieces to clear rows and columns for points.",
-        image: "/images/games/block-blast-preview.jpg",
-        tags: ["Puzzle", "Strategy"],
-    },
-    {
-        id: "bubble-pop",
-        title: "Bubble Pop",
-        description: "Pop groups of bubbles – casual and colorful.",
-        image: "/images/games/bubble-pop-preview.jpg",
-        tags: ["Casual", "Arcade"],
-        comingSoon: false,
-    },
-    {
-        id: "checkers",
-        title: "Checkers",
-        description: "Classic board strategy head‑to‑head.",
-        image: "/images/games/checkers-preview.jpg",
-        tags: ["Board", "Strategy"],
-        comingSoon: false,
-    },
-    {
-        id: "chess",
-        title: "Chess",
-        description: "Timeless strategy classic.",
-        image: "/images/games/chess-preview.jpg",
-        tags: ["Board", "Strategy"],
-        comingSoon: false,
-    },
-    {
-        id: "knitzy",
-        title: "Knitzy",
-        description: "Cozy puzzle interactions.",
-        image: "/images/games/knitzy-preview.jpg",
-        tags: ["Puzzle", "Casual"],
-        comingSoon: false,
-  },
-  {
-    id: "platformer",
-    title: "Puzzle Platformer",
-    description: "2D platformer with challenging puzzles",
-    image: "/images/games/platformer-preview.jpg",
-    tags: ["Platformer", "Puzzle", "Adventure"],
-    comingSoon: true,
-  },
-  {
-    id: "tower-defense",
-    title: "Tower Defense",
-    description: "Strategic tower defense game",
-    image: "/images/games/tower-defense-preview.jpg",
-    tags: ["Strategy", "Tactical", "Single Player"],
-    comingSoon: true,
-  },
-];
+import {type Game as CatalogGame, GAMES} from "@/lib/games";
 
 // Dynamically import the GamesList component with SSR disabled
-const GamesList = dynamic<{ games: Game[] }>(() => import("@/components/games/GamesList"), {
+const GamesList = dynamic<{ games: CatalogGame[] }>(() => import("@/components/games/GamesList"), {
   ssr: false,
   loading: () => (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
@@ -119,7 +17,6 @@ const GamesList = dynamic<{ games: Game[] }>(() => import("@/components/games/Ga
   ),
 });
 
-// This is a client-side only page component
 export default function GamesPage() {
   return <GamesList games={GAMES} />;
 }

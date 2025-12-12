@@ -7,6 +7,7 @@ import {Button} from "@/components/ui/button";
 import {FolderKanban, Gamepad2} from "lucide-react";
 import {Carousel} from "@/components/Carousel";
 import {useFeature} from "@/lib/flags";
+import {GAMES} from "@/lib/games";
 
 type Game = {
   id: number;
@@ -19,34 +20,16 @@ type Game = {
   featured?: boolean;
 };
 
-const ALL_GAMES: Game[] = [
-  {
-    id: 1,
-    title: "Snake Game",
-    description: "Classic snake with smooth controls.",
-    image: "/retro-snake-game-with-neon-colors.jpg",
-    tags: ["Canvas", "Arcade"],
-    slug: "snake",
-    featured: true,
-  },
-  {
-    id: 2,
-    title: "Breakout",
-    description: "Brick breaker with power-ups.",
-    image: "/breakout-game-with-paddle-and-colorful-bricks.jpg",
-    tags: ["Canvas", "Physics"],
-    slug: "breakout",
-  },
-  {
-    id: 3,
-    title: "Tetris",
-    description: "Tile-matching classic.",
-    image: "/colorful-tetris-blocks-falling.jpg",
-    tags: ["Puzzle"],
-    slug: "tetris",
-    upcoming: true,
-  },
-];
+const ALL_GAMES: Game[] = GAMES.map((g, idx) => ({
+  id: idx + 1,
+  title: g.title,
+  description: g.description,
+  image: g.image,
+  tags: g.tags,
+  slug: g.id,
+  upcoming: !!g.comingSoon,
+  featured: !!g.featured,
+}));
 
 type Project = {
   title: string;
