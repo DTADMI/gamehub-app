@@ -1,8 +1,11 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import {useEffect, useRef} from "react";
-import {enableGameKeyCapture} from "@games/shared";
+import {useEffect} from "react";
+import {GameShell} from "@/components/games/GameShell";
+import MiniBoard from "@/components/leaderboards/MiniBoard";
+import {submitScore} from "@/lib/graphql/queries";
+import {useAuth} from "@/contexts/AuthContext";
 
 const BubblePopGame = dynamic(() => import("@games/bubble-pop").then((m) => m.BubblePopGame), {
   ssr: false,
@@ -14,24 +17,34 @@ const BubblePopGame = dynamic(() => import("@games/bubble-pop").then((m) => m.Bu
 });
 
 export default function BubblePopPage() {
-    const rootRef = useRef<HTMLDivElement | null>(null);
+    const {user} = useAuth();
 
     useEffect(() => {
-        const el = rootRef.current;
-        el?.focus();
-        const cleanup = enableGameKeyCapture({rootEl: el ?? undefined});
-        return () => cleanup();
-    }, []);
+        const handler = async (e: Event) => {
+            const detail = (e as CustomEvent).detail as { score?: number } | undefined;
+            const score = detail?.score ?? 0;
+            if (user && score > 0) {
+                try {
+                    await submitScore({gameType: "BUBBLE_POP", score, metadata: {client: "web"}});
+                } catch (err) {
+                    console.warn("submitScore failed (BUBBLE_POP)", err);
+                }
+            }
+        };
+        window.addEventListener("bubble-pop:gameover", handler as EventListener);
+        window.addEventListener("game:gameover", handler as EventListener);
+        return () => {
+            window.removeEventListener("bubble-pop:gameover", handler as EventListener);
+            window.removeEventListener("game:gameover", handler as EventListener);
+        };
+    }, [user]);
 
     return (
-        <div
-            ref={rootRef}
-            className="relative min-h-[80vh] outline-none focus:outline-none"
-            tabIndex={0}
-            role="application"
-            aria-label="Bubble Pop game"
-        >
+        <GameShell ariaLabel="Bubble Pop game" tips="Click or tap to pop bubbles — chain pops for higher scores">
             <BubblePopGame/>
-        </div>
+            <div className="px-4">
+                <MiniBoard gameType="BUBBLE_POP" limit={10}/>
+            </div>
+        </GameShell>
     );
 }

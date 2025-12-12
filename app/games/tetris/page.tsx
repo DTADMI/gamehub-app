@@ -1,8 +1,11 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import {useEffect, useRef, useState} from "react";
-import {enableGameKeyCapture, GameHUD} from "@games/shared";
+import {useEffect, useState} from "react";
+import {GameShell} from "@/components/games/GameShell";
+import MiniBoard from "@/components/leaderboards/MiniBoard";
+import {submitScore} from "@/lib/graphql/queries";
+import {useAuth} from "@/contexts/AuthContext";
 
 const TetrisGame = dynamic(() => import("@games/tetris").then((m) => m.TetrisGame), {
   ssr: false,
@@ -14,32 +17,47 @@ const TetrisGame = dynamic(() => import("@games/tetris").then((m) => m.TetrisGam
 });
 
 export default function TetrisGamePage() {
-    const rootRef = useRef<HTMLDivElement | null>(null);
     const [seed, setSeed] = useState(0);
+    const {user} = useAuth();
 
     useEffect(() => {
-        const el = rootRef.current;
-        el?.focus();
-        const cleanup = enableGameKeyCapture({rootEl: el ?? undefined});
-        return () => cleanup();
-    }, []);
+        const handler = async (e: Event) => {
+            const detail = (e as CustomEvent).detail as { score?: number } | undefined;
+            const score = detail?.score ?? 0;
+            if (user && score > 0) {
+                try {
+                    await submitScore({gameType: "TETRIS", score, metadata: {client: "web"}});
+                } catch (err) {
+                    console.warn("submitScore failed (TETRIS)", err);
+                }
+            }
+        };
+        window.addEventListener("tetris:gameover", handler as EventListener);
+        window.addEventListener("game:gameover", handler as EventListener);
+        return () => {
+            window.removeEventListener("tetris:gameover", handler as EventListener);
+            window.removeEventListener("game:gameover", handler as EventListener);
+        };
+    }, [user]);
 
     return (
-        <div
-            ref={rootRef}
-            className="relative min-h-[80vh] outline-none focus:outline-none"
-            tabIndex={0}
-            role="application"
-            aria-label="Tetris game"
+        <GameShell
+            ariaLabel="Tetris game"
+            tips="Arrows to move • Up to rotate • Space to drop/pause"
+            onRestart={() => setSeed((s) => s + 1)}
+            preloadSounds={[
+                {key: "line", url: "/sounds/line.mp3"},
+                {key: "move", url: "/sounds/move.mp3"},
+                {key: "rotate", url: "/sounds/rotate.mp3"},
+                {key: "drop", url: "/sounds/drop.mp3"},
+                {key: "gameOver", url: "/sounds/game-over.mp3"},
+                {key: "background", url: "/sounds/tetris-bg.mp3", loop: true},
+            ]}
         >
             <TetrisGame key={seed}/>
-            <GameHUD
-                onPauseToggle={() => {
-                    window.dispatchEvent(new KeyboardEvent("keydown", {key: " ", code: "Space"}));
-                }}
-                onRestart={() => setSeed((s) => s + 1)}
-                tips="Arrows to move • Up to rotate • Space to drop/pause (game dependent)"
-            />
-        </div>
+            <div className="px-4">
+                <MiniBoard gameType="TETRIS" limit={10}/>
+            </div>
+        </GameShell>
     );
 }

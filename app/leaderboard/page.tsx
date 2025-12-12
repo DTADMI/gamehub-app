@@ -91,18 +91,25 @@ export default function LeaderboardPage() {
             <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">Window:</span>
                 <button className="px-2 py-1 text-sm rounded bg-primary text-primary-foreground">All‑time</button>
-                <button
-                    className={`px-2 py-1 text-sm rounded ${entitlements.advancedLeaderboards ? "bg-muted" : "bg-muted text-muted-foreground cursor-not-allowed"}`}
-                    title={entitlements.advancedLeaderboards ? "Coming soon" : "Subscriber only"}
-                >
-                    Weekly
-                </button>
-                <button
-                    className={`px-2 py-1 text-sm rounded ${entitlements.advancedLeaderboards ? "bg-muted" : "bg-muted text-muted-foreground cursor-not-allowed"}`}
-                    title={entitlements.advancedLeaderboards ? "Coming soon" : "Subscriber only"}
-                >
-                    Monthly
-                </button>
+                {entitlements.advancedLeaderboards ? (
+                    <>
+                        <button className="px-2 py-1 text-sm rounded bg-muted" title="Coming soon">Weekly</button>
+                        <button className="px-2 py-1 text-sm rounded bg-muted" title="Coming soon">Monthly</button>
+                    </>
+                ) : (
+                    <>
+                        <a href="/account/subscribe"
+                           className="px-2 py-1 text-sm rounded bg-muted text-muted-foreground hover:text-foreground"
+                           title="Subscriber only — Upgrade">
+                            Weekly (Pro)
+                        </a>
+                        <a href="/account/subscribe"
+                           className="px-2 py-1 text-sm rounded bg-muted text-muted-foreground hover:text-foreground"
+                           title="Subscriber only — Upgrade">
+                            Monthly (Pro)
+                        </a>
+                    </>
+                )}
             </div>
         </div>
 

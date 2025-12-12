@@ -63,3 +63,26 @@ export async function submitScore(params: {
         variables: {input: params},
     });
 }
+
+// Payments: create checkout session (Stripe, test mode initially)
+export type CreateCheckoutInput = {
+    plan: "WEEKLY" | "MONTHLY" | "YEARLY" | "LIFETIME";
+    returnUrl: string;
+    cancelUrl: string;
+};
+
+export type CreateCheckoutResult = {
+    createCheckout: {
+        id: string;
+        url: string;
+    };
+};
+
+export async function createCheckout(input: CreateCheckoutInput): Promise<CreateCheckoutResult> {
+    const mutation = `
+      mutation CreateCheckout($input: CreateCheckoutInput!) {
+        createCheckout(input: $input) { id url }
+      }
+    `;
+    return gqlFetch<CreateCheckoutResult>({query: mutation, variables: {input}});
+}

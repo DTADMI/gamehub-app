@@ -1,8 +1,11 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import {useEffect, useRef, useState} from "react";
-import {enableGameKeyCapture, GameHUD, soundManager} from "@games/shared";
+import {useEffect, useState} from "react";
+import {GameShell} from "@/components/games/GameShell";
+import MiniBoard from "@/components/leaderboards/MiniBoard";
+import {useAuth} from "@/contexts/AuthContext";
+import {submitScore} from "@/lib/graphql/queries";
 
 const BreakoutGame = dynamic(() => import("@games/breakout").then((m) => m.BreakoutGame), {
   ssr: false,
@@ -14,56 +17,50 @@ const BreakoutGame = dynamic(() => import("@games/breakout").then((m) => m.Break
 });
 
 export default function BreakoutGamePage() {
-    const rootRef = useRef<HTMLDivElement | null>(null);
     const [seed, setSeed] = useState(0);
+    const {user} = useAuth();
 
   useEffect(() => {
-      const el = rootRef.current;
-      el?.focus();
-      const cleanupCapture = enableGameKeyCapture({rootEl: el ?? undefined});
-
-    const preloadSounds = async () => {
-      try {
-        //await Promise.all([
-        soundManager.preloadSound("paddle", "/sounds/paddle.mp3");
-        soundManager.preloadSound("brickHit", "/sounds/brick-hit.mp3");
-        soundManager.preloadSound("brickBreak", "/sounds/brick-break.mp3");
-        soundManager.preloadSound("wall", "/sounds/wall.mp3");
-        soundManager.preloadSound("loseLife", "/sounds/lose-life.mp3");
-        soundManager.preloadSound("gameOver", "/sounds/game-over.mp3");
-        soundManager.preloadSound("levelComplete", "/sounds/level-complete.mp3");
-        soundManager.preloadSound("powerUp", "/sounds/power-up.mp3");
-        soundManager.preloadSound("background", "/sounds/breakout-bg.mp3", true);
-        //]);
-      } catch (error) {
-        console.warn("Error preloading sounds:", error);
+      const handler = async (e: Event) => {
+          const detail = (e as CustomEvent).detail as { score?: number } | undefined;
+          const score = detail?.score ?? 0;
+          if (user && score > 0) {
+              try {
+                  await submitScore({gameType: "BREAKOUT", score, metadata: {client: "web"}});
+              } catch (err) {
+                  console.warn("submitScore failed (BREAKOUT)", err);
+              }
       }
     };
-
-    preloadSounds();
-
+      window.addEventListener("breakout:gameover", handler as EventListener);
+      window.addEventListener("game:gameover", handler as EventListener);
     return () => {
-      soundManager.stopMusic();
-        cleanupCapture();
+        window.removeEventListener("breakout:gameover", handler as EventListener);
+        window.removeEventListener("game:gameover", handler as EventListener);
     };
-  }, []);
+  }, [user]);
 
     return (
-        <div
-            ref={rootRef}
-            className="relative min-h-[80vh] outline-none focus:outline-none"
-            tabIndex={0}
-            role="application"
-            aria-label="Breakout game"
+        <GameShell
+            ariaLabel="Breakout game"
+            tips="Move with mouse or arrows • Space to pause/resume"
+            onRestart={() => setSeed((s) => s + 1)}
+            preloadSounds={[
+                {key: "paddle", url: "/sounds/paddle.mp3"},
+                {key: "brickHit", url: "/sounds/brick-hit.mp3"},
+                {key: "brickBreak", url: "/sounds/brick-break.mp3"},
+                {key: "wall", url: "/sounds/wall.mp3"},
+                {key: "loseLife", url: "/sounds/lose-life.mp3"},
+                {key: "gameOver", url: "/sounds/game-over.mp3"},
+                {key: "levelComplete", url: "/sounds/level-complete.mp3"},
+                {key: "powerUp", url: "/sounds/power-up.mp3"},
+                {key: "background", url: "/sounds/breakout-bg.mp3", loop: true},
+            ]}
         >
             <BreakoutGame key={seed}/>
-            <GameHUD
-                onPauseToggle={() => {
-                    window.dispatchEvent(new KeyboardEvent("keydown", {key: " ", code: "Space"}));
-                }}
-                onRestart={() => setSeed((s) => s + 1)}
-                tips="Move with mouse or arrows • Space to pause/resume"
-            />
-        </div>
+            <div className="px-4">
+                <MiniBoard gameType="BREAKOUT" limit={10}/>
+            </div>
+        </GameShell>
     );
 }
