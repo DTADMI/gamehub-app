@@ -1,11 +1,14 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import {useCallback, useEffect, useMemo, useRef, useState} from "react";
-import {enableGameKeyCapture, GameHUD, soundManager} from "@games/shared";
+import {useEffect, useState} from "react";
 import {PresenceBadge} from "@/components/PresenceBadge";
 import {useStomp} from "@/lib/realtime/useStomp";
 import {useFeature} from "@/lib/flags";
+import {submitScore} from "@/lib/graphql/queries";
+import {useAuth} from "@/contexts/AuthContext";
+import {GameShell} from "@/components/games/GameShell";
+import MiniBoard from "@/components/leaderboards/MiniBoard";
 
 const SnakeGame = dynamic(() => import("@games/snake").then((m) => m.SnakeGame), {
   ssr: false,
@@ -52,62 +55,6 @@ function DifficultySelector() {
   );
 }
 
-function TouchControls() {
-  const sendKey = useCallback((key: string) => {
-    // Dispatch a keydown event so the game, which listens to keyboard, reacts to touch buttons
-    window.dispatchEvent(new KeyboardEvent("keydown", { key }));
-  }, []);
-
-  const controls = useMemo(
-    () => (
-      <div className="pointer-events-none fixed inset-0 flex flex-col justify-end p-4 gap-4">
-        <div className="pointer-events-auto mx-auto grid grid-cols-3 gap-3">
-          <button
-            aria-label="Up"
-            className="row-start-1 col-start-2 rounded-full size-14 bg-black/40 text-white backdrop-blur hover:bg-black/50 active:scale-95"
-            onClick={() => sendKey("ArrowUp")}
-          >
-            ▲
-          </button>
-          <button
-            aria-label="Left"
-            className="row-start-2 col-start-1 rounded-full size-14 bg-black/40 text-white backdrop-blur hover:bg-black/50 active:scale-95"
-            onClick={() => sendKey("ArrowLeft")}
-          >
-            ◀
-          </button>
-          <button
-            aria-label="Down"
-            className="row-start-2 col-start-2 rounded-full size-14 bg-black/40 text-white backdrop-blur hover:bg-black/50 active:scale-95"
-            onClick={() => sendKey("ArrowDown")}
-          >
-            ▼
-          </button>
-          <button
-            aria-label="Right"
-            className="row-start-2 col-start-3 rounded-full size-14 bg-black/40 text-white backdrop-blur hover:bg-black/50 active:scale-95"
-            onClick={() => sendKey("ArrowRight")}
-          >
-            ▶
-          </button>
-        </div>
-        <div className="pointer-events-auto flex justify-center">
-          <button
-            aria-label="Pause or resume"
-            className="rounded-full px-6 py-3 bg-primary text-primary-foreground shadow-md hover:bg-primary/90 active:scale-95"
-            onClick={() => sendKey(" ")}
-          >
-            Pause / Resume
-          </button>
-        </div>
-      </div>
-    ),
-    [sendKey],
-  );
-
-  return controls;
-}
-
 // Local SoundControls were moved to a global widget in the app shell.
 
 function LeaderboardPanel() {
@@ -152,37 +99,18 @@ function LeaderboardPanel() {
 }
 
 export default function SnakeGamePage() {
-    const rootRef = useRef<HTMLDivElement | null>(null);
   const realtimeEnabled = useFeature("realtime_enabled", true, { preferBackend: true });
   const threeDEnabled = useFeature("snake_3d_mode", false, { preferBackend: true });
   const [use3D, setUse3D] = useState(
     () => typeof window !== "undefined" && localStorage.getItem("snake:3d") === "1",
   );
   const { publish, connected } = useStomp({ enabled: realtimeEnabled });
+  const {user} = useAuth();
   useEffect(() => {
-      // Focus the game region for accessibility and to scope key capture
-      const el = rootRef.current;
-      el?.focus();
-      const cleanupCapture = enableGameKeyCapture({rootEl: el ?? undefined});
-
-    const preloadSounds = async () => {
-      try {
-        await Promise.all([
-          soundManager.preloadSound("eat", "/sounds/eat.mp3"),
-          soundManager.preloadSound("gameOver", "/sounds/game-over.mp3"),
-          soundManager.preloadSound("background", "/sounds/snake-bg.mp3", true),
-        ]);
-      } catch (error) {
-        console.warn("Error preloading sounds:", error);
-      }
-    };
-
-    preloadSounds();
-
-    // When the game ends, publish the score to STOMP (if enabled)
-    const onGameOver = (e: Event) => {
+    // When the game ends, publish the score (WS if enabled) and submit to backend if signed in
+    const onGameOver = async (e: Event) => {
       if (!realtimeEnabled) {
-        return;
+        // continue to submitScore if logged in
       }
       const detail = (e as CustomEvent).detail as { score?: number } | undefined;
       const score = detail?.score ?? 0;
@@ -195,25 +123,45 @@ export default function SnakeGamePage() {
         payload: { value: score },
       };
       try {
-        publish("/app/snake/score", env);
+        if (realtimeEnabled) publish("/app/snake/score", env);
       } catch {}
+
+      // Auth-only leaderboards: submit score to backend GraphQL when user is signed in
+      try {
+        if (user && score > 0) {
+          await submitScore({
+            gameType: "SNAKE",
+            score,
+            metadata: {
+              difficulty: (localStorage.getItem("snakeDifficulty") || "normal").toString(),
+              client: "web",
+              version: process.env.NEXT_PUBLIC_APP_VERSION || "0.1.0",
+            },
+          });
+          // Optionally trigger a UI refresh elsewhere
+          window.dispatchEvent(new Event("snake:leaderboardUpdated"));
+        }
+      } catch (err) {
+        // Non-blocking: log and proceed
+        console.warn("submitScore failed:", err);
+      }
     };
     window.addEventListener("snake:gameover", onGameOver as EventListener);
 
     return () => {
       window.removeEventListener("snake:gameover", onGameOver as EventListener);
-      soundManager.stopMusic();
-        cleanupCapture();
     };
-  }, [publish, realtimeEnabled]);
+  }, [publish, realtimeEnabled, user]);
 
   return (
-      <div
-          ref={rootRef}
-          className="relative min-h-[80vh] outline-none focus:outline-none"
-          tabIndex={0}
-          role="application"
-          aria-label="Snake game"
+      <GameShell
+          ariaLabel="Snake game"
+          tips="Arrows to move • Space to pause/resume • Space after Game Over to restart"
+          preloadSounds={[
+            {key: "eat", url: "/sounds/eat.mp3"},
+            {key: "gameOver", url: "/sounds/game-over.mp3"},
+            {key: "background", url: "/sounds/snake-bg.mp3", loop: true},
+          ]}
       >
       <div className="pt-4">
         <DifficultySelector />
@@ -244,17 +192,9 @@ export default function SnakeGamePage() {
       )}
       {use3D && threeDEnabled ? <SnakeGame3D /> : <SnakeGame />}
       <LeaderboardPanel />
-      {/* On-screen touch controls for mobile and desktop */}
-      <TouchControls />
-        <GameHUD
-            onPauseToggle={() => {
-              window.dispatchEvent(new Event("snake:pauseToggle"));
-            }}
-            onRestart={() => {
-              window.dispatchEvent(new Event("snake:restart"));
-            }}
-            tips="Arrows to move • Space to pause/resume • Space after Game Over to restart"
-        />
-    </div>
+        <div className="px-4">
+          <MiniBoard gameType="SNAKE" limit={10}/>
+        </div>
+      </GameShell>
   );
 }

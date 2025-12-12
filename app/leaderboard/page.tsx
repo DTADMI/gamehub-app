@@ -1,28 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import {useEffect, useMemo, useState} from "react";
+import {useSession} from "next-auth/react";
+import {useRouter} from "next/navigation";
+import {fetchLeaderboard, type LeaderboardEntry} from "@/lib/graphql/queries";
+import {useSubscription} from "@/contexts/SubscriptionContext";
 
-interface Score {
-  id: number;
-  user: {
-    username: string;
-    // email may not be present in the API payload; keep optional for safety
-    email?: string;
-  };
-  gameType: string;
-  score: number;
-  createdAt: string;
-}
+const GAME_TYPES = [
+    "SNAKE",
+    "BUBBLE_POP",
+    "TETRIS",
+    "BREAKOUT",
+    "KNITZY",
+    "MEMORY",
+    "CHECKERS",
+    "CHESS",
+    "PLATFORMER",
+    "TOWER_DEFENSE",
+] as const;
+
+type GameType = typeof GAME_TYPES[number];
 
 export default function LeaderboardPage() {
-  const [scores, setScores] = useState<Record<string, Score[]>>({});
+    const [gameType, setGameType] = useState<GameType>("SNAKE");
+    const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { status, data } = useSession();
   const router = useRouter();
+    const {entitlements} = useSubscription();
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -32,99 +38,106 @@ export default function LeaderboardPage() {
   }, [status, router]);
 
   useEffect(() => {
-    const fetchScores = async () => {
+      const run = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/scores/leaderboard`,
-        );
-        setScores(response.data);
+          setError("");
+          const res = await fetchLeaderboard({gameType, limit: 50});
+          setEntries(res.leaderboard);
       } catch (err) {
-        setError("Failed to load leaderboard");
         console.error(err);
+          setError("Failed to load leaderboard");
       } finally {
         setLoading(false);
       }
     };
+      if (status === "authenticated") run();
+  }, [gameType, status]);
 
-    fetchScores();
-  }, []);
-
-  if (loading) {
-    return <div className="text-center py-8">Loading leaderboard...</div>;
-  }
-
-  if (error) {
-    return <div className="text-center py-8 text-red-500">{error}</div>;
-  }
-
-  const currentIdentifier = (data?.user?.email || data?.user?.name || "").toLowerCase();
+    const currentIdentifier = useMemo(
+        () => (data?.user?.email || data?.user?.name || "").toLowerCase(),
+        [data?.user?.email, data?.user?.name],
+    );
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Leaderboard</h1>
+        <h1 className="text-3xl font-bold mb-6">Leaderboard</h1>
 
-      {Object.entries(scores).map(([gameType, gameScores]) => (
-        <div key={gameType} className="mb-12">
-          <h2 className="text-2xl font-semibold mb-4 capitalize">{gameType} Leaderboard</h2>
-          <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Rank
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Player
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Score
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Date
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {gameScores.map((score, index) => {
-                  const isCurrent =
-                    currentIdentifier &&
-                    (currentIdentifier === (score.user.email?.toLowerCase() || "") ||
-                      currentIdentifier === (score.user.username?.toLowerCase() || ""));
-                  return (
-                    <tr key={score.id} className={isCurrent ? "bg-blue-50" : ""}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {index + 1}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {score.user.username}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {score.score.toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(score.createdAt).toLocaleDateString()}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+        {/* Controls */}
+        <div className="flex flex-wrap items-center gap-3 mb-6">
+            <select
+                className="border rounded-md px-3 py-2 bg-background"
+                value={gameType}
+                onChange={(e) => setGameType(e.target.value as GameType)}
+            >
+                {GAME_TYPES.map((gt) => (
+                    <option key={gt} value={gt}>
+                        {gt.replace(/_/g, " ")}
+                    </option>
+                ))}
+            </select>
+
+            {/* Scope/window chips (UI only for now; PREMIUM locks) */}
+            <div className="flex items-center gap-2 ml-auto">
+                <span className="text-sm text-muted-foreground">Scope:</span>
+                <button className="px-2 py-1 text-sm rounded bg-primary text-primary-foreground">Global</button>
+                <button className="px-2 py-1 text-sm rounded bg-muted text-muted-foreground cursor-not-allowed"
+                        title="Coming soon">Friends
+                </button>
+                <button className="px-2 py-1 text-sm rounded bg-muted text-muted-foreground cursor-not-allowed"
+                        title="Coming soon">Personal
+                </button>
+            </div>
+            <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Window:</span>
+                <button className="px-2 py-1 text-sm rounded bg-primary text-primary-foreground">All‑time</button>
+                <button
+                    className={`px-2 py-1 text-sm rounded ${entitlements.advancedLeaderboards ? "bg-muted" : "bg-muted text-muted-foreground cursor-not-allowed"}`}
+                    title={entitlements.advancedLeaderboards ? "Coming soon" : "Subscriber only"}
+                >
+                    Weekly
+                </button>
+                <button
+                    className={`px-2 py-1 text-sm rounded ${entitlements.advancedLeaderboards ? "bg-muted" : "bg-muted text-muted-foreground cursor-not-allowed"}`}
+                    title={entitlements.advancedLeaderboards ? "Coming soon" : "Subscriber only"}
+                >
+                    Monthly
+                </button>
+            </div>
         </div>
-      ))}
+
+        {loading && <div className="text-center py-8">Loading leaderboard...</div>}
+        {error && <div className="text-center py-8 text-red-500">{error}</div>}
+
+        {!loading && !error && (
+            <div className="bg-white dark:bg-gray-900 shadow overflow-hidden sm:rounded-lg">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+                    <thead className="bg-gray-50 dark:bg-gray-800/50">
+                    <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Rank</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Player</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Score</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Game</th>
+                    </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
+                    {entries.map((row) => {
+                        const isCurrent =
+                            currentIdentifier && currentIdentifier === (row.user.username?.toLowerCase() || "");
+                        return (
+                            <tr key={`${row.gameType}-${row.rank}-${row.user.id}`}
+                                className={isCurrent ? "bg-blue-50 dark:bg-blue-900/20" : ""}>
+                                <td className="px-6 py-3 text-sm text-muted-foreground">{row.rank}</td>
+                                <td className="px-6 py-3 text-sm font-medium">{row.user.username}</td>
+                                <td className="px-6 py-3 text-sm">{row.score.toLocaleString()}</td>
+                                <td className="px-6 py-3 text-sm capitalize">{row.gameType.replace(/_/g, " ")}</td>
+                            </tr>
+                        );
+                    })}
+                    </tbody>
+                </table>
+            </div>
+        )}
     </div>
   );
 }
