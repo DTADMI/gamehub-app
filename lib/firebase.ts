@@ -1,43 +1,28 @@
-import { FirebaseApp, getApp, getApps, initializeApp } from "firebase/app";
-import { Auth, getAuth } from "firebase/auth";
-import { Firestore, getFirestore } from "firebase/firestore";
+"use client";
+import {FirebaseApp, getApp, getApps, initializeApp} from "firebase/app";
+import {Auth, getAuth} from "firebase/auth";
+import {Firestore, getFirestore} from "firebase/firestore";
 
-/*import admin from 'firebase-admin';
-import { type ServiceAccount} from 'firebase-admin/app';
-import {Buffer} from "buffer";
-
-const privateKey = process.env.NEXT_FIREBASE_CREDS_PRIVATE_KEY ? Buffer.from(process.env.NEXT_FIREBASE_CREDS_PRIVATE_KEY, 'base64').toString().replace(/\\n/g, '\n') : undefined;
-
-const serviceAccount: ServiceAccount = {
-  type: process.env.NEXT_FIREBASE_CREDS_TYPE,
-  projectId: process.env.NEXT_FIREBASE_CREDS_PROJECT_ID,
-  privateKeyId: process.env.NEXT_FIREBASE_CREDS_PRIVATE_KEY_ID,
-  privateKey,
-  clientEmail: process.env.NEXT_FIREBASE_CREDS_CLIENT_EMAIL,
-  clientId: process.env.NEXT_FIREBASE_CREDS_CLIENT_ID,
-  authUri: process.env.NEXT_FIREBASE_CREDS_AUTH_URI,
-  tokenUri: process.env.NEXT_FIREBASE_CREDS_TOKEN_URI,
-  authProviderX509CertUrl: process.env.NEXT_FIREBASE_CREDS_AUTH_PROVIDER_X509_CERT_URL,
-  clientX509CertUrl: process.env.NEXT_FIREBASE_CREDS_CLIENT_X509_CERT_URL,
-  universeDomain: process.env.NEXT_FIREBASE_CREDS_UNIVERSE_DOMAIN
-} as ServiceAccount;
-
-
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
-  }); // uses ADC on Cloud Run
+// Debug log environment variables in development
+if (typeof window !== "undefined" && process.env.NODE_ENV !== 'production') {
+  console.log('Firebase Config Environment Variables:', {
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY ? '***' : 'MISSING',
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'MISSING',
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'MISSING',
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'MISSING',
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || 'MISSING',
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || 'MISSING',
+  });
 }
-export const db = admin.firestore();*/
 
 // Client-side Firebase config
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || '',
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '',
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || '',
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '',
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '',
 };
 
 // Initialize Firebase on client-side only
@@ -46,12 +31,45 @@ let auth: Auth | undefined;
 let db: Firestore | undefined;
 
 if (typeof window !== "undefined") {
-  try {
-    app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-    auth = getAuth(app);
-    db = getFirestore(app);
-  } catch (error) {
-    console.error("Firebase initialization error:", error);
+  const requiredEnvVars = [
+    'NEXT_PUBLIC_FIREBASE_API_KEY',
+    'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
+    'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
+    'NEXT_PUBLIC_FIREBASE_APP_ID'
+  ];
+
+  const missingVars = requiredEnvVars.filter(
+      (envVar) => !process.env[envVar]
+  );
+
+  if (missingVars.length > 0) {
+    console.error('Missing required Firebase environment variables:', missingVars);
+  } else {
+    try {
+      // Check if Firebase is already initialized
+      if (getApps().length > 0) {
+        app = getApp();
+      } else {
+        app = initializeApp(firebaseConfig);
+        console.log('Firebase initialized successfully');
+      }
+
+      // Initialize auth and firestore
+      auth = getAuth(app);
+      db = getFirestore(app);
+
+      // Set persistence if needed
+      // setPersistence(auth, browserLocalPersistence);
+
+    } catch (error) {
+      console.error('Firebase initialization error:', {
+        error,
+        config: {
+          ...firebaseConfig,
+          apiKey: firebaseConfig.apiKey ? '***' : 'MISSING'
+        }
+      });
+    }
   }
 }
 
