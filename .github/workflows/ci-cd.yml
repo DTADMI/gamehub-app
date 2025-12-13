@@ -1,4 +1,4 @@
-name: CI/CD — Build, Push (Docker Hub & Artifact Registry), Deploy Cloud Run
+name: "CI/CD — Frontend: test, build-once, push (Hub+AR), deploy"
 
 on:
   push:
@@ -42,130 +42,63 @@ jobs:
       - name: Build
         run: pnpm build
 
-  build-and-push-dockerhub:
+  build-local-and-tag-images:
+    name: Build once locally and tag images
     needs: [ test-frontend ]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    outputs:
+      has_hub: ${{ steps.prep.outputs.has_hub }}
+      has_gcp: ${{ steps.prep.outputs.has_gcp }}
+      AR_SHA: ${{ steps.prep.outputs.AR_SHA }}
+      AR_LATEST: ${{ steps.prep.outputs.AR_LATEST }}
+      HUB_SHA: ${{ steps.prep.outputs.HUB_SHA }}
+      HUB_LATEST: ${{ steps.prep.outputs.HUB_LATEST }}
+      LOCAL_IMAGE: ${{ steps.prep.outputs.LOCAL_IMAGE }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set env flags for Docker Hub
-        id: hubflags
+      - name: Prepare variables (registries and tags)
+        id: prep
+        shell: bash
         run: |
+          # Docker Hub availability
           if [ -n "${{ vars.DOCKERHUB_USERNAME }}" ] && [ -n "${{ secrets.DOCKERHUB_TOKEN }}" ]; then
             echo "has_hub=true" >> $GITHUB_OUTPUT
           else
             echo "has_hub=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        if: ${{ github.ref == 'refs/heads/main' && steps.hubflags.outputs.has_hub == 'true' }}
-        with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-        if: ${{ github.ref == 'refs/heads/main' && steps.hubflags.outputs.has_hub == 'true' }}
-
-      - name: Build Docker image (with public env build args)
-        if: ${{ github.ref == 'refs/heads/main' && steps.hubflags.outputs.has_hub == 'true' }}
-        run: |
-          echo "IMAGE_DOCKERHUB=${{ vars.DOCKERHUB_USERNAME }}/gamehub-app:${{ github.sha }}" >> $GITHUB_ENV
-          echo "IMAGE_DOCKERHUB_LATEST=${{ vars.DOCKERHUB_USERNAME }}/gamehub-app:latest }}" >> $GITHUB_ENV
-
-          docker build \
-            --build-arg NEXT_PUBLIC_API_URL="${{ vars.NEXT_PUBLIC_API_URL }}" \
-            --build-arg NEXT_PUBLIC_FIREBASE_API_KEY="${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}" \
-            --build-arg NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="${{ vars.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}" \
-            --build-arg NEXT_PUBLIC_FIREBASE_PROJECT_ID="${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}" \
-            --build-arg NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET="${{ vars.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}" \
-            --build-arg NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="${{ vars.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}" \
-            --build-arg NEXT_PUBLIC_FIREBASE_APP_ID="${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}" \
-            -t $IMAGE_DOCKERHUB .
-
-          docker build \
-            --build-arg NEXT_PUBLIC_API_URL="${{ vars.NEXT_PUBLIC_API_URL }}" \
-            --build-arg NEXT_PUBLIC_FIREBASE_API_KEY="${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}" \
-            --build-arg NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="${{ vars.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}" \
-            --build-arg NEXT_PUBLIC_FIREBASE_PROJECT_ID="${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}" \
-            --build-arg NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET="${{ vars.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}" \
-            --build-arg NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="${{ vars.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}" \
-            --build-arg NEXT_PUBLIC_FIREBASE_APP_ID="${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}" \
-            -t $IMAGE_DOCKERHUB_LATEST .
-
-      - name: Push image
-        if: ${{ github.ref == 'refs/heads/main' && steps.hubflags.outputs.has_hub == 'true' && env.IMAGE_DOCKERHUB != '' }}
-        run: docker push $IMAGE_DOCKERHUB
-      - name: Push image latest
-        if: ${{ github.ref == 'refs/heads/main' && steps.hubflags.outputs.has_hub == 'true'&& env.IMAGE_DOCKERHUB_LATEST != '' }}
-        run: docker push $IMAGE_DOCKERHUB_LATEST
-
-  build-and-deploy-cloudrun:
-    needs: [ test-frontend ]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set flags for GCP deploy
-        id: gcpflags
-        run: |
-          HAS_KEY=false
-          HAS_WIF=false
+          # Artifact Registry availability (need project, region, and either SA key or WIF)
+          HAS_KEY=false; HAS_WIF=false
           if [ -n "${{ secrets.GCP_SA_KEY }}" ]; then HAS_KEY=true; fi
           if [ -n "${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}" ] && [ -n "${{ secrets.GCP_SERVICE_ACCOUNT }}" ]; then HAS_WIF=true; fi
           if [ -n "${{ secrets.GCP_PROJECT_ID }}" ] && [ -n "${{ secrets.GCP_REGION }}" ] && { [ "$HAS_KEY" = "true" ] || [ "$HAS_WIF" = "true" ]; }; then
-            echo "can_deploy=true" >> $GITHUB_OUTPUT
-            echo "has_wif=$HAS_WIF" >> $GITHUB_OUTPUT
+            echo "has_gcp=true" >> $GITHUB_OUTPUT
           else
-            echo "can_deploy=false" >> $GITHUB_OUTPUT
-            echo "has_wif=false" >> $GITHUB_OUTPUT
+            echo "has_gcp=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Authenticate to Google Cloud (WIF)
-        if: ${{ github.ref == 'refs/heads/main' && steps.gcpflags.outputs.can_deploy == 'true' && steps.gcpflags.outputs.has_wif == 'true' }}
-        uses: google-github-actions/auth@v2
-        with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          # Compute names
+          SHA=${GITHUB_SHA}
+          AR_REPO=${{ vars.GCP_ARTIFACT_REPO }}; if [ -z "$AR_REPO" ]; then AR_REPO=gamehub; fi
+          FRONT=${{ env.FRONTEND_SERVICE }}
+          HUB_REPO=${{ vars.DOCKERHUB_REPO }}
+          if [ -z "$HUB_REPO" ]; then HUB_REPO="${{ vars.DOCKERHUB_USERNAME }}/gamehub-app"; fi
 
-      - name: Authenticate to Google Cloud (Service Account Key)
-        if: ${{ github.ref == 'refs/heads/main' && steps.gcpflags.outputs.can_deploy == 'true' && steps.gcpflags.outputs.has_wif != 'true' }}
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          echo "LOCAL_IMAGE=local/gamehub-app:$SHA" >> $GITHUB_OUTPUT
+          echo "AR_SHA=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/$AR_REPO/$FRONT:$SHA" >> $GITHUB_OUTPUT
+          echo "AR_LATEST=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/$AR_REPO/$FRONT:latest" >> $GITHUB_OUTPUT
+          echo "HUB_SHA=docker.io/$HUB_REPO:$SHA" >> $GITHUB_OUTPUT
+          echo "HUB_LATEST=docker.io/$HUB_REPO:latest" >> $GITHUB_OUTPUT
 
-      - name: Set up gcloud SDK
-        if: ${{ github.ref == 'refs/heads/main' && steps.gcpflags.outputs.can_deploy == 'true' }}
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-
-      - name: Configure Docker to use gcloud as a credential helper
-        if: ${{ github.ref == 'refs/heads/main' && steps.gcpflags.outputs.can_deploy == 'true' }}
+      - name: Build Docker image once (with public env build args)
+        env:
+          LOCAL_IMAGE: ${{ steps.prep.outputs.LOCAL_IMAGE }}
         run: |
-          gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
-
-      - name: Compute image tags
-        id: tags
-        if: ${{ github.ref == 'refs/heads/main' && steps.gcpflags.outputs.can_deploy == 'true' }}
-        run: |
-          SHA=${GITHUB_SHA::12}
-          echo "frontend=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.AR_REPO }}/${{ vars.FRONTEND_SERVICE }}:${SHA}" >> $GITHUB_OUTPUT
-
-      - name: Build Docker image (with public env build args)
-        if: ${{ github.ref == 'refs/heads/main' && steps.gcpflags.outputs.can_deploy == 'true' }}
-        run: |
-          AR_REPO=${{ vars.GCP_ARTIFACT_REPO }}
-          if [ -z "$AR_REPO" ]; then AR_REPO=gamehub; fi
-          IMAGE=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${AR_REPO}/gamehub-app:${{ github.sha }}
-
           FINGERPRINT=$(printf "%s" "${{ vars.NEXT_PUBLIC_API_URL }}|${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}|${{ vars.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}|${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}|${{ vars.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}|${{ vars.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}|${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}" | sha256sum | cut -d' ' -f1)
 
           docker build \
@@ -177,19 +110,126 @@ jobs:
             --build-arg NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="${{ vars.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}" \
             --build-arg NEXT_PUBLIC_FIREBASE_APP_ID="${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}" \
             --build-arg PUBLIC_ENV_FINGERPRINT="$FINGERPRINT" \
-            -t $IMAGE .
+            -t "$LOCAL_IMAGE" .
 
-          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
-
-      - name: Push image
-        if: ${{ github.ref == 'refs/heads/main' && steps.gcpflags.outputs.can_deploy == 'true' }}
-        run: docker push $IMAGE
-
-      - name: Deploy to Cloud Run
-        if: ${{ github.ref == 'refs/heads/main' && steps.gcpflags.outputs.can_deploy == 'true' }}
+      - name: Save built image as artifact (OCI tar)
+        env:
+          LOCAL_IMAGE: ${{ steps.prep.outputs.LOCAL_IMAGE }}
         run: |
-          gcloud run deploy gamehub-app \
-            --image=$IMAGE \
+          mkdir -p out
+          docker save "$LOCAL_IMAGE" -o out/gamehub-app-image.tar
+
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gamehub-app-image
+          path: out/gamehub-app-image.tar
+          if-no-files-found: error
+          retention-days: 1
+
+  push-to-dockerhub:
+    name: Push to Docker Hub (:sha + :latest)
+    needs: [ test-frontend, build-local-and-tag-images ]
+    if: ${{ needs.build-local-and-tag-images.outputs.has_hub == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download built image
+        uses: actions/download-artifact@v4
+        with:
+          name: gamehub-app-image
+          path: ./out
+
+      - name: Load image
+        run: |
+          docker load -i ./out/gamehub-app-image.tar
+          docker images
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Compute and tag images for Docker Hub
+        run: |
+          LOCAL_IMAGE=${{ needs.build-local-and-tag-images.outputs.LOCAL_IMAGE }}
+          HUB_SHA=${{ needs.build-local-and-tag-images.outputs.HUB_SHA }}
+          HUB_LATEST=${{ needs.build-local-and-tag-images.outputs.HUB_LATEST }}
+          docker tag "$LOCAL_IMAGE" "$HUB_SHA"
+          docker tag "$LOCAL_IMAGE" "$HUB_LATEST"
+          echo "HUB_SHA=$HUB_SHA" >> $GITHUB_ENV
+          echo "HUB_LATEST=$HUB_LATEST" >> $GITHUB_ENV
+
+      - name: Push to Docker Hub (:sha)
+        run: docker push "$HUB_SHA"
+
+      - name: Push to Docker Hub (:latest)
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: docker push "$HUB_LATEST"
+
+  push-and-deploy-to-cloud-run:
+    name: Push to Artifact Registry (:sha + :latest) and Deploy to Cloud Run
+    needs: [ test-frontend, build-local-and-tag-images ]
+    if: ${{ needs.build-local-and-tag-images.outputs.has_gcp == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Download built image
+        uses: actions/download-artifact@v4
+        with:
+          name: gamehub-app-image
+          path: ./out
+
+      - name: Load image
+        run: |
+          docker load -i ./out/gamehub-app-image.tar
+          docker images
+
+      - name: Authenticate to Google Cloud (WIF)
+        if: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER != '' && secrets.GCP_SERVICE_ACCOUNT != '' }}
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Authenticate to Google Cloud (Service Account Key)
+        if: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER == '' || secrets.GCP_SERVICE_ACCOUNT == '' }}
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up gcloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
+
+      - name: Compute and tag images for Artifact Registry
+        run: |
+          LOCAL_IMAGE=${{ needs.build-local-and-tag-images.outputs.LOCAL_IMAGE }}
+          AR_SHA=${{ needs.build-local-and-tag-images.outputs.AR_SHA }}
+          AR_LATEST=${{ needs.build-local-and-tag-images.outputs.AR_LATEST }}
+          docker tag "$LOCAL_IMAGE" "$AR_SHA"
+          docker tag "$LOCAL_IMAGE" "$AR_LATEST"
+          echo "AR_SHA=$AR_SHA" >> $GITHUB_ENV
+          echo "AR_LATEST=$AR_LATEST" >> $GITHUB_ENV
+
+      - name: Push to Artifact Registry (:sha)
+        run: docker push "$AR_SHA"
+
+      - name: Push to Artifact Registry (:latest)
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: docker push "$AR_LATEST"
+
+      - name: Deploy to Cloud Run (using AR :sha)
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: |
+          gcloud run deploy ${{ env.FRONTEND_SERVICE }} \
+            --image="$AR_SHA" \
             --region=${{ secrets.GCP_REGION }} \
             --platform=managed \
             --allow-unauthenticated \
