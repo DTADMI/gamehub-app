@@ -1,11 +1,12 @@
 "use client";
 
 import * as Tabs from "@radix-ui/react-tabs";
+import {FolderKanban, Gamepad2} from "lucide-react";
 import Link from "next/link";
+
+import {Carousel} from "@/components/Carousel";
 import {GameCard} from "@/components/GameCard";
 import {Button} from "@/components/ui/button";
-import {FolderKanban, Gamepad2} from "lucide-react";
-import {Carousel} from "@/components/Carousel";
 import {useFeature} from "@/lib/flags";
 import {GAMES} from "@/lib/games";
 

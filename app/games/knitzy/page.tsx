@@ -1,8 +1,8 @@
 "use client";
 
+import {enableGameKeyCapture} from "@games/shared";
 import dynamic from "next/dynamic";
 import {useEffect, useRef} from "react";
-import {enableGameKeyCapture} from "@games/shared";
 
 const KnitzyGame = dynamic(() => import("@games/knitzy").then((m) => m.KnitzyGame), {
   ssr: false,

@@ -2,6 +2,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+
 import {type Game as CatalogGame, GAMES} from "@/lib/games";
 
 // Dynamically import the GamesList component with SSR disabled

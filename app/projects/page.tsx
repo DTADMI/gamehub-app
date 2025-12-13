@@ -1,9 +1,10 @@
 // frontend/app/projects/page.tsx
-import Link from "next/link";
 import {ExternalLink, FolderKanban, Github} from "lucide-react";
+import Link from "next/link";
+
+import {Carousel} from "@/components/Carousel";
 import {Button} from "@/components/ui/button";
 import {GITHUB_URL} from "@/lib/env";
-import {Carousel} from "@/components/Carousel";
 
 type Project = {
   title: string;
@@ -32,7 +33,7 @@ const projects: Project[] = [
   },
 ];
 
-export default function ProjectsPage(): JSX.Element {
+export default function ProjectsPage() {
   const featured = projects.filter((p) => p.featured && !p.comingSoon);
   const comingSoon = projects.filter((p) => p.comingSoon);
   return (

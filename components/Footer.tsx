@@ -1,11 +1,12 @@
 // frontend/components/Footer.tsx
 "use client";
 
-import Link from "next/link";
 import {Gamepad2, Github, Linkedin, Mail} from "lucide-react";
-import {Button} from "@/components/ui/button";
-import {ModeToggle} from "@/components/ModeToggle";
+import Link from "next/link";
 import {useState} from "react";
+
+import {ModeToggle} from "@/components/ModeToggle";
+import {Button} from "@/components/ui/button";
 import {CONTACT_EMAIL, GITHUB_URL, LINKEDIN_URL, mailto} from "@/lib/env";
 
 const footerLinks = [
@@ -76,9 +77,15 @@ export function Footer() {
             const items =
               section.title === "Social"
                 ? section.items.filter((item) => {
-                    if (item.name === "GitHub") return Boolean(GITHUB_URL);
-                    if (item.name === "LinkedIn") return Boolean(LINKEDIN_URL);
-                    if (item.name === "Email") return Boolean(CONTACT_EMAIL);
+                    if (item.name === "GitHub") {
+                      return Boolean(GITHUB_URL);
+                    }
+                    if (item.name === "LinkedIn") {
+                      return Boolean(LINKEDIN_URL);
+                    }
+                    if (item.name === "Email") {
+                      return Boolean(CONTACT_EMAIL);
+                    }
                     return true;
                   })
                 : section.items;

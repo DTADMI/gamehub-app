@@ -1,8 +1,8 @@
 // games/checkers/src/components/CheckersGame.tsx
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { soundManager } from "@games/shared";
+import {soundManager} from "@games/shared";
+import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
 
 type Color = "w" | "b";
 type Piece = { color: Color; king: boolean } | null;

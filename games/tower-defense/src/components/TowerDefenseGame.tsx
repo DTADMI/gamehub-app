@@ -1,8 +1,8 @@
 // games/tower-defense/src/components/TowerDefenseGame.tsx
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { soundManager } from "@games/shared";
+import {soundManager} from "@games/shared";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 
 // Minimal Tower Defense prototype: one path, simple waves, basic towers
 const TILE = 32;

@@ -1,8 +1,9 @@
 "use client";
 
-import React, {useCallback, useEffect, useState} from "react";
-import useEmblaCarousel, {EmblaOptionsType} from "embla-carousel-react";
+import useEmblaCarousel from "embla-carousel-react";
+import type {EmblaOptionsType} from "embla-carousel";
 import {ChevronLeft, ChevronRight} from "lucide-react";
+import React, {useCallback, useEffect, useState} from "react";
 
 type CarouselProps = {
     children: React.ReactNode;
@@ -16,13 +17,17 @@ export function Carousel({children, options, className}: CarouselProps) {
     const [canNext, setCanNext] = useState(false);
 
     const onSelect = useCallback(() => {
-        if (!emblaApi) return;
+        if (!emblaApi) {
+            return;
+        }
         setCanPrev(emblaApi.canScrollPrev());
         setCanNext(emblaApi.canScrollNext());
     }, [emblaApi]);
 
     useEffect(() => {
-        if (!emblaApi) return;
+        if (!emblaApi) {
+            return;
+        }
         onSelect();
         emblaApi.on("select", onSelect);
         emblaApi.on("reInit", onSelect);

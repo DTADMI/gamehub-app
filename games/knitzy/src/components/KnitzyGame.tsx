@@ -1,8 +1,8 @@
 // games/knitzy/src/components/KnitzyGame.tsx
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { soundManager } from "@games/shared";
+import {soundManager} from "@games/shared";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 
 // Board settings
 const SIZE = 12; // 12x12

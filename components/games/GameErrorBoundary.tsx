@@ -1,10 +1,11 @@
 // frontend/components/games/GameErrorBoundary.tsx
 "use client";
 
-import React, { Component, ErrorInfo, ReactNode } from "react";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import {AlertCircle} from "lucide-react";
+import React, {Component, ErrorInfo, ReactNode} from "react";
+
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
+import {Button} from "@/components/ui/button";
 
 interface GameErrorBoundaryProps {
   children: ReactNode;

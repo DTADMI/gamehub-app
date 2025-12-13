@@ -1,4 +1,4 @@
-import type { NextConfig } from "next";
+import type {NextConfig} from "next";
 import path from "path";
 
 // Central Next.js config (single source of truth)
@@ -7,6 +7,13 @@ const nextConfig: NextConfig = {
   output: process.env.NEXT_STANDALONE === "true" ? "standalone" : undefined,
   // Force absolute asset URLs so chunks load correctly on nested routes (Cloud Run)
   assetPrefix: "/",
+
+  // As of Next.js 16, Turbopack is the default bundler. Because we also define a
+  // custom `webpack` config (for local aliases), Next expects a `turbopack` key
+  // to acknowledge Turbopack usage. An empty object is sufficient and silences
+  // the warning/error: "using Turbopack with a webpack config and no turbopack config".
+  // If you need to force webpack instead, invoke `next build --webpack` in CI.
+  turbopack: {},
 
   // Enable React Strict Mode
   reactStrictMode: true,

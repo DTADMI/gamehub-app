@@ -1,7 +1,8 @@
 // Shared: contexts/SoundContext.tsx
 
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { soundManager } from "../lib/sound";
+import React, {createContext, useContext, useEffect, useState} from "react";
+
+import {soundManager} from "../lib/sound";
 
 interface SoundContextType {
   isMuted: boolean;

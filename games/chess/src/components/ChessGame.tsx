@@ -1,9 +1,10 @@
 // games/chess/src/components/ChessGame.tsx
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { soundManager } from "@games/shared";
-import { Board, Color, GameState, Move, Piece, PieceType, Pos, SIZE, Square } from "../logic/types";
+import {soundManager} from "@games/shared";
+import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
+
+import {Board, Color, GameState, Move, Piece, PieceType, Pos, SIZE, Square} from "../logic/types";
 
 function inBounds(r: number, c: number) {
   return r >= 0 && r < SIZE && c >= 0 && c < SIZE;
@@ -268,7 +269,7 @@ function applyMove(state: GameState, move: Move): GameState {
   const color = piece[0] as Color;
 
   if (move.enPassant) {
-    const dir = color === "w" ? 1 : -1;
+    const _dir = color === "w" ? 1 : -1;
     ns.board[from.r][to.c].piece = null;
   }
 

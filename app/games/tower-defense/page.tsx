@@ -1,8 +1,8 @@
 "use client";
 
+import {enableGameKeyCapture, GameHUD} from "@games/shared";
 import dynamic from "next/dynamic";
 import {useEffect, useRef, useState} from "react";
-import {enableGameKeyCapture, GameHUD} from "@games/shared";
 
 const TowerDefenseGame = dynamic(
   () => import("@games/tower-defense").then((m) => m.TowerDefenseGame),

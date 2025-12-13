@@ -1,8 +1,10 @@
 "use client";
 
-import {useEffect, useMemo, useState} from "react";
-import {useSession} from "next-auth/react";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
+import {useSession} from "next-auth/react";
+import {useEffect, useMemo, useState} from "react";
+
+import {useSubscription} from "@/contexts/SubscriptionContext";
 import {
   fetchLeaderboardPaged,
   type GameType,
@@ -10,7 +12,6 @@ import {
   type LeaderboardScope,
   type TimeWindow,
 } from "@/lib/graphql/queries";
-import {useSubscription} from "@/contexts/SubscriptionContext";
 
 const GAME_TYPES: GameType[] = [
   "SNAKE",

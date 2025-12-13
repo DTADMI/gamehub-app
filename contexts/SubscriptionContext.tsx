@@ -1,6 +1,7 @@
 "use client";
 
 import React, {createContext, useCallback, useContext, useEffect, useMemo, useState} from "react";
+
 import {useAuth} from "@/contexts/AuthContext";
 import {fetchViewer, type Plan} from "@/lib/graphql/queries";
 
@@ -80,6 +81,8 @@ export function SubscriptionProvider({children}: { children: React.ReactNode }) 
 
 export function useSubscription() {
     const ctx = useContext(SubscriptionContext);
-    if (!ctx) throw new Error("useSubscription must be used within SubscriptionProvider");
+    if (!ctx) {
+        throw new Error("useSubscription must be used within SubscriptionProvider");
+    }
     return ctx;
 }

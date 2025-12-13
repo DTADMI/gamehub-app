@@ -1,8 +1,9 @@
+import {ExternalLink} from "lucide-react";
+import Link from "next/link";
+
+import {Carousel} from "@/components/Carousel";
 import {GameCard} from "@/components/GameCard";
 import {Button} from "@/components/ui/button";
-import Link from "next/link";
-import {ExternalLink} from "lucide-react";
-import {Carousel} from "@/components/Carousel";
 import {GAMES} from "@/lib/games";
 
 type HomeGame = {

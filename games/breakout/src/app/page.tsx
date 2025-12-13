@@ -1,13 +1,13 @@
 // games/breakout/src/app/page.tsx
 "use client";
 
+import {soundManager} from "@games/shared";
 import dynamic from "next/dynamic";
-import { useEffect } from "react";
-import { soundManager } from "@games/shared";
+import {useEffect} from "react";
 
 // Dynamically import the game component with SSR disabled
 const BreakoutGame = dynamic(
-  () => import("@/components/BreakoutGame").then((mod) => mod.BreakoutGame),
+    () => import("../components/BreakoutGame").then((mod) => mod.BreakoutGame),
   {
     ssr: false,
     loading: () => (

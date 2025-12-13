@@ -1,14 +1,15 @@
 // frontend/components/Navbar.tsx
 "use client";
 
+import {Gamepad2, Github, Linkedin, LogIn, Menu, UserPlus, X} from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { Gamepad2, Github, Linkedin, LogIn, Menu, UserPlus, X } from "lucide-react";
-import { useEffect, useState } from "react";
-import { ModeToggle } from "@/components/mode-toggle";
-import { GITHUB_URL, LINKEDIN_URL } from "@/lib/env";
+import {usePathname} from "next/navigation";
+import {useEffect, useState} from "react";
+
+import {ModeToggle} from "@/components/mode-toggle";
+import {Button} from "@/components/ui/button";
+import {GITHUB_URL, LINKEDIN_URL} from "@/lib/env";
+import {cn} from "@/lib/utils";
 
 const navItems = [
   { name: "Home", href: "/" },

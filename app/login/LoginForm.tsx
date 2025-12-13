@@ -1,15 +1,15 @@
 "use client";
 
+import Link from "next/link";
+import {useSearchParams} from "next/navigation";
+import {signIn} from "next-auth/react";
+import {useState} from "react";
+
+import {Icons} from "@/components/icons";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
-import {Icons} from "@/components/icons";
-import {useRouter, useSearchParams} from "next/navigation";
 import {useToast} from "@/components/ui/use-toast";
-
-import {signIn} from "next-auth/react";
-import {useState} from "react";
-import Link from "next/link";
 
 export default function LoginForm() {
   const { toast } = useToast();
@@ -17,7 +17,6 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
   const searchParams = useSearchParams();
     // Sanitize callbackUrl: enforce same-origin relative path to avoid cross-origin redirects
     const rawCb = searchParams.get("callbackUrl") || "/";
@@ -29,14 +28,14 @@ export default function LoginForm() {
     setError(null);
 
     try {
-      const result = await signIn("credentials", {
+        const _result = await signIn("credentials", {
           redirect: true,
         email,
         password,
         callbackUrl,
       });
         // When redirect=true NextAuth will navigate; no manual push required
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Invalid email or password",

@@ -1,8 +1,9 @@
 "use client";
 
-import {useEffect, useRef, useState} from "react";
-import {Button} from "@/components/ui/button";
 import {enableGameKeyCapture, GameHUD} from "@games/shared";
+import {useEffect, useRef, useState} from "react";
+
+import {Button} from "@/components/ui/button";
 
 // Extremely small MVP for a 10x10 board Block Blast style game.
 // Pieces are tiny presets; scoring = +10 per cleared row/col.

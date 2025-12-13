@@ -1,12 +1,14 @@
 // frontend/components/games/GameHeader.tsx
 "use client";
 
+import {useSound} from "@games/shared";
+import {Volume2, VolumeX} from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { useGame } from "@/contexts/GameContext";
-import { useSound } from "@games/shared";
-import { Volume2, VolumeX } from "lucide-react";
-import { GameProgress } from "./GameProgress";
+
+import {Button} from "@/components/ui/button";
+import {useGame} from "@/contexts/GameContext";
+
+import {GameProgress} from "./GameProgress";
 
 export function GameHeader() {
   const { game, stats } = useGame();

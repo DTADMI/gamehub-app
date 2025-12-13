@@ -16,20 +16,24 @@ const config = {
 };
 
 function validateConfig() {
-  const missing: string[] = []
+  const missing: string[] = [];
   for (const [k, v] of Object.entries(config)) {
-    if (!v && ['apiKey', 'authDomain', 'projectId', 'appId'].includes(k)) missing.push(`NEXT_PUBLIC_FIREBASE_${k.toUpperCase()}`);
+    if (!v && ['apiKey', 'authDomain', 'projectId', 'appId'].includes(k)) {
+      missing.push(`NEXT_PUBLIC_FIREBASE_${k.toUpperCase()}`);
+    }
   }
   if (missing.length && isBrowser) {
     if (process.env.NODE_ENV !== 'production') {
-      // eslint-disable-next-line no-console
+
       console.warn('Missing Firebase envs:', missing);
     }
   }
 }
 
 export function getFirebaseApp() {
-  if (!isBrowser) return undefined // never initialize on server
+  if (!isBrowser) {
+    return undefined;
+  } // never initialize on server
   validateConfig();
   return getApps().length ? getApp() : initializeApp(config as any);
 }

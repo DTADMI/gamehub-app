@@ -1,6 +1,7 @@
 "use client";
 
 import {SessionProvider} from "next-auth/react";
+
 import {ThemeProvider} from "@/components/ThemeProvider";
 import {AuthProvider} from "@/contexts/AuthContext";
 import {SubscriptionProvider} from "@/contexts/SubscriptionContext";

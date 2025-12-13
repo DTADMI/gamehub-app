@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { type StompMessage, useStomp } from "@/lib/realtime/useStomp";
+import {useEffect, useMemo, useState} from "react";
+
+import {type StompMessage, useStomp} from "@/lib/realtime/useStomp";
 
 type PresencePayload = {
   count?: number;

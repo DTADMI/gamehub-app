@@ -1,9 +1,10 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { useFeature } from "@/lib/flags";
+import {useRouter} from "next/navigation";
+import {useEffect, useState} from "react";
+
+import {useFeature} from "@/lib/flags";
 
 // Dynamically import the ThreeScene component with no SSR
 const ThreeScene = dynamic(() => import("@/components/admin/ThreeScene"), {

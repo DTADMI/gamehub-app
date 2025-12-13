@@ -1,8 +1,8 @@
 import NextAuth, {NextAuthOptions, Session, User} from "next-auth";
-import Credentials from "next-auth/providers/credentials";
-import GoogleProvider from "next-auth/providers/google";
-import GitHubProvider from "next-auth/providers/github";
 import {JWT} from "next-auth/jwt";
+import Credentials from "next-auth/providers/credentials";
+import GitHubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
 
 interface AuthUser extends User {
   accessToken?: string;

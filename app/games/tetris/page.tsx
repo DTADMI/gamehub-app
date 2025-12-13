@@ -2,10 +2,11 @@
 
 import dynamic from "next/dynamic";
 import {useEffect, useState} from "react";
+
 import {GameShell} from "@/components/games/GameShell";
 import MiniBoard from "@/components/leaderboards/MiniBoard";
-import {submitScore} from "@/lib/graphql/queries";
 import {useAuth} from "@/contexts/AuthContext";
+import {submitScore} from "@/lib/graphql/queries";
 
 const TetrisGame = dynamic(() => import("@games/tetris").then((m) => m.TetrisGame), {
   ssr: false,

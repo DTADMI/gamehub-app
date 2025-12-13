@@ -1,12 +1,14 @@
 // frontend/contexts/GameContext.tsx
 "use client";
 
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Game, getGameById } from "@/lib/games";
-import { useAuth } from "./AuthContext";
-import { useSound } from "@games/shared";
-import { GameStats, getGameProgress, saveGameProgress } from "@/lib/gameProgress";
+import {useSound} from "@games/shared";
+import {useRouter} from "next/navigation";
+import React, {createContext, useCallback, useContext, useEffect, useState} from "react";
+
+import {GameStats, getGameProgress, saveGameProgress} from "@/lib/gameProgress";
+import {Game, getGameById} from "@/lib/games";
+
+import {useAuth} from "./AuthContext";
 
 interface GameContextType {
   game: Game | null;

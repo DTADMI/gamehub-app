@@ -1,6 +1,6 @@
 // games/memory/src/components/MemoryGame.tsx
-import React, { useCallback, useEffect, useState } from "react";
-import { GameContainer, soundManager } from "@games/shared";
+import {GameContainer, soundManager} from "@games/shared";
+import React, {useCallback, useEffect, useState} from "react";
 
 interface Card {
   id: number;

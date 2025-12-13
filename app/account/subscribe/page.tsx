@@ -1,9 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import React from "react";
+
 import PlanPicker from "@/components/billing/PlanPicker";
 import {useAuth} from "@/contexts/AuthContext";
-import Link from "next/link";
 
 export default function SubscribePage() {
     const {user} = useAuth();

@@ -1,6 +1,6 @@
 // games/breakout/src/components/BreakoutGame.tsx
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { GameContainer, soundManager } from "@games/shared";
+import {GameContainer, soundManager} from "@games/shared";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 
 interface Ball {
   x: number;

@@ -2,10 +2,11 @@
 
 import dynamic from "next/dynamic";
 import {useEffect} from "react";
+
 import {GameShell} from "@/components/games/GameShell";
 import MiniBoard from "@/components/leaderboards/MiniBoard";
-import {submitScore} from "@/lib/graphql/queries";
 import {useAuth} from "@/contexts/AuthContext";
+import {submitScore} from "@/lib/graphql/queries";
 
 const BubblePopGame = dynamic(() => import("@games/bubble-pop").then((m) => m.BubblePopGame), {
   ssr: false,

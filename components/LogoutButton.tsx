@@ -2,6 +2,7 @@
 
 import {getAuth, signOut} from "firebase/auth";
 import {useRouter} from "next/navigation";
+
 import {getFirebaseApp} from "@/lib/firebase";
 
 export default function LogoutButton() {

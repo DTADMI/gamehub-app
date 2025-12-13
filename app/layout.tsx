@@ -1,10 +1,12 @@
-import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
-import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
-import { Header } from '@/components/Header';
-import { Providers } from '@/components/Providers';
-import { Footer } from '@/components/Footer';
+
+import {Analytics} from '@vercel/analytics/next';
+import type {Metadata} from 'next';
+import {Geist, Geist_Mono} from 'next/font/google';
+
+import {Footer} from '@/components/Footer';
+import {Header} from '@/components/Header';
+import {Providers} from '@/components/Providers';
 
 const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });

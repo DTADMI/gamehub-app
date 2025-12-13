@@ -1,8 +1,8 @@
 "use client";
 
-import {useState} from "react";
 import Link from "next/link";
 import {signIn} from "next-auth/react";
+import {useState} from "react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "http://localhost:3000/api";
 

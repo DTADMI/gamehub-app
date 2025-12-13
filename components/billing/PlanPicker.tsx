@@ -1,8 +1,8 @@
 "use client";
 
 import React, {useState} from "react";
-import {useRouter} from "next/navigation";
-import {createCheckout} from "@/lib/graphql/queries";
+
+import {createCheckout, Plan} from "@/lib/graphql/queries";
 
 export type BillingPlan = "WEEKLY" | "MONTHLY" | "YEARLY" | "LIFETIME";
 
@@ -50,7 +50,6 @@ function PlanCard({title, price, period, features, recommended, onSelect, disabl
 }
 
 export default function PlanPicker() {
-    const router = useRouter();
     const [loadingPlan, setLoadingPlan] = useState<BillingPlan | null>(null);
     const [error, setError] = useState<string>("");
 
@@ -59,8 +58,17 @@ export default function PlanPicker() {
             setLoadingPlan(plan);
             setError("");
             const origin = typeof window !== "undefined" ? window.location.origin : "";
+
+            // Map BillingPlan to Plan
+            const planMapping: Record<BillingPlan, Plan> = {
+                "WEEKLY": "PRO",
+                "MONTHLY": "PRO",
+                "YEARLY": "PRO",
+                "LIFETIME": "PRO"
+            };
+
             const res = await createCheckout({
-                plan,
+                plan: planMapping[plan],
                 returnUrl: `${origin}/account/subscribe/success`,
                 cancelUrl: `${origin}/account/subscribe`,
             });

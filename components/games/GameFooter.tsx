@@ -1,9 +1,10 @@
 // frontend/components/games/GameFooter.tsx
 "use client";
 
-import { useGame } from "@/contexts/GameContext";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import {useRouter} from "next/navigation";
+
+import {Button} from "@/components/ui/button";
+import {useGame} from "@/contexts/GameContext";
 
 export function GameFooter() {
   const { game, stats, saveProgress } = useGame();

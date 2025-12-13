@@ -1,8 +1,9 @@
 // frontend/lib/gameProgress.ts
 "use client";
 
-import {getFireStore} from "./firebase";
 import {doc, Firestore, getDoc, serverTimestamp, setDoc} from "firebase/firestore";
+
+import {getFireStore} from "./firebase";
 
 export interface GameStats {
   highScore: number;

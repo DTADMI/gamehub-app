@@ -30,9 +30,13 @@ const DEFAULT_KEYS = new Set<string>([
 ]);
 
 function isTextInput(el: Element | null): boolean {
-    if (!el) return false;
+    if (!el) {
+        return false;
+    }
     const tag = el.tagName?.toLowerCase();
-    if (tag === "input" || tag === "textarea") return true;
+    if (tag === "input" || tag === "textarea") {
+        return true;
+    }
     const editable = (el as HTMLElement).isContentEditable;
     return Boolean(editable);
 }
@@ -50,17 +54,25 @@ export function enableGameKeyCapture(opts: GameKeyCaptureOptions = {}): () => vo
     const isActive = opts.isActive || (() => true);
 
     const shouldCapture = (): boolean => {
-        if (!isActive()) return false;
+        if (!isActive()) {
+            return false;
+        }
         const active = document.activeElement;
         // Do not capture when user types in inputs/textareas/contenteditable
-        if (isTextInput(active)) return false;
-        if (!opts.rootEl) return true;
+        if (isTextInput(active)) {
+            return false;
+        }
+        if (!opts.rootEl) {
+            return true;
+        }
         // If a root element is provided, only capture when focus is inside it
         return active ? opts.rootEl.contains(active) : true;
     };
 
     const onKeyDown = (e: KeyboardEvent) => {
-        if (!shouldCapture()) return;
+        if (!shouldCapture()) {
+            return;
+        }
         if (keySet.has(e.key)) {
             // Prevent page scroll and other default browser actions
             e.preventDefault();

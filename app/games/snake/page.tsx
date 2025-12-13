@@ -2,13 +2,14 @@
 
 import dynamic from "next/dynamic";
 import {useEffect, useState} from "react";
-import {PresenceBadge} from "@/components/PresenceBadge";
-import {useStomp} from "@/lib/realtime/useStomp";
-import {useFeature} from "@/lib/flags";
-import {submitScore} from "@/lib/graphql/queries";
-import {useAuth} from "@/contexts/AuthContext";
+
 import {GameShell} from "@/components/games/GameShell";
 import MiniBoard from "@/components/leaderboards/MiniBoard";
+import {PresenceBadge} from "@/components/PresenceBadge";
+import {useAuth} from "@/contexts/AuthContext";
+import {useFeature} from "@/lib/flags";
+import {submitScore} from "@/lib/graphql/queries";
+import {useStomp} from "@/lib/realtime/useStomp";
 
 const SnakeGame = dynamic(() => import("@games/snake").then((m) => m.SnakeGame), {
   ssr: false,
@@ -123,7 +124,9 @@ export default function SnakeGamePage() {
         payload: { value: score },
       };
       try {
-        if (realtimeEnabled) publish("/app/snake/score", env);
+        if (realtimeEnabled) {
+          publish("/app/snake/score", env);
+        }
       } catch {}
 
       // Auth-only leaderboards: submit score to backend GraphQL when user is signed in

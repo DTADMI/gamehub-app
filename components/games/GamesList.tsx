@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
-import { useAuth } from "@/contexts/AuthContext";
+import Link from "next/link";
+
+import {useAuth} from "@/contexts/AuthContext";
 
 interface Game {
   id: string;

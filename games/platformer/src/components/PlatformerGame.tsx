@@ -1,8 +1,8 @@
 // games/platformer/src/components/PlatformerGame.tsx
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { soundManager } from "@games/shared";
+import {soundManager} from "@games/shared";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 
 // Minimal platformer constants
 const TILE = 32;

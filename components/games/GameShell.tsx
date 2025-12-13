@@ -1,7 +1,7 @@
 "use client";
 
-import React, {useCallback, useEffect, useMemo, useRef} from "react";
 import {enableGameKeyCapture, GameHUD, soundManager} from "@games/shared";
+import React, {useCallback, useEffect, useMemo, useRef} from "react";
 
 type PreloadSound = {
     key: string;
@@ -41,7 +41,9 @@ function MobileTouchControls({onKey}: { onKey: (key: string) => void }) {
             onKey(key);
             // Haptics if available
             try {
-                if (navigator.vibrate) navigator.vibrate(10);
+                if (navigator.vibrate) {
+                    navigator.vibrate(10);
+                }
             } catch {
             }
         },
@@ -115,7 +117,9 @@ export function GameShell({
         const cleanupCapture = enableGameKeyCapture({rootEl: el ?? undefined});
 
         const preload = async () => {
-            if (!preloadSounds || !preloadSounds.length) return;
+            if (!preloadSounds || !preloadSounds.length) {
+                return;
+            }
             try {
                 await Promise.all(
                     preloadSounds.map((s) => soundManager.preloadSound(s.key, s.url, !!s.loop)),
@@ -141,14 +145,18 @@ export function GameShell({
     }, []);
 
     const handlePause = useCallback(() => {
-        if (onPauseToggle) return onPauseToggle();
+        if (onPauseToggle) {
+            return onPauseToggle();
+        }
         // Fallback: emit custom event then Space for keyboard‑driven games
         window.dispatchEvent(new Event("game:pauseToggle"));
         sendKey(" ");
     }, [onPauseToggle, sendKey]);
 
     const handleRestart = useCallback(() => {
-        if (onRestart) return onRestart();
+        if (onRestart) {
+            return onRestart();
+        }
         window.dispatchEvent(new Event("game:restart"));
     }, [onRestart]);
 

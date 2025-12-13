@@ -1,8 +1,8 @@
 "use client";
 
+import {enableGameKeyCapture, GameHUD} from "@games/shared";
 import dynamic from "next/dynamic";
 import {useEffect, useRef, useState} from "react";
-import {enableGameKeyCapture, GameHUD} from "@games/shared";
 
 const PlatformerGame = dynamic(() => import("@games/platformer").then((m) => m.PlatformerGame), {
   ssr: false,

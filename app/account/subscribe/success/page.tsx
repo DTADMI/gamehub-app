@@ -1,7 +1,8 @@
 "use client";
 
-import React, {useEffect} from "react";
 import Link from "next/link";
+import React, {useEffect} from "react";
+
 import {useSubscription} from "@/contexts/SubscriptionContext";
 
 export default function SubscribeSuccessPage() {

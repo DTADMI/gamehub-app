@@ -1,10 +1,11 @@
 "use client";
 
+import {LogIn} from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { LogIn } from "lucide-react";
-import { useFeature } from "@/lib/flags";
-import { ModeToggle } from "@/components/ModeToggle";
+
+import {ModeToggle} from "@/components/ModeToggle";
+import {Button} from "@/components/ui/button";
+import {useFeature} from "@/lib/flags";
 
 export function Header() {
   const showAdmin = useFeature("ADMIN", false);

@@ -1,16 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import {
-  BOARD_HEIGHT,
-  BOARD_WIDTH,
-  CELL_SIZE,
-  GameState,
-  Position,
-  TETROMINO_TYPES,
-  TETROMINOS,
-} from "../types/game";
 import axios from "axios";
+import {useCallback, useEffect, useState} from "react";
+
+import {BOARD_HEIGHT, BOARD_WIDTH, CELL_SIZE, GameState, Position, TETROMINO_TYPES, TETROMINOS,} from "../types/game";
 
 const createEmptyBoard = () =>
   Array(BOARD_HEIGHT)

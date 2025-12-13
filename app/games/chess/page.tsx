@@ -1,8 +1,8 @@
 "use client";
 
+import {enableGameKeyCapture, GameHUD} from "@games/shared";
 import dynamic from "next/dynamic";
 import {useEffect, useRef, useState} from "react";
-import {enableGameKeyCapture, GameHUD} from "@games/shared";
 
 const ChessGame = dynamic(() => import("@games/chess").then((m) => m.ChessGame), {
   ssr: false,

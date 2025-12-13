@@ -1,7 +1,8 @@
 "use client";
 
-import { signIn, signOut, useSession } from "next-auth/react";
-import { Button } from "@/components/ui/button";
+import {signIn, signOut, useSession} from "next-auth/react";
+
+import {Button} from "@/components/ui/button";
 
 export function UserMenu() {
   const { data: session, status } = useSession();

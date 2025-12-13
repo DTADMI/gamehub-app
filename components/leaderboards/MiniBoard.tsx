@@ -1,11 +1,12 @@
 "use client";
 
 import React, {useEffect, useMemo, useState} from "react";
-import {fetchLeaderboard, type LeaderboardEntry} from "@/lib/graphql/queries";
+
 import {useAuth} from "@/contexts/AuthContext";
+import {fetchLeaderboard, type GameType, type LeaderboardEntry} from "@/lib/graphql/queries";
 
 type MiniBoardProps = {
-    gameType: string;
+    gameType: GameType;
     limit?: number;
     className?: string;
 };
@@ -41,12 +42,18 @@ export default function MiniBoard({gameType, limit = 10, className}: MiniBoardPr
             setError("");
             try {
                 const res = await fetchLeaderboard({gameType, limit});
-                if (!cancelled) setEntries(res.leaderboard);
+                if (!cancelled) {
+                    setEntries(res.leaderboard);
+                }
             } catch (e) {
                 console.warn("MiniBoard fetch error", e);
-                if (!cancelled) setError("Failed to load leaderboard");
+                if (!cancelled) {
+                    setError("Failed to load leaderboard");
+                }
             } finally {
-                if (!cancelled) setLoading(false);
+                if (!cancelled) {
+                    setLoading(false);
+                }
             }
         }
 

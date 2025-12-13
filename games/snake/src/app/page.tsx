@@ -1,12 +1,12 @@
 // games/snake/src/app/page.tsx
 "use client";
 
+import {soundManager} from "@games/shared";
 import dynamic from "next/dynamic";
-import { useEffect } from "react";
-import { soundManager } from "@games/shared";
+import {useEffect} from "react";
 
 // Dynamically import the game component with SSR disabled
-const SnakeGame = dynamic(() => import("@/components/SnakeGame").then((mod) => mod.SnakeGame), {
+const SnakeGame = dynamic(() => import("../components/SnakeGame").then((mod) => mod.SnakeGame), {
   ssr: false,
   loading: () => (
     <div className="min-h-screen flex items-center justify-center">

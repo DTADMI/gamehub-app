@@ -1,16 +1,17 @@
 // games/snake/src/components/SnakeGame.tsx
-import React, {useCallback, useEffect, useRef, useState} from "react";
 import {GameContainer, soundManager} from "@games/shared";
+import React, {useCallback, useEffect, useRef, useState} from "react";
+
 import {
-    CELL_SIZE,
-    Direction,
-    GAME_SPEED,
-    GameConfig,
-    GameMode,
-    GRID_SIZE,
-    Obstacle,
-    Portal,
-    Position,
+  CELL_SIZE,
+  Direction,
+  GAME_SPEED,
+  GameConfig,
+  GameMode,
+  GRID_SIZE,
+  Obstacle,
+  Portal,
+  Position,
 } from "../types/game";
 
 export const SnakeGame: React.FC = () => {
@@ -52,71 +53,8 @@ export const SnakeGame: React.FC = () => {
     } catch {}
   }, []);
 
-  // Initialize game
-  const initGame = useCallback(() => {
-    // Set up initial snake
-    const initialSnake = [
-      { x: 5, y: 10 },
-      { x: 4, y: 10 },
-      { x: 3, y: 10 },
-    ];
-
-    setSnake(initialSnake);
-    setDirection("RIGHT");
-    setNextDirection("RIGHT");
-    setScore(0);
-    setGameOver(false);
-    setFood(generateFood(initialSnake));
-
-    if (config.hasObstacles) {
-      setObstacles(generateObstacles(initialSnake));
-    } else {
-      setObstacles([]);
-    }
-
-    if (config.hasPortals) {
-      setPortals(generatePortals());
-    } else {
-      setPortals([]);
-    }
-
-    soundManager.playMusic("background");
-    // The helpers are stable for the game boot; intentionally not adding them as deps
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [config.hasObstacles, config.hasPortals]);
-
-  // Restart helper that applies a provided configuration immediately
-  const restartWithConfig = useCallback((nextCfg: GameConfig) => {
-    setConfig(nextCfg);
-    // Initialize with nextCfg settings explicitly
-    const initialSnake = [
-      {x: 5, y: 10},
-      {x: 4, y: 10},
-      {x: 3, y: 10},
-    ];
-    setSnake(initialSnake);
-    setDirection("RIGHT");
-    setNextDirection("RIGHT");
-    setScore(0);
-    setGameOver(false);
-    setFood(generateFood(initialSnake));
-    if (nextCfg.hasObstacles) {
-      setObstacles(generateObstacles(initialSnake));
-    } else {
-      setObstacles([]);
-    }
-    if (nextCfg.hasPortals) {
-      setPortals(generatePortals());
-    } else {
-      setPortals([]);
-    }
-    setGameStarted(true);
-    setIsPaused(false);
-    soundManager.playMusic("background");
-  }, []);
-
   // Generate random position
-  const getRandomPosition = (exclude: Position[] = []): Position => {
+  const getRandomPosition = useCallback((exclude: Position[] = []): Position => {
     let position: Position;
     do {
       position = {
@@ -125,15 +63,15 @@ export const SnakeGame: React.FC = () => {
       };
     } while (exclude.some((pos) => pos.x === position.x && pos.y === position.y));
     return position;
-  };
+  }, [config.gridSize]);
 
   // Generate food at random position
-  const generateFood = (exclude: Position[]): Position => {
+  const generateFood = useCallback((exclude: Position[]): Position => {
     return getRandomPosition(exclude);
-  };
+  }, [getRandomPosition]);
 
   // Generate obstacles
-  const generateObstacles = (exclude: Position[]): Obstacle[] => {
+  const generateObstacles = useCallback((exclude: Position[]): Obstacle[] => {
     const obstacles: Obstacle[] = [];
     const obstacleCount = Math.floor(config.gridSize * config.gridSize * 0.1); // 10% of grid
 
@@ -142,10 +80,10 @@ export const SnakeGame: React.FC = () => {
     }
 
     return obstacles;
-  };
+  }, [config.gridSize, getRandomPosition]);
 
   // Generate portal pairs
-  const generatePortals = (): Portal[] => {
+  const generatePortals = useCallback((): Portal[] => {
     const portalCount = 2; // Number of portal pairs
     const portals: Portal[] = [];
     const usedPositions: Position[] = [];
@@ -161,7 +99,49 @@ export const SnakeGame: React.FC = () => {
     }
 
     return portals;
-  };
+  }, [getRandomPosition]);
+
+  // Initialize game
+  const initGame = useCallback((nextCfg?: GameConfig) => {
+    // Use provided config or fall back to current state
+    const currentConfig = nextCfg || config;
+
+    // Set up initial snake
+    const initialSnake = [
+      {x: 5, y: 10},
+      {x: 4, y: 10},
+      {x: 3, y: 10},
+    ];
+
+    setSnake(initialSnake);
+    setDirection("RIGHT");
+    setNextDirection("RIGHT");
+    setScore(0);
+    setGameOver(false);
+    setFood(generateFood(initialSnake));
+
+    if (currentConfig.hasObstacles) {
+      setObstacles(generateObstacles(initialSnake));
+    } else {
+      setObstacles([]);
+    }
+
+    if (currentConfig.hasPortals) {
+      setPortals(generatePortals());
+    } else {
+      setPortals([]);
+    }
+
+    soundManager.playMusic("background");
+
+    return initialSnake;
+  }, [config, generateFood, generateObstacles, generatePortals]);
+
+  // Restart helper that applies a provided configuration immediately
+  const restartWithConfig = useCallback((nextCfg: GameConfig) => {
+    setConfig(nextCfg);
+    initGame(nextCfg);
+  }, [initGame]);
 
   // Check collision
   const checkCollision = (position: Position, checkWalls = true): boolean => {
@@ -245,7 +225,7 @@ export const SnakeGame: React.FC = () => {
           break;
       }
     },
-      [direction, gameStarted, gameOver, initGame],
+      [direction, gameStarted, gameOver, initGame, config, restartWithConfig],
   );
 
   // Game loop

@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import {useEffect, useState} from "react";
+
 import {GameShell} from "@/components/games/GameShell";
 import MiniBoard from "@/components/leaderboards/MiniBoard";
 import {useAuth} from "@/contexts/AuthContext";

@@ -1,8 +1,8 @@
 // games/bubble-pop/src/components/BubblePopGame.tsx
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { soundManager } from "@games/shared";
+import {soundManager} from "@games/shared";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 
 // --- Game constants
 const COLS = 10;
