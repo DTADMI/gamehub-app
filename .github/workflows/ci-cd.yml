@@ -44,7 +44,7 @@ jobs:
 
   build-local-and-tag-images:
     name: Build once locally and tag images
-    needs: [ test-frontend ]
+    needs: [ test-frontend, test-e2e ]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -52,8 +52,6 @@ jobs:
     outputs:
       has_hub: ${{ steps.prep.outputs.has_hub }}
       has_gcp: ${{ steps.prep.outputs.has_gcp }}
-      AR_SHA: ${{ steps.prep.outputs.AR_SHA }}
-      AR_LATEST: ${{ steps.prep.outputs.AR_LATEST }}
       HUB_SHA: ${{ steps.prep.outputs.HUB_SHA }}
       HUB_LATEST: ${{ steps.prep.outputs.HUB_LATEST }}
       LOCAL_IMAGE: ${{ steps.prep.outputs.LOCAL_IMAGE }}
@@ -90,8 +88,7 @@ jobs:
           if [ -z "$HUB_REPO" ]; then HUB_REPO="${{ vars.DOCKERHUB_USERNAME }}/gamehub-app"; fi
 
           echo "LOCAL_IMAGE=local/gamehub-app:$SHA" >> $GITHUB_OUTPUT
-          echo "AR_SHA=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/$AR_REPO/$FRONT:$SHA" >> $GITHUB_OUTPUT
-          echo "AR_LATEST=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/$AR_REPO/$FRONT:latest" >> $GITHUB_OUTPUT
+          # Avoid exporting AR_* via outputs since they are derived from secrets; compute them in downstream job
           echo "HUB_SHA=docker.io/$HUB_REPO:$SHA" >> $GITHUB_OUTPUT
           echo "HUB_LATEST=docker.io/$HUB_REPO:latest" >> $GITHUB_OUTPUT
 
@@ -225,8 +222,12 @@ jobs:
       - name: Compute and tag images for Artifact Registry
         run: |
           LOCAL_IMAGE=${{ needs.build-local-and-tag-images.outputs.LOCAL_IMAGE }}
-          AR_SHA=${{ needs.build-local-and-tag-images.outputs.AR_SHA }}
-          AR_LATEST=${{ needs.build-local-and-tag-images.outputs.AR_LATEST }}
+          AR_REPO_NAME=${{ vars.GCP_ARTIFACT_REPO }}
+          if [ -z "$AR_REPO_NAME" ]; then AR_REPO_NAME=gamehub; fi
+          FRONT=${{ env.FRONTEND_SERVICE }}
+          SHA=${GITHUB_SHA}
+          AR_SHA="${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/$AR_REPO_NAME/$FRONT:$SHA"
+          AR_LATEST="${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/$AR_REPO_NAME/$FRONT:latest"
           docker tag "$LOCAL_IMAGE" "$AR_SHA"
           docker tag "$LOCAL_IMAGE" "$AR_LATEST"
           echo "AR_SHA=$AR_SHA" >> $GITHUB_ENV
@@ -272,3 +273,14 @@ jobs:
           E2E_PUBLIC_MODE: "false"
           NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api' }}
         run: pnpm test:e2e
+
+      - name: Upload Playwright artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          path: |
+            playwright-report
+            test-results
+          if-no-files-found: ignore
+          retention-days: 7
