@@ -12,6 +12,7 @@ export default defineConfig({
     reporter: [["list", "html"]],
   use: {
       baseURL: process.env.E2E_BASE_URL || "http://localhost:3000",
+      navigationTimeout: 30_000,
       trace: "on-first-retry",
       screenshot: 'only-on-failure',
       video: 'on-first-retry',

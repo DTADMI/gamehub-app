@@ -253,6 +253,8 @@ jobs:
   test-e2e:
     name: Playwright E2E
     runs-on: ubuntu-latest
+    # Let PRs continue even if E2E fails (preview builds), but keep main gated
+    continue-on-error: ${{ github.event_name == 'pull_request' }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node & pnpm (Corepack)
