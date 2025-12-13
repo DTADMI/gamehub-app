@@ -1,6 +1,8 @@
 // frontend/lib/gameProgress.ts
-import { db } from "./firebase";
-import { doc, Firestore, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+"use client";
+
+import {getFireStore} from "./firebase";
+import {doc, Firestore, getDoc, serverTimestamp, setDoc} from "firebase/firestore";
 
 export interface GameStats {
   highScore: number;
@@ -9,6 +11,8 @@ export interface GameStats {
   lastPlayed: string;
   // Add more stats as needed
 }
+
+const db = getFireStore();
 
 function ensureDbInitialized(): Firestore {
   if (!db) {

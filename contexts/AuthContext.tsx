@@ -1,8 +1,8 @@
 "use client";
 
 import {createContext, useContext, useEffect, useMemo, useState} from "react";
-import {getAuth, onAuthStateChanged, User} from "firebase/auth";
-import {app} from "@/lib/firebase";
+import {onAuthStateChanged, User} from "firebase/auth";
+import {getFirebaseAuth} from "@/lib/firebase";
 
 interface AuthContextType {
   user: User | null;
@@ -26,7 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (typeof window === "undefined") {
       return null;
     }
-    return getAuth(app);
+    return getFirebaseAuth();
   }, []);
 
   useEffect(() => {

@@ -1,11 +1,13 @@
 "use client";
 
-import { getAuth, signOut } from "firebase/auth";
-import { useRouter } from "next/navigation";
-import { app } from "@/lib/firebase";
+import {getAuth, signOut} from "firebase/auth";
+import {useRouter} from "next/navigation";
+import {getFirebaseApp} from "@/lib/firebase";
 
 export default function LogoutButton() {
   const router = useRouter();
+
+  const app = getFirebaseApp();
 
   const handleLogout = async () => {
     try {
