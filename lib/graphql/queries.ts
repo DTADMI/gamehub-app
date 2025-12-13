@@ -137,13 +137,18 @@ export type CreateCheckoutResult = {
     };
 };
 
-export async function createCheckout(input: CreateCheckoutInput): Promise<CreateCheckoutResult> {
+export async function createCheckout(
+    input: CreateCheckoutInput,
+): Promise<CreateCheckoutResult> {
     const mutation = `
       mutation CreateCheckout($input: CreateCheckoutInput!) {
         createCheckout(input: $input) { id url }
       }
     `;
-    return gqlFetch<CreateCheckoutResult>({query: mutation, variables: {input}});
+    return gqlFetch<CreateCheckoutResult>({
+        query: mutation,
+        variables: {input},
+    });
 }
 
 // Viewer / subscription info (for premium gating)

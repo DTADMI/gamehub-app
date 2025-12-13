@@ -45,7 +45,9 @@ function isTextInput(el: Element | null): boolean {
  * Enable global key capture for a game session. Returns a cleanup function.
  * Use inside a useEffect in client components.
  */
-export function enableGameKeyCapture(opts: GameKeyCaptureOptions = {}): () => void {
+export function enableGameKeyCapture(
+    opts: GameKeyCaptureOptions = {},
+): () => void {
     if (typeof window === "undefined") {
         return () => void 0;
     }

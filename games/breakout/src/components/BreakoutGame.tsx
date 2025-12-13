@@ -30,7 +30,14 @@ interface Brick {
   health: number;
 }
 
-type PowerUpType = "expand" | "shrink" | "slow" | "fast" | "multiball" | "laser" | "extraLife";
+type PowerUpType =
+    | "expand"
+    | "shrink"
+    | "slow"
+    | "fast"
+    | "multiball"
+    | "laser"
+    | "extraLife";
 
 interface PowerUp {
   x: number;
@@ -192,7 +199,10 @@ export const BreakoutGame: React.FC = () => {
 
     const handleKeyUp = (e: KeyboardEvent) => {
       if (
-        (e.key === "ArrowLeft" || e.key === "a" || e.key === "ArrowRight" || e.key === "d") &&
+          (e.key === "ArrowLeft" ||
+              e.key === "a" ||
+              e.key === "ArrowRight" ||
+              e.key === "d") &&
         paddle.dx !== 0
       ) {
         setPaddle((prev) => ({ ...prev, dx: 0 }));
@@ -254,12 +264,22 @@ export const BreakoutGame: React.FC = () => {
     // The animation loop deliberately uses stable closures for performance; adding
     // all helpers as deps would restart the loop unnecessarily.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameStarted, gameOver, isPaused, bricks, powerUps, activePowerUps, balls]);
+  }, [
+    gameStarted,
+    gameOver,
+    isPaused,
+    bricks,
+    powerUps,
+    activePowerUps,
+    balls,
+  ]);
 
   // Draw paddle
   const drawPaddle = (ctx: CanvasRenderingContext2D) => {
     ctx.beginPath();
-    ctx.roundRect(paddle.x, paddle.y, paddle.width, paddle.height, [paddle.height / 2]);
+    ctx.roundRect(paddle.x, paddle.y, paddle.width, paddle.height, [
+      paddle.height / 2,
+    ]);
     ctx.fillStyle = "#3498db";
     ctx.fill();
     ctx.closePath();
@@ -407,7 +427,11 @@ export const BreakoutGame: React.FC = () => {
         ctx.font = "12px Arial";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText(`${type}: ${timeLeft}s`, powerUpX + 30, canvasRef.current!.height - 15);
+        ctx.fillText(
+            `${type}: ${timeLeft}s`,
+            powerUpX + 30,
+            canvasRef.current!.height - 15,
+        );
 
         powerUpX += 70;
       }
@@ -422,7 +446,11 @@ export const BreakoutGame: React.FC = () => {
       ctx.font = "48px Arial";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText("Game Over", canvasRef.current!.width / 2, canvasRef.current!.height / 2 - 50);
+      ctx.fillText(
+          "Game Over",
+          canvasRef.current!.width / 2,
+          canvasRef.current!.height / 2 - 50,
+      );
 
       ctx.font = "24px Arial";
       ctx.fillText(
@@ -465,7 +493,11 @@ export const BreakoutGame: React.FC = () => {
       ctx.font = "36px Arial";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText("Breakout", canvasRef.current!.width / 2, canvasRef.current!.height / 2 - 60);
+      ctx.fillText(
+          "Breakout",
+          canvasRef.current!.width / 2,
+          canvasRef.current!.height / 2 - 60,
+      );
 
       ctx.font = "20px Arial";
       ctx.fillText(
@@ -486,7 +518,11 @@ export const BreakoutGame: React.FC = () => {
       ctx.font = "36px Arial";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText("Paused", canvasRef.current!.width / 2, canvasRef.current!.height / 2);
+      ctx.fillText(
+          "Paused",
+          canvasRef.current!.width / 2,
+          canvasRef.current!.height / 2,
+      );
 
       ctx.font = "20px Arial";
       ctx.fillText(
@@ -797,7 +833,8 @@ export const BreakoutGame: React.FC = () => {
                 "laser",
                 "extraLife",
               ];
-              const randomType = powerUpTypes[Math.floor(Math.random() * powerUpTypes.length)];
+              const randomType =
+                  powerUpTypes[Math.floor(Math.random() * powerUpTypes.length)];
 
               newPowerUps.push({
                 x: brick.x + brick.width / 2 - POWER_UP_SIZE / 2,
@@ -871,7 +908,8 @@ export const BreakoutGame: React.FC = () => {
                   "laser",
                   "extraLife",
                 ];
-                const randomType = powerUpTypes[Math.floor(Math.random() * powerUpTypes.length)];
+                const randomType =
+                    powerUpTypes[Math.floor(Math.random() * powerUpTypes.length)];
 
                 newPowerUps.push({
                   x: brick.x + brick.width / 2 - POWER_UP_SIZE / 2,
@@ -908,7 +946,9 @@ export const BreakoutGame: React.FC = () => {
       setPowerUps(newPowerUps);
 
       // Check if level is complete
-      const levelComplete = newBricks.every((column) => column.every((brick) => brick.health <= 0));
+      const levelComplete = newBricks.every((column) =>
+          column.every((brick) => brick.health <= 0),
+      );
 
       if (levelComplete) {
         soundManager.playSound("levelComplete");
@@ -1148,7 +1188,8 @@ export const BreakoutGame: React.FC = () => {
         <h3 className="text-lg font-semibold mb-2">How to Play</h3>
         <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
           <li>
-            • Use <kbd>←</kbd> <kbd>→</kbd> or <kbd>A</kbd> <kbd>D</kbd> to move the paddle
+            • Use <kbd>←</kbd> <kbd>→</kbd> or <kbd>A</kbd> <kbd>D</kbd> to move
+            the paddle
           </li>
           <li>
             • Press <kbd>Space</kbd> to start/pause the game
@@ -1160,20 +1201,36 @@ export const BreakoutGame: React.FC = () => {
         <h3 className="text-lg font-semibold mt-4 mb-2">Power-Ups</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
           <div className="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-lg">
-            <div className="font-medium text-blue-700 dark:text-blue-300">Expand</div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">Wider paddle</div>
+            <div className="font-medium text-blue-700 dark:text-blue-300">
+              Expand
+            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              Wider paddle
+            </div>
           </div>
           <div className="bg-red-50 dark:bg-red-900/30 p-3 rounded-lg">
-            <div className="font-medium text-red-700 dark:text-red-300">Shrink</div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">Smaller paddle</div>
+            <div className="font-medium text-red-700 dark:text-red-300">
+              Shrink
+            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              Smaller paddle
+            </div>
           </div>
           <div className="bg-yellow-50 dark:bg-yellow-900/30 p-3 rounded-lg">
-            <div className="font-medium text-yellow-700 dark:text-yellow-300">Slow</div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">Slower ball</div>
+            <div className="font-medium text-yellow-700 dark:text-yellow-300">
+              Slow
+            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              Slower ball
+            </div>
           </div>
           <div className="bg-purple-50 dark:bg-purple-900/30 p-3 rounded-lg">
-            <div className="font-medium text-purple-700 dark:text-purple-300">Multiball</div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">Extra balls</div>
+            <div className="font-medium text-purple-700 dark:text-purple-300">
+              Multiball
+            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              Extra balls
+            </div>
           </div>
         </div>
       </div>

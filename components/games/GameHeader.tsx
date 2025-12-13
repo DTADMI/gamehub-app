@@ -44,7 +44,11 @@ export function GameHeader() {
               onClick={toggleMute}
               aria-label={isMuted ? "Unmute" : "Mute"}
             >
-              {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+              {isMuted ? (
+                  <VolumeX className="h-5 w-5"/>
+              ) : (
+                  <Volume2 className="h-5 w-5"/>
+              )}
             </Button>
 
             <input

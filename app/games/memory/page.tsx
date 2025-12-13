@@ -4,14 +4,17 @@ import {enableGameKeyCapture, GameHUD} from "@games/shared";
 import dynamic from "next/dynamic";
 import {useEffect, useRef, useState} from "react";
 
-const MemoryGame = dynamic(() => import("@games/memory").then((m) => m.MemoryGame), {
-  ssr: false,
-  loading: () => (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-xl">Loading game...</div>
-    </div>
-  ),
-});
+const MemoryGame = dynamic(
+    () => import("@games/memory").then((m) => m.MemoryGame),
+    {
+        ssr: false,
+        loading: () => (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-xl">Loading game...</div>
+            </div>
+        ),
+    },
+);
 
 export default function MemoryGamePage() {
     const rootRef = useRef<HTMLDivElement | null>(null);
@@ -35,7 +38,9 @@ export default function MemoryGamePage() {
             <MemoryGame key={seed}/>
             <GameHUD
                 onPauseToggle={() => {
-                    window.dispatchEvent(new KeyboardEvent("keydown", {key: " ", code: "Space"}));
+                    window.dispatchEvent(
+                        new KeyboardEvent("keydown", {key: " ", code: "Space"}),
+                    );
                 }}
                 onRestart={() => setSeed((s) => s + 1)}
                 tips="Click cards to match pairs • Try to remember positions"

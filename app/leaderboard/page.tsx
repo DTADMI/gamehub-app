@@ -36,9 +36,15 @@ export default function LeaderboardPage() {
   const {status, data} = useSession();
   const {entitlements} = useSubscription();
 
-  const [gameType, setGameType] = useState<GameType>((search.get("game") as GameType) || "SNAKE");
-  const [scope, setScope] = useState<LeaderboardScope>((search.get("scope") as LeaderboardScope) || "GLOBAL");
-  const [window_, setWindow] = useState<TimeWindow>((search.get("window") as TimeWindow) || "ALL_TIME");
+  const [gameType, setGameType] = useState<GameType>(
+      (search.get("game") as GameType) || "SNAKE",
+  );
+  const [scope, setScope] = useState<LeaderboardScope>(
+      (search.get("scope") as LeaderboardScope) || "GLOBAL",
+  );
+  const [window_, setWindow] = useState<TimeWindow>(
+      (search.get("window") as TimeWindow) || "ALL_TIME",
+  );
 
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
@@ -78,7 +84,7 @@ export default function LeaderboardPage() {
       } as const;
 
       // Premium gating on client: FRIENDS and non-ALL_TIME windows require advancedLeaderboards
-      const isPremiumRequired = (scope !== "GLOBAL") || (window_ !== "ALL_TIME");
+      const isPremiumRequired = scope !== "GLOBAL" || window_ !== "ALL_TIME";
       if (isPremiumRequired && !entitlements.advancedLeaderboards) {
         setError("This leaderboard is available to Pro subscribers.");
         setEntries([]);
@@ -88,11 +94,13 @@ export default function LeaderboardPage() {
       }
 
       const res = await fetchLeaderboardPaged(variables);
-      const newEntries = res.leaderboard.edges.map(e => e.node);
+      const newEntries = res.leaderboard.edges.map((e) => e.node);
       const end = res.leaderboard.pageInfo.endCursor || null;
       setHasNext(res.leaderboard.pageInfo.hasNextPage);
       setCursor(end);
-      setEntries((prev) => (opts.reset ? newEntries : [...prev, ...newEntries]));
+      setEntries((prev) =>
+          opts.reset ? newEntries : [...prev, ...newEntries],
+      );
     } catch (err) {
       console.error(err);
       setError("Failed to load leaderboard");
@@ -136,7 +144,8 @@ export default function LeaderboardPage() {
         <div className="flex items-center gap-2 ml-auto">
           <span className="text-sm text-muted-foreground">Scope:</span>
           {SCOPES.map((s) => {
-            const disabled = (s !== "GLOBAL") && !entitlements.advancedLeaderboards;
+            const disabled =
+                s !== "GLOBAL" && !entitlements.advancedLeaderboards;
             return (
                 <button
                     key={s}
@@ -155,8 +164,12 @@ export default function LeaderboardPage() {
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Window:</span>
           {WINDOWS.map((w) => {
-            const disabled = (w !== "ALL_TIME") && !entitlements.advancedLeaderboards;
-            const label = w.replace(/_/g, " ").toLowerCase().replace(/^./, (c) => c.toUpperCase());
+            const disabled =
+                w !== "ALL_TIME" && !entitlements.advancedLeaderboards;
+            const label = w
+                .replace(/_/g, " ")
+                .toLowerCase()
+                .replace(/^./, (c) => c.toUpperCase());
             return (
                 <button
                     key={w}
@@ -172,7 +185,9 @@ export default function LeaderboardPage() {
         </div>
       </div>
 
-      {loading && <div className="text-center py-8">Loading leaderboard...</div>}
+      {loading && (
+          <div className="text-center py-8">Loading leaderboard...</div>
+      )}
       {error && <div className="text-center py-8 text-red-500">{error}</div>}
 
       {!loading && !error && (
@@ -180,23 +195,45 @@ export default function LeaderboardPage() {
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
               <thead className="bg-gray-50 dark:bg-gray-800/50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Rank</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Player</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Score</th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Game</th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                  Rank
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                  Player
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                  Score
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                  Game
+                </th>
               </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
               {entries.map((row) => {
                 const isCurrent =
-                    currentIdentifier && currentIdentifier === (row.user.username?.toLowerCase() || "");
+                    currentIdentifier &&
+                    currentIdentifier ===
+                    (row.user.username?.toLowerCase() || "");
                 return (
-                    <tr key={`${row.gameType}-${row.rank}-${row.user.id}`}
-                        className={isCurrent ? "bg-blue-50 dark:bg-blue-900/20" : ""}>
-                      <td className="px-6 py-3 text-sm text-muted-foreground">{row.rank}</td>
-                      <td className="px-6 py-3 text-sm font-medium">{row.user.username}</td>
-                      <td className="px-6 py-3 text-sm">{row.score.toLocaleString()}</td>
-                      <td className="px-6 py-3 text-sm capitalize">{row.gameType.replace(/_/g, " ")}</td>
+                    <tr
+                        key={`${row.gameType}-${row.rank}-${row.user.id}`}
+                        className={
+                          isCurrent ? "bg-blue-50 dark:bg-blue-900/20" : ""
+                        }
+                    >
+                      <td className="px-6 py-3 text-sm text-muted-foreground">
+                        {row.rank}
+                      </td>
+                      <td className="px-6 py-3 text-sm font-medium">
+                        {row.user.username}
+                      </td>
+                      <td className="px-6 py-3 text-sm">
+                        {row.score.toLocaleString()}
+                      </td>
+                      <td className="px-6 py-3 text-sm capitalize">
+                        {row.gameType.replace(/_/g, " ")}
+                      </td>
                     </tr>
                 );
               })}

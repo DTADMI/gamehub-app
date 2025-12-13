@@ -40,7 +40,20 @@ export default [
 
   // TypeScript + React rules for project files
   {
-    files: ["**/*.{ts,tsx,js,jsx}", "app/**/*", "games/**/*", "libs/**/*", "components/**/*", "contexts/**/*", "lib/**/*", "**/*.{test,spec}.{ts,tsx,js,jsx}", "tests/**", "tests-e2e/**", "e2e/**", "vitest.setup.ts"],
+    files: [
+      "**/*.{ts,tsx,js,jsx}",
+      "app/**/*",
+      "games/**/*",
+      "libs/**/*",
+      "components/**/*",
+      "contexts/**/*",
+      "lib/**/*",
+      "**/*.{test,spec}.{ts,tsx,js,jsx}",
+      "tests/**",
+      "tests-e2e/**",
+      "e2e/**",
+      "vitest.setup.ts",
+    ],
     languageOptions: {
       parser: tsparser,
       parserOptions: tsParserOptions,
@@ -66,7 +79,8 @@ export default [
       },
     },
     plugins: {
-      "@typescript-eslint": tsPlugin, tseslint,
+      "@typescript-eslint": tsPlugin,
+      tseslint,
       react,
       "react-hooks": hooks,
       "jsx-a11y": a11y,
@@ -132,7 +146,11 @@ export default [
       // TS
       "@typescript-eslint/no-unused-vars": [
         "warn",
-        {argsIgnorePattern: "^_", varsIgnorePattern: "^_", ignoreRestSiblings: true},
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          ignoreRestSiblings: true,
+        },
       ],
 
       // Imports sorting

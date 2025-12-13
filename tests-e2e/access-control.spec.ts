@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import {expect, test} from "@playwright/test";
 
 test.describe("Access control via middleware", () => {
   test("home (/) is public and does not redirect", async ({ page }) => {
@@ -17,9 +17,13 @@ test.describe("Access control via middleware", () => {
     await expect(page.getByRole("heading", { name: "Projects" })).toBeVisible();
   });
 
-  test("non-public route redirects to /login with redirect param", async ({ page }) => {
+    test("non-public route redirects to /login with redirect param", async ({
+                                                                                page,
+                                                                            }) => {
     const gatedPath = "/dashboard";
     await page.goto(gatedPath);
-    await expect(page).toHaveURL(new RegExp(`/login.*[?&]redirect=${encodeURIComponent(gatedPath)}`));
+        await expect(page).toHaveURL(
+            new RegExp(`/login.*[?&]redirect=${encodeURIComponent(gatedPath)}`),
+        );
   });
 });

@@ -49,9 +49,13 @@ export function ModeToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => apply("light")}>Light</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => apply("light")}>
+              Light
+          </DropdownMenuItem>
         <DropdownMenuItem onClick={() => apply("dark")}>Dark</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => apply("system")}>System</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => apply("system")}>
+              System
+          </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

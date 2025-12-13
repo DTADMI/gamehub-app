@@ -1,10 +1,10 @@
 // lib/firebase.ts
-'use client';
-import {getApp, getApps, initializeApp} from 'firebase/app';
+"use client";
+import {getApp, getApps, initializeApp} from "firebase/app";
 import {getAuth} from "firebase/auth";
 import {getFirestore} from "firebase/firestore";
 
-const isBrowser = typeof window !== 'undefined';
+const isBrowser = typeof window !== "undefined";
 
 const config = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -18,14 +18,13 @@ const config = {
 function validateConfig() {
   const missing: string[] = [];
   for (const [k, v] of Object.entries(config)) {
-    if (!v && ['apiKey', 'authDomain', 'projectId', 'appId'].includes(k)) {
+    if (!v && ["apiKey", "authDomain", "projectId", "appId"].includes(k)) {
       missing.push(`NEXT_PUBLIC_FIREBASE_${k.toUpperCase()}`);
     }
   }
   if (missing.length && isBrowser) {
-    if (process.env.NODE_ENV !== 'production') {
-
-      console.warn('Missing Firebase envs:', missing);
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("Missing Firebase envs:", missing);
     }
   }
 }
@@ -37,7 +36,6 @@ export function getFirebaseApp() {
   validateConfig();
   return getApps().length ? getApp() : initializeApp(config as any);
 }
-
 
 export function getFireStore() {
   const app = getFirebaseApp();

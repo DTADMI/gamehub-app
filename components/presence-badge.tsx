@@ -21,7 +21,9 @@ interface PresenceBadgeProps {
 
 export function PresenceBadge({ game, nickname }: PresenceBadgeProps) {
   const realtimeEnabled = process.env.NEXT_PUBLIC_FEATURE_REALTIME === "true";
-  const { connected, subscribe, publish } = useStomp({ enabled: realtimeEnabled });
+  const {connected, subscribe, publish} = useStomp({
+    enabled: realtimeEnabled,
+  });
   const [count, setCount] = useState<number>(0);
 
   // Memoize envelope base

@@ -32,7 +32,11 @@ export function GameFooter() {
           </div>
 
           <div className="flex space-x-2">
-            <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
+            <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.location.reload()}
+            >
               Restart
             </Button>
 

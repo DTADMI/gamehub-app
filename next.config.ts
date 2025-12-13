@@ -64,19 +64,24 @@ const nextConfig: NextConfig = {
       "@games/platformer": path.resolve(__dirname, "games/platformer/src"),
       "@games/snake": path.resolve(__dirname, "games/snake/src"),
       "@games/tetris": path.resolve(__dirname, "games/tetris/src"),
-      "@games/tower-defense": path.resolve(__dirname, "games/tower-defense/src"),
+      "@games/tower-defense": path.resolve(
+          __dirname,
+          "games/tower-defense/src",
+      ),
     };
     return config;
   },
 
   // Environment variables baked at build time (local default points at backend:3000)
   env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api",
+    NEXT_PUBLIC_API_URL:
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api",
   },
 
   // Keep API requests going to the configured backend when running in the same origin
   async rewrites() {
-    const target = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+    const target =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
     return [
       // IMPORTANT: Keep NextAuth routes on the frontend (do not proxy to backend)
       {
@@ -99,7 +104,8 @@ const nextConfig: NextConfig = {
 
   // Security headers with CSP tuned for Next.js 16, next/font, and optional Google Fonts
   async headers() {
-    const backend = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+    const backend =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
     // Allow Google Fonts when used by older pages; next/font is self-hosted and works with 'self'
     const csp = [
       "default-src 'self'",
@@ -120,7 +126,10 @@ const nextConfig: NextConfig = {
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
-          { key: "Permissions-Policy", value: "geolocation=(), microphone=(), camera=()" },
+          {
+            key: "Permissions-Policy",
+            value: "geolocation=(), microphone=(), camera=()",
+          },
         ],
       },
     ];

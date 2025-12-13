@@ -9,8 +9,14 @@ declare global {
 
       // Geometries
       mesh: THREE.MeshProps;
-      planeGeometry: THREE.BufferGeometryNode<THREE.PlaneGeometry, typeof THREE.PlaneGeometry>;
-      boxGeometry: THREE.BufferGeometryNode<THREE.BoxGeometry, typeof THREE.BoxGeometry>;
+      planeGeometry: THREE.BufferGeometryNode<
+          THREE.PlaneGeometry,
+          typeof THREE.PlaneGeometry
+      >;
+      boxGeometry: THREE.BufferGeometryNode<
+          THREE.BoxGeometry,
+          typeof THREE.BoxGeometry
+      >;
       sphereGeometry: THREE.SphereGeometryProps;
 
       // Materials

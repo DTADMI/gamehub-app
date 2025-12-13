@@ -8,14 +8,17 @@ import MiniBoard from "@/components/leaderboards/MiniBoard";
 import {useAuth} from "@/contexts/AuthContext";
 import {submitScore} from "@/lib/graphql/queries";
 
-const BreakoutGame = dynamic(() => import("@games/breakout").then((m) => m.BreakoutGame), {
-  ssr: false,
-  loading: () => (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-xl">Loading game...</div>
-    </div>
-  ),
-});
+const BreakoutGame = dynamic(
+    () => import("@games/breakout").then((m) => m.BreakoutGame),
+    {
+        ssr: false,
+        loading: () => (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-xl">Loading game...</div>
+            </div>
+        ),
+    },
+);
 
 export default function BreakoutGamePage() {
     const [seed, setSeed] = useState(0);
@@ -23,11 +26,17 @@ export default function BreakoutGamePage() {
 
   useEffect(() => {
       const handler = async (e: Event) => {
-          const detail = (e as CustomEvent).detail as { score?: number } | undefined;
+          const detail = (e as CustomEvent).detail as
+              | { score?: number }
+              | undefined;
           const score = detail?.score ?? 0;
           if (user && score > 0) {
               try {
-                  await submitScore({gameType: "BREAKOUT", score, metadata: {client: "web"}});
+                  await submitScore({
+                      gameType: "BREAKOUT",
+                      score,
+                      metadata: {client: "web"},
+                  });
               } catch (err) {
                   console.warn("submitScore failed (BREAKOUT)", err);
               }

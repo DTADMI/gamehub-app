@@ -27,14 +27,14 @@ Table of contents
 
 — — —
 
-1) Prerequisites
+1. Prerequisites
 
 - Node.js 20+
 - pnpm (recommended; Corepack can enable it automatically) or npm
 - Docker and `gcloud` CLI (for Cloud Run)
 - A Google Cloud project with Artifact Registry and Cloud Run enabled
 
-2) Environment variables
+2. Environment variables
 
 Create a `.env.local` (for local dev) with at least:
 
@@ -51,7 +51,7 @@ Notes:
   backend is expected on port 8080.
 - Additional optional envs are documented in `.env.example`.
 
-3) Local development
+3. Local development
 
 Install and run the frontend on port 3000:
 
@@ -67,7 +67,7 @@ Point it to a running backend (port 8080):
 export NEXT_PUBLIC_API_URL=http://localhost:8080/api
 ```
 
-4) Testing (Playwright e2e)
+4. Testing (Playwright e2e)
 
 We include Playwright in devDependencies and a smoke test suite that:
 
@@ -82,7 +82,7 @@ pnpm exec playwright install --with-deps
 pnpm test:e2e
 ```
 
-5) Build & production run
+5. Build & production run
 
 ```
 pnpm build
@@ -117,7 +117,7 @@ NEXT_PUBLIC_FEATURE_EXPLORE_SHOW_PROJECTS_COMING_SOON=true
 
 Set a flag to `false` to hide that section or disable carousels (grids will be used instead).
 
-6) Deploy to Google Cloud Run (manual)
+6. Deploy to Google Cloud Run (manual)
 
 Build and push the container to Artifact Registry, then deploy:
 
@@ -144,7 +144,7 @@ gcloud run deploy gamehub \
   --set-env-vars=NEXT_PUBLIC_API_URL=https://<your-backend-domain>/api
 ```
 
-7) Deploy to Google Cloud Run (GitHub Actions)
+7. Deploy to Google Cloud Run (GitHub Actions)
 
 This repo includes `.github/workflows/deploy-cloud-run.yml` which:
 
@@ -161,7 +161,7 @@ Required GitHub repository secrets:
 - `GCP_SERVICE_ACCOUNT` — service account email with `Artifact Registry Writer` and `Cloud Run Admin`
 - `NEXT_PUBLIC_API_URL` — backend API base with `/api` suffix for the deployed service
 
-8) Design choices and trade‑offs
+8. Design choices and trade‑offs
 
 - Next.js 16 + React 19: modern app router with good DX; dynamic imports for game bundles keep initial payloads small.
 - TailwindCSS v4 + shadcn‑style tokens: rapid UI development with a custom palette; consistent semantic colors.
@@ -179,18 +179,18 @@ Alternatives considered:
 - Server‑side sessions — kept frontend backend‑agnostic and compatible with JWT; NextAuth is configured for credential
   login when the backend exposes endpoints.
 
-9) Troubleshooting
+9. Troubleshooting
 
 - Hydration warnings
-    - Ensure any client‑only UI (theme toggles etc.) uses deterministic SSR markup. We fixed Footer imports and heading
-      classes to remove drift.
+  - Ensure any client‑only UI (theme toggles etc.) uses deterministic SSR markup. We fixed Footer imports and heading
+    classes to remove drift.
 - Space bar scrolls the page while playing
-    - Each game page uses a focusable container + shared input capture. If you add a new game, copy that wrapper.
+  - Each game page uses a focusable container + shared input capture. If you add a new game, copy that wrapper.
 - 404 importing `@games/*`
-    - Check `tsconfig.json` `paths` and `next.config.ts` webpack aliases. Games live under `games/<id>/src`.
+  - Check `tsconfig.json` `paths` and `next.config.ts` webpack aliases. Games live under `games/<id>/src`.
 - Cloud Run shows a 404 on nested routes
-    - Ensure the container serves on `PORT=3000` and that you haven’t configured a basePath/assetPrefix incorrectly.
-      This repo serves with `next start -p 3000`.
+  - Ensure the container serves on `PORT=3000` and that you haven’t configured a basePath/assetPrefix incorrectly.
+    This repo serves with `next start -p 3000`.
 
 Deploy to Cloud Run:
 
@@ -321,9 +321,9 @@ Recommended path for this repo:
 - Stage A (now, implemented): use a monorepo-aware build (`frontend/Dockerfile.monorepo`) so the CI/CD pipeline reliably
   builds the current architecture.
 - Stage B (optional, near future): introduce a "remote game" plugin path for selected games:
-    - Build step emits game bundles to a CDN bucket `games/<slug>/<version>/index.js`.
-    - Backend (or a static file) serves a `games-manifest.json` with URLs.
-    - Frontend uses `dynamic import()` to load the game module at runtime based on the manifest.
+  - Build step emits game bundles to a CDN bucket `games/<slug>/<version>/index.js`.
+  - Backend (or a static file) serves a `games-manifest.json` with URLs.
+  - Frontend uses `dynamic import()` to load the game module at runtime based on the manifest.
 - Stage C (later, if needed): evolve to Module Federation or per-game services.
 
 This lets you ship new games (or rollback) by updating CDN assets/manifests, without a full frontend rebuild, while
@@ -394,7 +394,7 @@ curl -sS "$SERVICE_URL/actuator/health"
 ### GitHub Actions CI/CD
 
 - Repository secrets (Settings → Secrets and variables → Actions):
-    - `GCP_PROJECT_ID`, `GCP_REGION`, `GCP_SA_KEY` (JSON). Prefer WIF for keyless in production.
+  - `GCP_PROJECT_ID`, `GCP_REGION`, `GCP_SA_KEY` (JSON). Prefer WIF for keyless in production.
   - Optional variables: `AR_REPO` (default `gamehub`), `BACKEND_SERVICE` (default `gamehub-api`), `FRONTEND_SERVICE` (
     default `gamehub-app`), `NEXT_PUBLIC_API_URL`.
 - The workflow `.github/workflows/ci-cd.yml` builds images, pushes to AR, and deploys to Cloud Run on pushes to `main`
@@ -420,22 +420,22 @@ Below is a checklist of required variables/secrets and how to obtain them.
 - `NEXT_PUBLIC_API_URL` (variable): base URL to backend API (e.g., https://api.example.com/api or the Cloud Run backend
   URL + `/api`).
 - Stripe (optional; behind `payments.stripe_enabled`):
-    - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` (variable): from Stripe Dashboard → Developers → API keys.
-    - `STRIPE_SECRET_KEY` (secret): Stripe secret key (store in Secret Manager / GitHub Actions secret).
-    - `STRIPE_WEBHOOK_SECRET` (secret): after creating a webhook endpoint in Stripe (test mode), copy the signing
-      secret.
+  - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` (variable): from Stripe Dashboard → Developers → API keys.
+  - `STRIPE_SECRET_KEY` (secret): Stripe secret key (store in Secret Manager / GitHub Actions secret).
+  - `STRIPE_WEBHOOK_SECRET` (secret): after creating a webhook endpoint in Stripe (test mode), copy the signing
+    secret.
 
 ### Backend (Spring Boot)
 
 - Database (Cloud SQL):
-    - `SPRING_DATASOURCE_URL`: jdbc:postgresql://<PRIVATE_IP_OR_PROXY>/<DB_NAME>
-    - `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD` (Secret Manager / Actions secret).
+  - `SPRING_DATASOURCE_URL`: jdbc:postgresql://<PRIVATE_IP_OR_PROXY>/<DB_NAME>
+  - `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD` (Secret Manager / Actions secret).
 - JWT:
-    - `APP_JWT_SECRET` (secret) and `APP_JWT_EXPIRATION_MS` (e.g., 86400000).
+  - `APP_JWT_SECRET` (secret) and `APP_JWT_EXPIRATION_MS` (e.g., 86400000).
 - Feature flags:
-    - Unleash (default): `UNLEASH_URL`, `UNLEASH_INSTANCE_ID`/token (if secured). Or rely on built-in overlay +
-      `application.yml` defaults.
-    - flagd (dev only): `FLAGD_ENDPOINT` (optional).
+  - Unleash (default): `UNLEASH_URL`, `UNLEASH_INSTANCE_ID`/token (if secured). Or rely on built-in overlay +
+    `application.yml` defaults.
+  - flagd (dev only): `FLAGD_ENDPOINT` (optional).
 - Redis (optional): `REDIS_HOST`, `REDIS_PORT` (Memorystore). Enable with `features.cache.redis_enabled=true`.
 - Stripe (optional): `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`.
 
@@ -445,7 +445,7 @@ Below is a checklist of required variables/secrets and how to obtain them.
 - `GCP_REGION` (secret): GCP region (e.g., us-central1).
 - `GCP_SA_KEY` (secret): JSON key for a service account with roles: Cloud Run Admin, Cloud Build Editor, Artifact
   Registry Writer, Secret Manager Accessor.
-    - Recommended: switch to Workload Identity Federation to avoid JSON keys.
+  - Recommended: switch to Workload Identity Federation to avoid JSON keys.
 
 ## Feature Flags provider
 
@@ -589,8 +589,8 @@ Troubleshooting (frontend):
 
 - If Cloud Run says the container didn’t listen on the expected port, open the revision logs. You should see
   `[launcher]` messages:
-    - `Found standalone entry: ...` → standalone startup.
-    - `Falling back to Next CLI from: ...` → `next start` fallback.
+  - `Found standalone entry: ...` → standalone startup.
+  - `Falling back to Next CLI from: ...` → `next start` fallback.
 - Verify you deployed the frontend with `--port=3000` and that `NEXT_PUBLIC_API_URL` points at a reachable backend URL (
   ending with `/api`).
 - Ensure you built from the repository root; otherwise, the monorepo workspaces won’t resolve.
@@ -625,8 +625,8 @@ Relevant e2e specs (run with `bun run test:e2e` or `pnpm test:e2e` in `frontend/
 # What changed and why (Frontend runtime)
 
 - The container now starts via `frontend/docker/run.sh`, which:
-    - Prefers the Next.js standalone server entry when present (`.next/standalone`)
-    - Falls back to `next start` using the copied `.next` assets and full `node_modules` when standalone isn’t emitted
+  - Prefers the Next.js standalone server entry when present (`.next/standalone`)
+  - Falls back to `next start` using the copied `.next` assets and full `node_modules` when standalone isn’t emitted
 - We added `assetPrefix: '/'` in `next.config.*` so static assets and chunks are requested with absolute paths (
   `/_next/...`), fixing 404s on nested routes in Cloud Run.
 

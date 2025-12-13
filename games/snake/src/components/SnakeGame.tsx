@@ -42,11 +42,16 @@ export const SnakeGame: React.FC = () => {
   // Load persisted scores on mount
   useEffect(() => {
     try {
-      const savedHigh = parseInt(localStorage.getItem("snakeHighScore") || "0", 10);
+      const savedHigh = parseInt(
+          localStorage.getItem("snakeHighScore") || "0",
+          10,
+      );
       if (!isNaN(savedHigh)) {
         setHighScore(savedHigh);
       }
-      const savedBoard = JSON.parse(localStorage.getItem("snakeLeaderboard") || "[]");
+      const savedBoard = JSON.parse(
+          localStorage.getItem("snakeLeaderboard") || "[]",
+      );
       if (Array.isArray(savedBoard)) {
         setLeaderboard(savedBoard);
       }
@@ -54,33 +59,44 @@ export const SnakeGame: React.FC = () => {
   }, []);
 
   // Generate random position
-  const getRandomPosition = useCallback((exclude: Position[] = []): Position => {
-    let position: Position;
-    do {
-      position = {
-        x: Math.floor(Math.random() * config.gridSize),
-        y: Math.floor(Math.random() * config.gridSize),
-      };
-    } while (exclude.some((pos) => pos.x === position.x && pos.y === position.y));
-    return position;
-  }, [config.gridSize]);
+  const getRandomPosition = useCallback(
+      (exclude: Position[] = []): Position => {
+        let position: Position;
+        do {
+          position = {
+            x: Math.floor(Math.random() * config.gridSize),
+            y: Math.floor(Math.random() * config.gridSize),
+          };
+        } while (
+            exclude.some((pos) => pos.x === position.x && pos.y === position.y)
+            );
+        return position;
+      },
+      [config.gridSize],
+  );
 
   // Generate food at random position
-  const generateFood = useCallback((exclude: Position[]): Position => {
-    return getRandomPosition(exclude);
-  }, [getRandomPosition]);
+  const generateFood = useCallback(
+      (exclude: Position[]): Position => {
+        return getRandomPosition(exclude);
+      },
+      [getRandomPosition],
+  );
 
   // Generate obstacles
-  const generateObstacles = useCallback((exclude: Position[]): Obstacle[] => {
-    const obstacles: Obstacle[] = [];
-    const obstacleCount = Math.floor(config.gridSize * config.gridSize * 0.1); // 10% of grid
+  const generateObstacles = useCallback(
+      (exclude: Position[]): Obstacle[] => {
+        const obstacles: Obstacle[] = [];
+        const obstacleCount = Math.floor(config.gridSize * config.gridSize * 0.1); // 10% of grid
 
-    for (let i = 0; i < obstacleCount; i++) {
-      obstacles.push(getRandomPosition([...exclude, ...obstacles]));
-    }
+        for (let i = 0; i < obstacleCount; i++) {
+          obstacles.push(getRandomPosition([...exclude, ...obstacles]));
+        }
 
-    return obstacles;
-  }, [config.gridSize, getRandomPosition]);
+        return obstacles;
+      },
+      [config.gridSize, getRandomPosition],
+  );
 
   // Generate portal pairs
   const generatePortals = useCallback((): Portal[] => {
@@ -102,46 +118,52 @@ export const SnakeGame: React.FC = () => {
   }, [getRandomPosition]);
 
   // Initialize game
-  const initGame = useCallback((nextCfg?: GameConfig) => {
-    // Use provided config or fall back to current state
-    const currentConfig = nextCfg || config;
+  const initGame = useCallback(
+      (nextCfg?: GameConfig) => {
+        // Use provided config or fall back to current state
+        const currentConfig = nextCfg || config;
 
-    // Set up initial snake
-    const initialSnake = [
-      {x: 5, y: 10},
-      {x: 4, y: 10},
-      {x: 3, y: 10},
-    ];
+        // Set up initial snake
+        const initialSnake = [
+          {x: 5, y: 10},
+          {x: 4, y: 10},
+          {x: 3, y: 10},
+        ];
 
-    setSnake(initialSnake);
-    setDirection("RIGHT");
-    setNextDirection("RIGHT");
-    setScore(0);
-    setGameOver(false);
-    setFood(generateFood(initialSnake));
+        setSnake(initialSnake);
+        setDirection("RIGHT");
+        setNextDirection("RIGHT");
+        setScore(0);
+        setGameOver(false);
+        setFood(generateFood(initialSnake));
 
-    if (currentConfig.hasObstacles) {
-      setObstacles(generateObstacles(initialSnake));
-    } else {
-      setObstacles([]);
-    }
+        if (currentConfig.hasObstacles) {
+          setObstacles(generateObstacles(initialSnake));
+        } else {
+          setObstacles([]);
+        }
 
-    if (currentConfig.hasPortals) {
-      setPortals(generatePortals());
-    } else {
-      setPortals([]);
-    }
+        if (currentConfig.hasPortals) {
+          setPortals(generatePortals());
+        } else {
+          setPortals([]);
+        }
 
-    soundManager.playMusic("background");
+        soundManager.playMusic("background");
 
-    return initialSnake;
-  }, [config, generateFood, generateObstacles, generatePortals]);
+        return initialSnake;
+      },
+      [config, generateFood, generateObstacles, generatePortals],
+  );
 
   // Restart helper that applies a provided configuration immediately
-  const restartWithConfig = useCallback((nextCfg: GameConfig) => {
-    setConfig(nextCfg);
-    initGame(nextCfg);
-  }, [initGame]);
+  const restartWithConfig = useCallback(
+      (nextCfg: GameConfig) => {
+        setConfig(nextCfg);
+        initGame(nextCfg);
+      },
+      [initGame],
+  );
 
   // Check collision
   const checkCollision = (position: Position, checkWalls = true): boolean => {
@@ -159,7 +181,8 @@ export const SnakeGame: React.FC = () => {
     // Check self collision
     if (
       snake.some(
-        (segment, index) => index > 0 && segment.x === position.x && segment.y === position.y,
+          (segment, index) =>
+              index > 0 && segment.x === position.x && segment.y === position.y,
       )
     ) {
       return true;
@@ -179,15 +202,15 @@ export const SnakeGame: React.FC = () => {
   // Handle keyboard input
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-        // If game over: Space should restart a fresh game
-        if (gameOver) {
-            if (e.code === "Space") {
-                setIsPaused(false);
-                setGameStarted(true);
-              restartWithConfig(config);
-            }
-            return;
+      // If game over: Space should restart a fresh game
+      if (gameOver) {
+        if (e.code === "Space") {
+          setIsPaused(false);
+          setGameStarted(true);
+          restartWithConfig(config);
         }
+        return;
+      }
 
       if (!gameStarted) {
         if (e.code === "Space") {
@@ -257,7 +280,9 @@ export const SnakeGame: React.FC = () => {
 
       // Check for portal
       if (config.hasPortals) {
-        const portal = portals.find((p) => p.entry.x === head.x && p.entry.y === head.y);
+        const portal = portals.find(
+            (p) => p.entry.x === head.x && p.entry.y === head.y,
+        );
 
         if (portal) {
           soundManager.playSound("portal");
@@ -306,7 +331,17 @@ export const SnakeGame: React.FC = () => {
     });
     // The loop uses current closures intentionally; keep deps minimal to avoid jitter
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [direction, nextDirection, isPaused, gameStarted, food, obstacles, portals, score, highScore]);
+  }, [
+    direction,
+    nextDirection,
+    isPaused,
+    gameStarted,
+    food,
+    obstacles,
+    portals,
+    score,
+    highScore,
+  ]);
 
   // Set up game loop
   useEffect(() => {
@@ -358,7 +393,12 @@ export const SnakeGame: React.FC = () => {
     if (config.hasObstacles) {
       ctx.fillStyle = "#6b7280";
       obstacles.forEach((obstacle) => {
-        ctx.fillRect(obstacle.x * CELL_SIZE, obstacle.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        ctx.fillRect(
+            obstacle.x * CELL_SIZE,
+            obstacle.y * CELL_SIZE,
+            CELL_SIZE,
+            CELL_SIZE,
+        );
       });
     }
 
@@ -453,7 +493,11 @@ export const SnakeGame: React.FC = () => {
       ctx.fillText("Game Over!", canvas.width / 2, canvas.height / 2 - 30);
       ctx.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2 + 10);
       ctx.font = "16px Arial";
-      ctx.fillText("Press Space to Restart", canvas.width / 2, canvas.height / 2 + 50);
+      ctx.fillText(
+          "Press Space to Restart",
+          canvas.width / 2,
+          canvas.height / 2 + 50,
+      );
     } else if (!gameStarted) {
       ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -463,8 +507,16 @@ export const SnakeGame: React.FC = () => {
       ctx.textAlign = "center";
       ctx.fillText("Snake Game", canvas.width / 2, canvas.height / 2 - 50);
       ctx.font = "16px Arial";
-      ctx.fillText("Use arrow keys to move", canvas.width / 2, canvas.height / 2 - 10);
-      ctx.fillText("Press Space to Start", canvas.width / 2, canvas.height / 2 + 30);
+      ctx.fillText(
+          "Use arrow keys to move",
+          canvas.width / 2,
+          canvas.height / 2 - 10,
+      );
+      ctx.fillText(
+          "Press Space to Start",
+          canvas.width / 2,
+          canvas.height / 2 + 30,
+      );
     } else if (isPaused) {
       ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -474,9 +526,23 @@ export const SnakeGame: React.FC = () => {
       ctx.textAlign = "center";
       ctx.fillText("Paused", canvas.width / 2, canvas.height / 2);
       ctx.font = "16px Arial";
-      ctx.fillText("Press Space to Resume", canvas.width / 2, canvas.height / 2 + 30);
+      ctx.fillText(
+          "Press Space to Resume",
+          canvas.width / 2,
+          canvas.height / 2 + 30,
+      );
     }
-  }, [snake, food, gameOver, isPaused, gameStarted, score, obstacles, portals, config]);
+  }, [
+    snake,
+    food,
+    gameOver,
+    isPaused,
+    gameStarted,
+    score,
+    obstacles,
+    portals,
+    config,
+  ]);
 
   // Handle game over
   useEffect(() => {
@@ -488,14 +554,18 @@ export const SnakeGame: React.FC = () => {
       }
       // Dispatch a public gameover event for external integrations (e.g., STOMP score submit)
       try {
-        window.dispatchEvent(new CustomEvent("snake:gameover", { detail: { score } }));
+        window.dispatchEvent(
+            new CustomEvent("snake:gameover", {detail: {score}}),
+        );
       } catch {}
       // Update local high score and leaderboard
       try {
         // Save high score
         localStorage.setItem("snakeHighScore", String(highScore));
         // Update leaderboard with current score
-        const existing = JSON.parse(localStorage.getItem("snakeLeaderboard") || "[]");
+        const existing = JSON.parse(
+            localStorage.getItem("snakeLeaderboard") || "[]",
+        );
         const next = Array.isArray(existing) ? existing : [];
         next.push(score);
         const top = next
@@ -557,18 +627,29 @@ export const SnakeGame: React.FC = () => {
     // Apply saved or default difficulty on mount
     try {
       const saved =
-        (localStorage.getItem("snakeDifficulty") as "easy" | "normal" | "hard" | null) || "normal";
+          (localStorage.getItem("snakeDifficulty") as
+              | "easy"
+              | "normal"
+              | "hard"
+              | null) || "normal";
       window.dispatchEvent(
-        new CustomEvent("snake:setDifficulty", { detail: { difficulty: saved } }),
+          new CustomEvent("snake:setDifficulty", {
+            detail: {difficulty: saved},
+          }),
       );
     } catch {
       window.dispatchEvent(
-        new CustomEvent("snake:setDifficulty", { detail: { difficulty: "normal" } }),
+          new CustomEvent("snake:setDifficulty", {
+            detail: {difficulty: "normal"},
+          }),
       );
     }
 
     return () => {
-      window.removeEventListener("snake:setDifficulty", handler as EventListener);
+      window.removeEventListener(
+          "snake:setDifficulty",
+          handler as EventListener,
+      );
     };
   }, []);
 
@@ -581,10 +662,16 @@ export const SnakeGame: React.FC = () => {
       setIsPaused((p) => !p);
     };
     window.addEventListener("snake:restart", onRestart as EventListener);
-    window.addEventListener("snake:pauseToggle", onPauseToggle as EventListener);
+    window.addEventListener(
+        "snake:pauseToggle",
+        onPauseToggle as EventListener,
+    );
     return () => {
       window.removeEventListener("snake:restart", onRestart as EventListener);
-      window.removeEventListener("snake:pauseToggle", onPauseToggle as EventListener);
+      window.removeEventListener(
+          "snake:pauseToggle",
+          onPauseToggle as EventListener,
+      );
     };
   }, [config, restartWithConfig]);
 
@@ -633,26 +720,30 @@ export const SnakeGame: React.FC = () => {
       <div className="p-4">
         {/* Game Mode Selector */}
         <div className="mb-4 flex flex-wrap justify-center gap-2">
-          {(["classic", "obstacles", "portal", "speed"] as GameMode[]).map((mode) => (
-            <button
-              key={mode}
-              onClick={() => handleModeChange(mode)}
-              className={`px-3 py-1 rounded-md ${
-                config.mode === mode
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600"
-              }`}
-            >
-              {mode.charAt(0).toUpperCase() + mode.slice(1)}
-            </button>
-          ))}
+          {(["classic", "obstacles", "portal", "speed"] as GameMode[]).map(
+              (mode) => (
+                  <button
+                      key={mode}
+                      onClick={() => handleModeChange(mode)}
+                      className={`px-3 py-1 rounded-md ${
+                          config.mode === mode
+                              ? "bg-blue-600 text-white"
+                              : "bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600"
+                      }`}
+                  >
+                    {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                  </button>
+              ),
+          )}
         </div>
 
         {/* Inline confirm for mode change */}
         {pendingMode && (
             <div className="mx-auto mb-4 max-w-md rounded-md border bg-card text-card-foreground p-3 shadow-sm">
-              <p className="text-sm mb-2">Restart the game in <b>{pendingMode}</b> mode? Current progress will be
-                lost.</p>
+              <p className="text-sm mb-2">
+                Restart the game in <b>{pendingMode}</b> mode? Current progress
+                will be lost.
+              </p>
               <div className="flex gap-2 justify-end">
                 <button
                     className="px-3 py-1.5 text-sm rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80"
@@ -689,7 +780,9 @@ export const SnakeGame: React.FC = () => {
 
         {/* Controls Info */}
         <div className="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
-          <p>Use arrow keys to move | Space to {isPaused ? "resume" : "pause"}</p>
+          <p>
+            Use arrow keys to move | Space to {isPaused ? "resume" : "pause"}
+          </p>
         </div>
 
         {/* Game Stats */}
@@ -701,7 +794,10 @@ export const SnakeGame: React.FC = () => {
             High Score: <span className="font-bold">{highScore}</span>
           </div>
           <div>
-            Speed: <span className="font-bold">{config.mode === "speed" ? "Fast" : "Normal"}</span>
+            Speed:{" "}
+            <span className="font-bold">
+              {config.mode === "speed" ? "Fast" : "Normal"}
+            </span>
           </div>
         </div>
       </div>

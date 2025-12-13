@@ -16,19 +16,32 @@ type PlanCardProps = {
     disabled?: boolean;
 };
 
-function PlanCard({title, price, period, features, recommended, onSelect, disabled}: PlanCardProps) {
+function PlanCard({
+                      title,
+                      price,
+                      period,
+                      features,
+                      recommended,
+                      onSelect,
+                      disabled,
+                  }: PlanCardProps) {
     return (
         <div
-            className={`rounded-xl border bg-card text-card-foreground shadow-sm p-6 flex flex-col ${recommended ? "ring-2 ring-primary/30" : ""}`}>
+            className={`rounded-xl border bg-card text-card-foreground shadow-sm p-6 flex flex-col ${recommended ? "ring-2 ring-primary/30" : ""}`}
+        >
             <div className="flex items-baseline justify-between mb-4">
                 <h3 className="text-xl font-semibold">{title}</h3>
                 {recommended && (
-                    <span className="text-xs px-2 py-1 rounded bg-primary text-primary-foreground">Recommended</span>
+                    <span className="text-xs px-2 py-1 rounded bg-primary text-primary-foreground">
+            Recommended
+          </span>
                 )}
             </div>
             <div className="mb-4">
                 <span className="text-3xl font-bold">{price}</span>
-                {period && <span className="text-muted-foreground ml-1">/{period}</span>}
+                {period && (
+                    <span className="text-muted-foreground ml-1">/{period}</span>
+                )}
             </div>
             <ul className="text-sm space-y-2 mb-6">
                 {features.map((f) => (
@@ -57,14 +70,15 @@ export default function PlanPicker() {
         try {
             setLoadingPlan(plan);
             setError("");
-            const origin = typeof window !== "undefined" ? window.location.origin : "";
+            const origin =
+                typeof window !== "undefined" ? window.location.origin : "";
 
             // Map BillingPlan to Plan
             const planMapping: Record<BillingPlan, Plan> = {
-                "WEEKLY": "PRO",
-                "MONTHLY": "PRO",
-                "YEARLY": "PRO",
-                "LIFETIME": "PRO"
+                WEEKLY: "PRO",
+                MONTHLY: "PRO",
+                YEARLY: "PRO",
+                LIFETIME: "PRO",
             };
 
             const res = await createCheckout({
@@ -89,8 +103,9 @@ export default function PlanPicker() {
         <div className="space-y-6">
             <div className="text-center">
                 <h2 className="text-2xl font-bold mb-2">Choose your plan</h2>
-                <p className="text-muted-foreground">Upgrade to unlock advanced leaderboards, cosmetics, and early
-                    access.</p>
+                <p className="text-muted-foreground">
+                    Upgrade to unlock advanced leaderboards, cosmetics, and early access.
+                </p>
             </div>
             {error && (
                 <div
@@ -103,7 +118,11 @@ export default function PlanPicker() {
                     title="Weekly"
                     price="$2.99"
                     period="week"
-                    features={["Advanced leaderboards", "Cosmetic themes", "Early access"]}
+                    features={[
+                        "Advanced leaderboards",
+                        "Cosmetic themes",
+                        "Early access",
+                    ]}
                     onSelect={() => handleSelect("WEEKLY")}
                     recommended={false}
                     disabled={loadingPlan !== null}
@@ -112,7 +131,11 @@ export default function PlanPicker() {
                     title="Monthly"
                     price="$7.99"
                     period="month"
-                    features={["Advanced leaderboards", "Cosmetic themes", "Early access"]}
+                    features={[
+                        "Advanced leaderboards",
+                        "Cosmetic themes",
+                        "Early access",
+                    ]}
                     onSelect={() => handleSelect("MONTHLY")}
                     recommended
                     disabled={loadingPlan !== null}
@@ -121,7 +144,11 @@ export default function PlanPicker() {
                     title="Yearly"
                     price="$79.99"
                     period="year"
-                    features={["2 months free", "Advanced leaderboards", "Cosmetic themes"]}
+                    features={[
+                        "2 months free",
+                        "Advanced leaderboards",
+                        "Cosmetic themes",
+                    ]}
                     onSelect={() => handleSelect("YEARLY")}
                     recommended={false}
                     disabled={loadingPlan !== null}
@@ -135,8 +162,9 @@ export default function PlanPicker() {
                     disabled={loadingPlan !== null}
                 />
             </div>
-            <p className="text-xs text-muted-foreground text-center">Prices are placeholders in test mode. Taxes may
-                apply at checkout.</p>
+            <p className="text-xs text-muted-foreground text-center">
+                Prices are placeholders in test mode. Taxes may apply at checkout.
+            </p>
         </div>
     );
 }

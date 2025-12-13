@@ -4,14 +4,17 @@ import {enableGameKeyCapture, GameHUD} from "@games/shared";
 import dynamic from "next/dynamic";
 import {useEffect, useRef, useState} from "react";
 
-const PlatformerGame = dynamic(() => import("@games/platformer").then((m) => m.PlatformerGame), {
-  ssr: false,
-  loading: () => (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-xl">Loading game...</div>
-    </div>
-  ),
-});
+const PlatformerGame = dynamic(
+    () => import("@games/platformer").then((m) => m.PlatformerGame),
+    {
+        ssr: false,
+        loading: () => (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-xl">Loading game...</div>
+            </div>
+        ),
+    },
+);
 
 export default function PlatformerPage() {
     const rootRef = useRef<HTMLDivElement | null>(null);
@@ -37,7 +40,9 @@ export default function PlatformerPage() {
             <GameHUD
                 onPauseToggle={() => {
                     // Dispatch Space
-                    window.dispatchEvent(new KeyboardEvent("keydown", {key: " ", code: "Space"}));
+                    window.dispatchEvent(
+                        new KeyboardEvent("keydown", {key: " ", code: "Space"}),
+                    );
                 }}
                 onRestart={() => setSeed((s) => s + 1)}
                 tips="Arrows/WASD to move • Space to jump"

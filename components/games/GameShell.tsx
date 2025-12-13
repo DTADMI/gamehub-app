@@ -122,7 +122,9 @@ export function GameShell({
             }
             try {
                 await Promise.all(
-                    preloadSounds.map((s) => soundManager.preloadSound(s.key, s.url, !!s.loop)),
+                    preloadSounds.map((s) =>
+                        soundManager.preloadSound(s.key, s.url, !!s.loop),
+                    ),
                 );
             } catch (e) {
                 console.warn("[GameShell] sound preload failed", e);
@@ -170,7 +172,11 @@ export function GameShell({
         >
             {children}
             {mobileControls && <MobileTouchControls onKey={sendKey}/>}
-            <GameHUD onPauseToggle={handlePause} onRestart={handleRestart} tips={tips}/>
+            <GameHUD
+                onPauseToggle={handlePause}
+                onRestart={handleRestart}
+                tips={tips}
+            />
         </div>
     );
 }

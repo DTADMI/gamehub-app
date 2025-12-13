@@ -1,22 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
 /**
  * Simple feature flag reader for the frontend.
  * - Reads NEXT_PUBLIC_FEATURE_* env at build/runtime first
  * - Optionally fetches backend evaluation at /api/features when `preferBackend` is true
  */
-export function useFeature(flag: string, defaultValue = false, opts?: { preferBackend?: boolean }) {
+export function useFeature(
+    flag: string,
+    defaultValue = false,
+    opts?: { preferBackend?: boolean },
+) {
   const preferBackend = opts?.preferBackend ?? false;
-  const [value, setValue] = useState<boolean>(() => readEnv(flag, defaultValue));
+  const [value, setValue] = useState<boolean>(() =>
+      readEnv(flag, defaultValue),
+  );
 
   useEffect(() => {
     if (!preferBackend) {
       return;
     }
     // Try to read from backend (best effort)
-    const api = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "http://localhost:8080/api";
+    const api =
+        process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
+        "http://localhost:8080/api";
     fetch(`${api}/features`)
       .then(async (res) => {
         if (!res.ok) {

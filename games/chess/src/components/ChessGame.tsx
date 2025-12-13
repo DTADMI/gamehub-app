@@ -2,16 +2,18 @@
 "use client";
 
 import {soundManager} from "@games/shared";
-import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useRef, useState,} from "react";
 
-import {Board, Color, GameState, Move, Piece, PieceType, Pos, SIZE, Square} from "../logic/types";
+import {Board, Color, GameState, Move, Piece, PieceType, Pos, SIZE, Square,} from "../logic/types";
 
 function inBounds(r: number, c: number) {
   return r >= 0 && r < SIZE && c >= 0 && c < SIZE;
 }
 
 function sameColor(a: Piece | null, b: Piece | null) {
-  if (!a || !b) {return false;}
+  if (!a || !b) {
+    return false;
+  }
   return a[0] === b[0];
 }
 
@@ -24,11 +26,23 @@ function initialState(): GameState {
     Array.from({ length: SIZE }, (_, c) => ({ piece: p(c) }));
   const empty = () => row(() => null);
   const setup: Square[][] = [];
-  setup.push(row((c) => ("wRNBQKBNR"[c] ? "w" + ("RNBQKBNR"[c] as PieceType) : null) as Piece));
+  setup.push(
+      row(
+          (c) =>
+              ("wRNBQKBNR"[c] ? "w" + ("RNBQKBNR"[c] as PieceType) : null) as Piece,
+      ),
+  );
   setup.push(row(() => "wP"));
-  for (let i = 0; i < 4; i++) {setup.push(empty());}
+  for (let i = 0; i < 4; i++) {
+    setup.push(empty());
+  }
   setup.push(row(() => "bP"));
-  setup.push(row((c) => ("bRNBQKBNR"[c] ? "b" + ("RNBQKBNR"[c] as PieceType) : null) as Piece));
+  setup.push(
+      row(
+          (c) =>
+              ("bRNBQKBNR"[c] ? "b" + ("RNBQKBNR"[c] as PieceType) : null) as Piece,
+      ),
+  );
   return {
     board: setup,
     turn: "w",
@@ -46,7 +60,9 @@ function findKing(board: Board, color: Color): Pos | null {
   for (let r = 0; r < SIZE; r++) {
     for (let c = 0; c < SIZE; c++) {
       const p = board[r][c].piece;
-      if (p === `${color}K`) {return { r, c };}
+      if (p === `${color}K`) {
+        return {r, c};
+      }
     }
   }
   return null;
@@ -71,7 +87,9 @@ function isSquareAttacked(board: Board, target: Pos, byColor: Color): boolean {
   for (const dc of [-1, 1]) {
     const r = target.r - pawnDir;
     const c = target.c - dc;
-    if (inBounds(r, c) && board[r][c].piece === `${byColor}P`) {return true;}
+    if (inBounds(r, c) && board[r][c].piece === `${byColor}P`) {
+      return true;
+    }
   }
   // Knights
   const jumps = [
@@ -87,7 +105,9 @@ function isSquareAttacked(board: Board, target: Pos, byColor: Color): boolean {
   for (const [dr, dc] of jumps) {
     const r = target.r + dr,
       c = target.c + dc;
-    if (inBounds(r, c) && board[r][c].piece === `${byColor}N`) {return true;}
+    if (inBounds(r, c) && board[r][c].piece === `${byColor}N`) {
+      return true;
+    }
   }
   // Bishops/Queens diagonals
   for (const [dr, dc] of dirsBishop) {
@@ -96,7 +116,9 @@ function isSquareAttacked(board: Board, target: Pos, byColor: Color): boolean {
     while (inBounds(r, c)) {
       const p = board[r][c].piece;
       if (p) {
-        if (p[0] === byColor && (p[1] === "B" || p[1] === "Q")) {return true;}
+        if (p[0] === byColor && (p[1] === "B" || p[1] === "Q")) {
+          return true;
+        }
         break;
       }
       r += dr;
@@ -110,7 +132,9 @@ function isSquareAttacked(board: Board, target: Pos, byColor: Color): boolean {
     while (inBounds(r, c)) {
       const p = board[r][c].piece;
       if (p) {
-        if (p[0] === byColor && (p[1] === "R" || p[1] === "Q")) {return true;}
+        if (p[0] === byColor && (p[1] === "R" || p[1] === "Q")) {
+          return true;
+        }
         break;
       }
       r += dr;
@@ -120,10 +144,14 @@ function isSquareAttacked(board: Board, target: Pos, byColor: Color): boolean {
   // King one-step
   for (let dr = -1; dr <= 1; dr++) {
     for (let dc = -1; dc <= 1; dc++) {
-      if (dr === 0 && dc === 0) {continue;}
+      if (dr === 0 && dc === 0) {
+        continue;
+      }
       const r = target.r + dr,
         c = target.c + dc;
-      if (inBounds(r, c) && board[r][c].piece === `${byColor}K`) {return true;}
+      if (inBounds(r, c) && board[r][c].piece === `${byColor}K`) {
+        return true;
+      }
     }
   }
   return false;
@@ -132,7 +160,9 @@ function isSquareAttacked(board: Board, target: Pos, byColor: Color): boolean {
 function generatePseudoLegalMoves(state: GameState, from: Pos): Move[] {
   const { board, turn, canCastle, enPassant } = state;
   const piece = board[from.r][from.c].piece;
-  if (!piece || piece[0] !== turn) {return [];}
+  if (!piece || piece[0] !== turn) {
+    return [];
+  }
   const color: Color = piece[0] as Color;
   const type: PieceType = piece[1] as PieceType;
   const moves: Move[] = [];
@@ -143,7 +173,9 @@ function generatePseudoLegalMoves(state: GameState, from: Pos): Move[] {
     while (inBounds(r, c)) {
       const target = board[r][c].piece;
       if (target) {
-        if (!sameColor(piece, target)) {moves.push({ from, to: { r, c }, capture: true });}
+        if (!sameColor(piece, target)) {
+          moves.push({from, to: {r, c}, capture: true});
+        }
         break;
       }
       moves.push({ from, to: { r, c } });
@@ -168,11 +200,16 @@ function generatePseudoLegalMoves(state: GameState, from: Pos): Move[] {
         const cap = { r: from.r + dir, c: from.c + dc };
         if (inBounds(cap.r, cap.c)) {
           const target = board[cap.r][cap.c].piece;
-          if (target && target[0] !== color) {moves.push({ from, to: cap, capture: true });}
+          if (target && target[0] !== color) {
+            moves.push({from, to: cap, capture: true});
+          }
         }
       }
       if (enPassant) {
-        if (Math.abs(enPassant.c - from.c) === 1 && enPassant.r === from.r + dir) {
+        if (
+            Math.abs(enPassant.c - from.c) === 1 &&
+            enPassant.r === from.r + dir
+        ) {
           moves.push({
             from,
             to: { r: enPassant.r, c: enPassant.c },
@@ -197,9 +234,13 @@ function generatePseudoLegalMoves(state: GameState, from: Pos): Move[] {
       for (const k of ks) {
         const r = from.r + k.r,
           c = from.c + k.c;
-        if (!inBounds(r, c)) {continue;}
+        if (!inBounds(r, c)) {
+          continue;
+        }
         const target = board[r][c].piece;
-        if (!target || target[0] !== color) {moves.push({ from, to: { r, c }, capture: !!target });}
+        if (!target || target[0] !== color) {
+          moves.push({from, to: {r, c}, capture: !!target});
+        }
       }
       break;
     }
@@ -234,17 +275,27 @@ function generatePseudoLegalMoves(state: GameState, from: Pos): Move[] {
     case "K": {
       for (let dr = -1; dr <= 1; dr++) {
         for (let dc = -1; dc <= 1; dc++) {
-          if (dr === 0 && dc === 0) {continue;}
+          if (dr === 0 && dc === 0) {
+            continue;
+          }
           const r = from.r + dr,
             c = from.c + dc;
-          if (!inBounds(r, c)) {continue;}
+          if (!inBounds(r, c)) {
+            continue;
+          }
           const target = board[r][c].piece;
-          if (!target || target[0] !== color) {moves.push({ from, to: { r, c }, capture: !!target });}
+          if (!target || target[0] !== color) {
+            moves.push({from, to: {r, c}, capture: !!target});
+          }
         }
       }
       const homeRow = color === "w" ? 0 : 7;
       if (from.r === homeRow && from.c === 4) {
-        if (canCastle[color].king && !board[homeRow][5].piece && !board[homeRow][6].piece) {
+        if (
+            canCastle[color].king &&
+            !board[homeRow][5].piece &&
+            !board[homeRow][6].piece
+        ) {
           moves.push({ from, to: { r: homeRow, c: 6 }, castling: "K" });
         }
         if (
@@ -263,7 +314,11 @@ function generatePseudoLegalMoves(state: GameState, from: Pos): Move[] {
 }
 
 function applyMove(state: GameState, move: Move): GameState {
-  const ns: GameState = { ...state, board: cloneBoard(state.board), enPassant: null };
+  const ns: GameState = {
+    ...state,
+    board: cloneBoard(state.board),
+    enPassant: null,
+  };
   const { from, to } = move;
   const piece = state.board[from.r][from.c].piece!;
   const color = piece[0] as Color;
@@ -296,14 +351,22 @@ function applyMove(state: GameState, move: Move): GameState {
   }
   if (piece === `${color}R`) {
     const homeRow = color === "w" ? 0 : 7;
-    if (from.r === homeRow && from.c === 0) {ns.canCastle[color].queen = false;}
-    if (from.r === homeRow && from.c === 7) {ns.canCastle[color].king = false;}
+    if (from.r === homeRow && from.c === 0) {
+      ns.canCastle[color].queen = false;
+    }
+    if (from.r === homeRow && from.c === 7) {
+      ns.canCastle[color].king = false;
+    }
   }
   const opp: Color = color === "w" ? "b" : "w";
   const oppHome = opp === "w" ? 0 : 7;
   if (state.board[to.r][to.c].piece === `${opp}R`) {
-    if (to.r === oppHome && to.c === 0) {ns.canCastle[opp].queen = false;}
-    if (to.r === oppHome && to.c === 7) {ns.canCastle[opp].king = false;}
+    if (to.r === oppHome && to.c === 0) {
+      ns.canCastle[opp].queen = false;
+    }
+    if (to.r === oppHome && to.c === 7) {
+      ns.canCastle[opp].king = false;
+    }
   }
 
   if (piece[1] === "P") {
@@ -315,7 +378,9 @@ function applyMove(state: GameState, move: Move): GameState {
   }
 
   ns.turn = ns.turn === "w" ? "b" : "w";
-  if (ns.turn === "w") {ns.fullmoveNumber += 1;}
+  if (ns.turn === "w") {
+    ns.fullmoveNumber += 1;
+  }
   return ns;
 }
 
@@ -330,12 +395,16 @@ function legalMoves(state: GameState, from: Pos): Move[] {
       const cols = m.castling === "K" ? [4, 5, 6] : [4, 3, 2];
       let ok = true;
       for (const c of cols) {
-        if (isSquareAttacked(ns.board, { r: row, c }, color === "w" ? "b" : "w")) {
+        if (
+            isSquareAttacked(ns.board, {r: row, c}, color === "w" ? "b" : "w")
+        ) {
           ok = false;
           break;
         }
       }
-      if (!ok) {continue;}
+      if (!ok) {
+        continue;
+      }
     }
     const k = findKing(ns.board, color);
     if (k && !isSquareAttacked(ns.board, k, color === "w" ? "b" : "w")) {
@@ -346,7 +415,14 @@ function legalMoves(state: GameState, from: Pos): Move[] {
 }
 
 function pieceToChar(p: Piece): string {
-  const map: Record<PieceType, string> = { K: "♔", Q: "♕", R: "♖", B: "♗", N: "♘", P: "♙" };
+  const map: Record<PieceType, string> = {
+    K: "♔",
+    Q: "♕",
+    R: "♖",
+    B: "♗",
+    N: "♘",
+    P: "♙",
+  };
   const ch = map[p[1] as PieceType];
   return p[0] === "w"
     ? ch
@@ -366,7 +442,11 @@ export const ChessGame: React.FC = () => {
   const [state, setState] = useState<GameState>(() => initialState());
   const [selected, setSelected] = useState<Pos | null>(null);
   const [legal, setLegal] = useState<Move[]>([]);
-  const [promotion, setPromotion] = useState<{ from: Pos; to: Pos; color: Color } | null>(null);
+  const [promotion, setPromotion] = useState<{
+    from: Pos;
+    to: Pos;
+    color: Color;
+  } | null>(null);
   const [status, setStatus] = useState<string>("");
   const boardRef = useRef<HTMLDivElement>(null);
   const liveRef = useRef<HTMLDivElement>(null);
@@ -381,7 +461,9 @@ export const ChessGame: React.FC = () => {
 
   const inCheck = useMemo(() => {
     const k = findKing(state.board, state.turn);
-    if (!k) {return false;}
+    if (!k) {
+      return false;
+    }
     return isSquareAttacked(state.board, k, state.turn === "w" ? "b" : "w");
   }, [state]);
 
@@ -390,7 +472,9 @@ export const ChessGame: React.FC = () => {
       for (let c = 0; c < SIZE; c++) {
         const p = state.board[r][c].piece;
         if (p && p[0] === state.turn) {
-          if (legalMoves(state, { r, c }).length) {return true;}
+          if (legalMoves(state, {r, c}).length) {
+            return true;
+          }
         }
       }
     }
@@ -416,7 +500,9 @@ export const ChessGame: React.FC = () => {
 
   const onSquareClick = useCallback(
     (r: number, c: number) => {
-      if (mate || gameOver) {return;}
+      if (mate || gameOver) {
+        return;
+      }
       const sq = state.board[r][c];
       const piece = sq.piece;
 
@@ -443,7 +529,10 @@ export const ChessGame: React.FC = () => {
           setState(ns);
           setSelected(null);
           setLegal([]);
-          soundManager.playSound(mv.capture ? "capture" : "move", mv.capture ? 0.8 : 0.5);
+          soundManager.playSound(
+              mv.capture ? "capture" : "move",
+              mv.capture ? 0.8 : 0.5,
+          );
           return;
         }
         setSelected(null);
@@ -459,16 +548,23 @@ export const ChessGame: React.FC = () => {
   );
 
   const confirmPromotion = (t: PieceType) => {
-    if (!promotion) {return;}
+    if (!promotion) {
+      return;
+    }
     const mv = legalMoves(state, promotion.from).find(
       (m) => m.to.r === promotion.to.r && m.to.c === promotion.to.c,
     );
-    const move = (mv ? { ...mv } : { from: promotion.from, to: promotion.to }) as Move;
+    const move = (
+        mv ? {...mv} : {from: promotion.from, to: promotion.to}
+    ) as Move;
     move.promotion = t;
     const ns = applyMove(state, move);
     setState(ns);
     setPromotion(null);
-    soundManager.playSound(move.capture ? "capture" : "move", move.capture ? 0.8 : 0.5);
+    soundManager.playSound(
+        move.capture ? "capture" : "move",
+        move.capture ? 0.8 : 0.5,
+    );
   };
 
   const uiBoard = useMemo(() => state.board, [state.board]);
@@ -483,7 +579,9 @@ export const ChessGame: React.FC = () => {
   const onSquareKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
     const r = Number(e.currentTarget.getAttribute("data-r"));
     const c = Number(e.currentTarget.getAttribute("data-c"));
-    if (Number.isNaN(r) || Number.isNaN(c)) {return;}
+    if (Number.isNaN(r) || Number.isNaN(c)) {
+      return;
+    }
     switch (e.key) {
       case "Enter":
       case " ":
@@ -517,14 +615,22 @@ export const ChessGame: React.FC = () => {
       <div className="text-lg font-semibold">
         Chess — Turn: {state.turn === "w" ? "White" : "Black"}
       </div>
-      {inCheck && !mate && <div className="text-sm text-yellow-300">Check!</div>}
+      {inCheck && !mate && (
+          <div className="text-sm text-yellow-300">Check!</div>
+      )}
       {mate && (
         <div className="text-sm text-red-400">
           Checkmate. {state.turn === "w" ? "Black" : "White"} wins.
         </div>
       )}
-      {gameOver && !mate && <div className="text-sm text-gray-400">Stalemate.</div>}
-      <div ref={boardRef} className="grid" style={{ gridTemplateColumns: `repeat(${SIZE}, 3rem)` }}>
+      {gameOver && !mate && (
+          <div className="text-sm text-gray-400">Stalemate.</div>
+      )}
+      <div
+          ref={boardRef}
+          className="grid"
+          style={{gridTemplateColumns: `repeat(${SIZE}, 3rem)`}}
+      >
         {uiBoard.map((row, r) =>
           row.map((sq, c) => {
             const dark = (r + c) % 2 === 1;
@@ -538,7 +644,9 @@ export const ChessGame: React.FC = () => {
                 data-r={r}
                 data-c={c}
                 className={`w-12 h-12 flex items-center justify-center border text-sm select-none ${
-                  dark ? "bg-muted/60 text-foreground" : "bg-card text-card-foreground"
+                    dark
+                        ? "bg-muted/60 text-foreground"
+                        : "bg-card text-card-foreground"
                 } ${isSel ? "outline outline-2 outline-accent" : ""}`}
                 aria-label={`Square ${String.fromCharCode(97 + c)}${r + 1}${sq.piece ? ", " + (sq.piece[0] === "w" ? "White " : "Black ") + sq.piece[1] : ""}`}
               >

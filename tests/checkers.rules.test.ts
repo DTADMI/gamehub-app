@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import {describe, expect, it} from "vitest";
 
 // We import the raw logic indirectly via the component's simple rules.
 // For now we will simulate board interactions by calling minimal helpers
@@ -14,7 +14,9 @@ type Move = { to: Pos; capture?: Pos };
 const SIZE = 8;
 
 function initialBoard(): Piece[][] {
-  const board: Piece[][] = Array.from({ length: SIZE }, () => Array<Piece>(SIZE).fill(null));
+  const board: Piece[][] = Array.from({length: SIZE}, () =>
+      Array<Piece>(SIZE).fill(null),
+  );
   for (let r = 0; r < SIZE; r++) {
     for (let c = 0; c < SIZE; c++) {
       const dark = (r + c) % 2 === 1;

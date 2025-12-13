@@ -1,9 +1,14 @@
-import { describe, expect, it } from "vitest";
-import { applyMove, type GameState, initialState, legalMoves, type Pos } from "@games/chess";
+import {describe, expect, it} from "vitest";
+import {applyMove, type GameState, initialState, legalMoves, type Pos,} from "@games/chess";
 
 function moveBy(state: GameState, from: Pos, to: Pos) {
-  const m = legalMoves(state, from).find((x) => x.to.r === to.r && x.to.c === to.c);
-  expect(m, `Expected legal move from ${from.r},${from.c} to ${to.r},${to.c}`).toBeTruthy();
+    const m = legalMoves(state, from).find(
+        (x) => x.to.r === to.r && x.to.c === to.c,
+    );
+    expect(
+        m,
+        `Expected legal move from ${from.r},${from.c} to ${to.r},${to.c}`,
+    ).toBeTruthy();
   return applyMove(state, m!);
 }
 
@@ -32,7 +37,9 @@ describe("chess rules", () => {
     s = moveBy(s, { r: 1, c: 4 }, { r: 2, c: 4 }); // e2->e3
     s = moveBy(s, { r: 6, c: 1 }, { r: 5, c: 1 }); // ... black move
     // attempt castling detection
-    const castle = legalMoves(s, { r: 0, c: 4 }).find((m) => m.castling === "K");
+      const castle = legalMoves(s, {r: 0, c: 4}).find(
+          (m) => m.castling === "K",
+      );
     // Allow either found or not, but if found, applying should place rook on f1 and king on g1
     if (castle) {
       s = applyMove(s, castle);

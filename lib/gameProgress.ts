@@ -1,7 +1,7 @@
 // frontend/lib/gameProgress.ts
 "use client";
 
-import {doc, Firestore, getDoc, serverTimestamp, setDoc} from "firebase/firestore";
+import {doc, Firestore, getDoc, serverTimestamp, setDoc,} from "firebase/firestore";
 
 import {getFireStore} from "./firebase";
 
@@ -46,7 +46,10 @@ export async function saveGameProgress(
   }
 }
 
-export async function getGameProgress(userId: string, gameId: string): Promise<GameStats | null> {
+export async function getGameProgress(
+    userId: string,
+    gameId: string,
+): Promise<GameStats | null> {
   try {
     const firestore = ensureDbInitialized();
     const userRef = doc(firestore, "users", userId);

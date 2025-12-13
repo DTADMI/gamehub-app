@@ -1,14 +1,19 @@
 "use client";
 
-import { Client, IMessage, StompSubscription } from "@stomp/stompjs";
-import { useEffect, useMemo, useRef, useState } from "react";
+import {Client, IMessage, StompSubscription} from "@stomp/stompjs";
+import {useEffect, useMemo, useRef, useState} from "react";
 
 export type StompMessage = {
   eventId?: string;
   type?: string;
   ts?: number;
   room?: { id?: string; game?: string; visibility?: string };
-  user?: { id?: string; role?: string; nickname?: string; subscription?: string };
+  user?: {
+    id?: string;
+    role?: string;
+    nickname?: string;
+    subscription?: string;
+  };
   payload?: unknown;
 };
 
@@ -17,10 +22,13 @@ export function useStomp(opts?: {
   enabled?: boolean;
   headers?: Record<string, string>;
 }) {
-  const enabled = opts?.enabled ?? process.env.NEXT_PUBLIC_FEATURE_REALTIME === "true";
+  const enabled =
+      opts?.enabled ?? process.env.NEXT_PUBLIC_FEATURE_REALTIME === "true";
   const url =
     opts?.url ??
-    (typeof window !== "undefined" ? `${window.location.origin.replace(/^http/, "ws")}/ws` : "");
+      (typeof window !== "undefined"
+          ? `${window.location.origin.replace(/^http/, "ws")}/ws`
+          : "");
   const [connected, setConnected] = useState(false);
   const clientRef = useRef<Client | null>(null);
   const subsRef = useRef<StompSubscription[]>([]);

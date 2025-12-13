@@ -16,7 +16,9 @@ interface SoundContextType {
 
 const SoundContext = createContext<SoundContextType | undefined>(undefined);
 
-export const SoundProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const SoundProvider: React.FC<{ children: React.ReactNode }> = ({
+                                                                         children,
+                                                                       }) => {
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolumeState] = useState(0.5);
 
@@ -26,7 +28,9 @@ export const SoundProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     // Load saved settings
     const savedMuted = localStorage.getItem("soundMuted") === "true";
-    const savedVolume = parseFloat(localStorage.getItem("soundVolume") || "0.5");
+    const savedVolume = parseFloat(
+        localStorage.getItem("soundVolume") || "0.5",
+    );
 
     setIsMuted(savedMuted);
     setVolumeState(savedVolume);

@@ -12,7 +12,8 @@ const createEmptyBoard = () =>
 
 const createRandomTetromino = () => {
   const tetrominos = TETROMINO_TYPES;
-  const randTetromino = tetrominos[Math.floor(Math.random() * tetrominos.length)];
+  const randTetromino =
+      tetrominos[Math.floor(Math.random() * tetrominos.length)];
   return {
     ...TETROMINOS[randTetromino],
     position: { x: Math.floor(BOARD_WIDTH / 2) - 1, y: 0 },
@@ -31,29 +32,34 @@ const TetrisGame = () => {
     isPaused: false,
     gameStarted: false,
     highScore:
-      typeof window !== "undefined" ? parseInt(localStorage.getItem("tetrisHighScore") || "0") : 0,
+        typeof window !== "undefined"
+            ? parseInt(localStorage.getItem("tetrisHighScore") || "0")
+            : 0,
   });
 
-  const checkCollision = useCallback((tetromino: any, board: string[][], position: Position) => {
-    for (let y = 0; y < tetromino.shape.length; y++) {
-      for (let x = 0; x < tetromino.shape[y].length; x++) {
-        if (tetromino.shape[y][x] !== 0) {
-          const newX = position.x + x;
-          const newY = position.y + y;
+  const checkCollision = useCallback(
+      (tetromino: any, board: string[][], position: Position) => {
+        for (let y = 0; y < tetromino.shape.length; y++) {
+          for (let x = 0; x < tetromino.shape[y].length; x++) {
+            if (tetromino.shape[y][x] !== 0) {
+              const newX = position.x + x;
+              const newY = position.y + y;
 
-          if (
-            newX < 0 ||
-            newX >= BOARD_WIDTH ||
-            newY >= BOARD_HEIGHT ||
-            (newY >= 0 && board[newY][newX] !== "")
-          ) {
-            return true;
+              if (
+                  newX < 0 ||
+                  newX >= BOARD_WIDTH ||
+                  newY >= BOARD_HEIGHT ||
+                  (newY >= 0 && board[newY][newX] !== "")
+              ) {
+                return true;
+              }
+            }
           }
         }
-      }
-    }
-    return false;
-  }, []);
+        return false;
+      },
+      [],
+  );
 
   const rotate = useCallback((matrix: number[][]) => {
     const N = matrix.length;
@@ -114,7 +120,11 @@ const TetrisGame = () => {
       score: prev.score + points,
       lines: newLines,
       level: newLevel,
-      gameOver: checkCollision(prev.nextTetromino, updatedBoard, prev.nextTetromino.position),
+      gameOver: checkCollision(
+          prev.nextTetromino,
+          updatedBoard,
+          prev.nextTetromino.position,
+      ),
     }));
 
     // Update high score if needed
@@ -146,14 +156,29 @@ const TetrisGame = () => {
         let newTetromino = { ...tetromino };
         if (direction === "rotate") {
           const rotatedShape = rotate(tetromino.shape);
-          if (!checkCollision({ ...tetromino, shape: rotatedShape }, board, tetromino.position)) {
+          if (
+              !checkCollision(
+                  {...tetromino, shape: rotatedShape},
+                  board,
+                  tetromino.position,
+              )
+          ) {
             newTetromino = { ...tetromino, shape: rotatedShape };
           }
         }
 
-        if (direction !== "rotate" && !checkCollision(tetromino, board, newPosition)) {
-          return { ...prev, tetromino: { ...tetromino, position: newPosition } };
-        } else if (direction === "down" && checkCollision(tetromino, board, newPosition)) {
+        if (
+            direction !== "rotate" &&
+            !checkCollision(tetromino, board, newPosition)
+        ) {
+          return {
+            ...prev,
+            tetromino: {...tetromino, position: newPosition},
+          };
+        } else if (
+            direction === "down" &&
+            checkCollision(tetromino, board, newPosition)
+        ) {
           placeTetromino();
         }
 
@@ -293,14 +318,17 @@ const TetrisGame = () => {
   const renderCell = (cell: string, rowIndex: number, colIndex: number) => {
     const isCurrentTetromino =
       rowIndex >= gameState.tetromino.position.y &&
-      rowIndex < gameState.tetromino.position.y + gameState.tetromino.shape.length &&
+        rowIndex <
+        gameState.tetromino.position.y + gameState.tetromino.shape.length &&
       colIndex >= gameState.tetromino.position.x &&
-      colIndex < gameState.tetromino.position.x + gameState.tetromino.shape[0].length &&
+        colIndex <
+        gameState.tetromino.position.x + gameState.tetromino.shape[0].length &&
       gameState.tetromino.shape[rowIndex - gameState.tetromino.position.y]?.[
         colIndex - gameState.tetromino.position.x
       ];
 
-    const cellColor = cell || (isCurrentTetromino ? gameState.tetromino.color : "");
+    const cellColor =
+        cell || (isCurrentTetromino ? gameState.tetromino.color : "");
 
     return (
       <div
@@ -350,7 +378,9 @@ const TetrisGame = () => {
 
           {gameState.gameOver && (
             <div className="absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center">
-              <div className="text-white text-2xl font-bold mb-4">Game Over!</div>
+              <div className="text-white text-2xl font-bold mb-4">
+                Game Over!
+              </div>
               <div className="text-white mb-6">Score: {gameState.score}</div>
               <button
                 onClick={() => {
@@ -383,14 +413,19 @@ const TetrisGame = () => {
         <div className="flex flex-col">
           <div className="bg-white p-4 rounded-lg shadow mb-4">
             <h2 className="text-lg font-semibold mb-2">Next</h2>
-            <div className="grid grid-cols-4 gap-1" style={{ width: "120px", height: "120px" }}>
+            <div
+                className="grid grid-cols-4 gap-1"
+                style={{width: "120px", height: "120px"}}
+            >
               {gameState.nextTetromino.shape.map((row, rowIndex) =>
                 row.map((cell, colIndex) => (
                   <div
                     key={`next-${rowIndex}-${colIndex}`}
                     className={`w-6 h-6 ${cell ? `bg-${gameState.nextTetromino.color}-500` : "bg-transparent"}`}
                     style={{
-                      backgroundColor: cell ? gameState.nextTetromino.color : "transparent",
+                      backgroundColor: cell
+                          ? gameState.nextTetromino.color
+                          : "transparent",
                     }}
                   />
                 )),

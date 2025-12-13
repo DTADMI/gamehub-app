@@ -30,14 +30,20 @@ export default defineConfig({
       { find: "@", replacement: path.resolve(__dirname, ".") },
 
       // Shared library
-      {find: "@games/shared", replacement: path.resolve(__dirname, "libs/shared/src")},
+      {
+        find: "@games/shared",
+        replacement: path.resolve(__dirname, "libs/shared/src"),
+      },
       {
         find: /^@games\/shared\/(.*)$/,
         replacement: path.resolve(__dirname, "libs/shared/src") + "/$1",
       },
 
       // Specific chess package root (ensure it wins over the generic rule below)
-      {find: /^@games\/chess$/, replacement: path.resolve(__dirname, "games/chess/src")},
+      {
+        find: /^@games\/chess$/,
+        replacement: path.resolve(__dirname, "games/chess/src"),
+      },
 
       // Games packages — import from package root
       {

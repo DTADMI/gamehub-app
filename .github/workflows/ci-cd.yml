@@ -34,7 +34,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Lint
-        run: pnpm lint
+        run: pnpm run lint:ci
 
       - name: Test
         run: pnpm test
@@ -212,15 +212,29 @@ jobs:
           docker load -i ./out/gamehub-app-image.tar
           docker images
 
+      - name: Decide GCP auth method
+        id: decide-auth
+        run: |
+          if [ -n "${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}" ] && [ -n "${{ secrets.GCP_SERVICE_ACCOUNT }}" ]; then
+            echo "HAS_WIF=true" >> $GITHUB_ENV
+          else
+            echo "HAS_WIF=false" >> $GITHUB_ENV
+          fi
+          if [ -n "${{ secrets.GCP_SA_KEY }}" ]; then
+            echo "HAS_SA=true" >> $GITHUB_ENV
+          else
+            echo "HAS_SA=false" >> $GITHUB_ENV
+          fi
+
       - name: Authenticate to Google Cloud (WIF)
-        if: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER != '' && secrets.GCP_SERVICE_ACCOUNT != '' }}
+        if: ${{ env.HAS_WIF == 'true' }}
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
       - name: Authenticate to Google Cloud (Service Account Key)
-        if: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER == '' || secrets.GCP_SERVICE_ACCOUNT == '' }}
+        if: ${{ env.HAS_WIF != 'true' && env.HAS_SA == 'true' }}
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}

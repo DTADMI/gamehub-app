@@ -59,8 +59,14 @@ export default function ExplorePage() {
     const useCarousels = useFeature("EXPLORE_CAROUSELS", true);
     const showGamesFeatured = useFeature("EXPLORE_SHOW_FEATURED", true);
     const showGamesUpcoming = useFeature("EXPLORE_SHOW_UPCOMING", true);
-    const showProjectsFeatured = useFeature("EXPLORE_SHOW_PROJECTS_FEATURED", true);
-    const showProjectsComing = useFeature("EXPLORE_SHOW_PROJECTS_COMING_SOON", true);
+  const showProjectsFeatured = useFeature(
+      "EXPLORE_SHOW_PROJECTS_FEATURED",
+      true,
+  );
+  const showProjectsComing = useFeature(
+      "EXPLORE_SHOW_PROJECTS_COMING_SOON",
+      true,
+  );
 
   return (
     <section className="space-y-8 px-6 md:px-8 py-8">
@@ -90,15 +96,19 @@ export default function ExplorePage() {
                       <h3 className="text-lg font-semibold">Featured</h3>
                       {useCarousels ? (
                           <Carousel>
-                              {ALL_GAMES.filter((g) => g.featured && !g.upcoming).map((g) => (
-                                  <GameCard key={g.id} game={g} featured={g.featured}/>
-                              ))}
+                            {ALL_GAMES.filter((g) => g.featured && !g.upcoming).map(
+                                (g) => (
+                                    <GameCard key={g.id} game={g} featured={g.featured}/>
+                                ),
+                            )}
                           </Carousel>
                       ) : (
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                              {ALL_GAMES.filter((g) => g.featured && !g.upcoming).map((g) => (
-                                  <GameCard key={g.id} game={g} featured={g.featured}/>
-                              ))}
+                            {ALL_GAMES.filter((g) => g.featured && !g.upcoming).map(
+                                (g) => (
+                                    <GameCard key={g.id} game={g} featured={g.featured}/>
+                                ),
+                            )}
                           </div>
                       )}
                   </>
@@ -135,11 +145,15 @@ export default function ExplorePage() {
                       {useCarousels ? (
                           <Carousel>
                               {PROJECTS.filter((p) => !p.comingSoon).map((p) => (
-                                  <article key={p.title}
-                                           className="rounded-lg border bg-card text-card-foreground shadow-sm">
+                                  <article
+                                      key={p.title}
+                                      className="rounded-lg border bg-card text-card-foreground shadow-sm"
+                                  >
                                       <div className="p-5 space-y-3">
                                           <h2 className="text-lg font-semibold">{p.title}</h2>
-                                          <p className="text-sm text-muted-foreground">{p.description}</p>
+                                        <p className="text-sm text-muted-foreground">
+                                          {p.description}
+                                        </p>
                                           <div className="flex flex-wrap gap-2">
                                               {p.tags.map((t) => (
                                                   <span
@@ -157,11 +171,15 @@ export default function ExplorePage() {
                       ) : (
                           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                               {PROJECTS.filter((p) => !p.comingSoon).map((p) => (
-                                  <article key={p.title}
-                                           className="rounded-lg border bg-card text-card-foreground shadow-sm">
+                                  <article
+                                      key={p.title}
+                                      className="rounded-lg border bg-card text-card-foreground shadow-sm"
+                                  >
                                       <div className="p-5 space-y-3">
                                           <h2 className="text-lg font-semibold">{p.title}</h2>
-                                          <p className="text-sm text-muted-foreground">{p.description}</p>
+                                        <p className="text-sm text-muted-foreground">
+                                          {p.description}
+                                        </p>
                                           <div className="flex flex-wrap gap-2">
                                               {p.tags.map((t) => (
                                                   <span
@@ -185,11 +203,15 @@ export default function ExplorePage() {
                       {useCarousels ? (
                           <Carousel>
                               {PROJECTS.filter((p) => p.comingSoon).map((p) => (
-                                  <article key={p.title}
-                                           className="rounded-lg border bg-card text-card-foreground shadow-sm">
+                                  <article
+                                      key={p.title}
+                                      className="rounded-lg border bg-card text-card-foreground shadow-sm"
+                                  >
                                       <div className="p-5 space-y-3">
                                           <h2 className="text-lg font-semibold">{p.title}</h2>
-                                          <p className="text-sm text-muted-foreground">{p.description}</p>
+                                        <p className="text-sm text-muted-foreground">
+                                          {p.description}
+                                        </p>
                                           <div className="flex flex-wrap gap-2">
                                               {p.tags.map((t) => (
                                                   <span
@@ -201,7 +223,9 @@ export default function ExplorePage() {
                                               ))}
                                           </div>
                                           <span
-                                              className="text-xs px-2 py-1 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">Coming soon</span>
+                                              className="text-xs px-2 py-1 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+                          Coming soon
+                        </span>
                                       </div>
                                   </article>
                               ))}
@@ -209,11 +233,15 @@ export default function ExplorePage() {
                       ) : (
                           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                               {PROJECTS.filter((p) => p.comingSoon).map((p) => (
-                                  <article key={p.title}
-                                           className="rounded-lg border bg-card text-card-foreground shadow-sm">
+                                  <article
+                                      key={p.title}
+                                      className="rounded-lg border bg-card text-card-foreground shadow-sm"
+                                  >
                                       <div className="p-5 space-y-3">
                                           <h2 className="text-lg font-semibold">{p.title}</h2>
-                                          <p className="text-sm text-muted-foreground">{p.description}</p>
+                                        <p className="text-sm text-muted-foreground">
+                                          {p.description}
+                                        </p>
                                           <div className="flex flex-wrap gap-2">
                                               {p.tags.map((t) => (
                                                   <span
@@ -225,7 +253,9 @@ export default function ExplorePage() {
                                               ))}
                                           </div>
                                           <span
-                                              className="text-xs px-2 py-1 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">Coming soon</span>
+                                              className="text-xs px-2 py-1 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+                          Coming soon
+                        </span>
                                       </div>
                                   </article>
                               ))}

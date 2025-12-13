@@ -1,7 +1,10 @@
 // libs/shared/src/lib/sound.ts
 export class SoundManager {
   private static instance: SoundManager;
-  private sounds: Map<string, HTMLAudioElement> = new Map<string, HTMLAudioElement>();
+  private sounds: Map<string, HTMLAudioElement> = new Map<
+      string,
+      HTMLAudioElement
+  >();
   private musicEnabled = true;
   private soundEffectsEnabled = true;
   private currentMusic: string | null = null;
@@ -44,7 +47,11 @@ export class SoundManager {
     }
   }
 
-  async preloadSound(name: string, path: string, loop = false): Promise<boolean> {
+  async preloadSound(
+      name: string,
+      path: string,
+      loop = false,
+  ): Promise<boolean> {
     // Skip on server-side
     if (typeof window === "undefined") {
       return false;
@@ -118,7 +125,9 @@ export class SoundManager {
     if (music) {
       this.currentMusic = name;
       music.volume = Math.min(1, Math.max(0, volume * this.volume));
-      void music.play().catch((e) => console.warn(`Could not play music ${name}:`, e));
+      void music
+          .play()
+          .catch((e) => console.warn(`Could not play music ${name}:`, e));
     }
   }
 

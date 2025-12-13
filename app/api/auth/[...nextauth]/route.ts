@@ -36,7 +36,8 @@ interface UserData {
 }
 
 const BACKEND_URL =
-    process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "http://localhost:3000/api";
+    process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
+    "http://localhost:3000/api";
 
 function safeJson<T = any>(input: Response | string | null): T | null {
   try {
@@ -63,7 +64,10 @@ const authOptions: NextAuthOptions = {
     // Keep cookie settings explicit in dev to avoid host/port mismatches
     cookies: {
         sessionToken: {
-            name: process.env.NODE_ENV === "production" ? "__Secure-next-auth.session-token" : "next-auth.session-token",
+            name:
+                process.env.NODE_ENV === "production"
+                    ? "__Secure-next-auth.session-token"
+                    : "next-auth.session-token",
             options: {
                 httpOnly: true,
                 sameSite: "lax",
@@ -89,11 +93,11 @@ const authOptions: NextAuthOptions = {
             method: "POST",
               headers: {
                   "Content-Type": "application/json",
-                  "Accept": "application/json"
+                  Accept: "application/json",
               },
               body: JSON.stringify({
                   email: credentials.email,
-                  password: credentials.password
+                  password: credentials.password,
               }),
           });
           if (!res.ok) {
@@ -163,11 +167,15 @@ const authOptions: NextAuthOptions = {
       // Prevent redirects to external origins (e.g., backend) — always bring back to frontend base URL.
       async redirect({url, baseUrl}) {
           // Always redirect to the frontend origin (NEXTAUTH_URL or computed baseUrl)
-          const frontendBase = (process.env.NEXTAUTH_URL || baseUrl).replace(/\/$/, "");
+          const frontendBase = (process.env.NEXTAUTH_URL || baseUrl).replace(
+              /\/$/,
+              "",
+          );
           try {
               // Normalize incoming url to a URL object using frontendBase as base
               const normalized = new URL(url, `${frontendBase}/`);
-              const targetPath = normalized.pathname + normalized.search + normalized.hash;
+              const targetPath =
+                  normalized.pathname + normalized.search + normalized.hash;
               // Only ever return same-origin URLs
               return `${frontendBase}${targetPath}`;
           } catch {
@@ -201,7 +209,8 @@ const authOptions: NextAuthOptions = {
             const data = (await safeJson<TokenResponse>(res)) || null;
             if (data && data.accessToken) {
               authToken.accessToken = data.accessToken;
-              authToken.refreshToken = data.refreshToken || authToken.refreshToken;
+                authToken.refreshToken =
+                    data.refreshToken || authToken.refreshToken;
               authToken.expiresIn = data.expiresIn;
               authToken.accessTokenIssuedAt = Date.now();
               try {

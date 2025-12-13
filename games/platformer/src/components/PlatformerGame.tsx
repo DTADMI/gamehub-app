@@ -105,7 +105,10 @@ export const PlatformerGame: React.FC = () => {
       if (keys.current["ArrowRight"] || keys.current["d"]) {
         p.vx = MOVE_VX;
       }
-      if ((keys.current["ArrowUp"] || keys.current["w"] || keys.current[" "]) && p.onGround) {
+      if (
+          (keys.current["ArrowUp"] || keys.current["w"] || keys.current[" "]) &&
+          p.onGround
+      ) {
         p.vy = JUMP_VY;
         p.onGround = false;
         soundManager.playSound("click", 0.5);

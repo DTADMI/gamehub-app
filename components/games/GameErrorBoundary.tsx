@@ -17,7 +17,10 @@ interface GameErrorBoundaryState {
   error: Error | null;
 }
 
-export class GameErrorBoundary extends Component<GameErrorBoundaryProps, GameErrorBoundaryState> {
+export class GameErrorBoundary extends Component<
+    GameErrorBoundaryProps,
+    GameErrorBoundaryState
+> {
   constructor(props: GameErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false, error: null };

@@ -18,14 +18,19 @@ export default function SubscribeSuccessPage() {
             <div className="max-w-xl mx-auto text-center space-y-4">
                 <h1 className="text-2xl font-bold">Thanks for upgrading!</h1>
                 <p className="text-muted-foreground">
-                    Your subscription status has been updated. Advanced leaderboards and premium features are now
-                    unlocked.
+                    Your subscription status has been updated. Advanced leaderboards and
+                    premium features are now unlocked.
                 </p>
                 <div className="flex items-center justify-center gap-3">
-                    <Link href="/leaderboard"
-                          className="rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm">View
-                        Leaderboards</Link>
-                    <Link href="/games" className="rounded-md border px-4 py-2 text-sm">Browse Games</Link>
+                    <Link
+                        href="/leaderboard"
+                        className="rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm"
+                    >
+                        View Leaderboards
+                    </Link>
+                    <Link href="/games" className="rounded-md border px-4 py-2 text-sm">
+                        Browse Games
+                    </Link>
                 </div>
             </div>
         </div>

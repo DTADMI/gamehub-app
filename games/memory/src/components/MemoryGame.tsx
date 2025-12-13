@@ -18,7 +18,9 @@ export const MemoryGame: React.FC = () => {
   const [moves, setMoves] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">("medium");
+  const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">(
+      "medium",
+  );
 
   // Initialize game
   const initializeGame = useCallback(() => {
@@ -61,7 +63,9 @@ export const MemoryGame: React.FC = () => {
         // Match found
         setCards((prevCards) =>
           prevCards.map((card, idx) =>
-            idx === firstIndex || idx === secondIndex ? { ...card, isMatched: true } : card,
+              idx === firstIndex || idx === secondIndex
+                  ? {...card, isMatched: true}
+                  : card,
           ),
         );
         soundManager.playSound("match");
@@ -70,7 +74,9 @@ export const MemoryGame: React.FC = () => {
         setTimeout(() => {
           setCards((prevCards) =>
             prevCards.map((card, idx) =>
-              idx === firstIndex || idx === secondIndex ? { ...card, isFlipped: false } : card,
+                idx === firstIndex || idx === secondIndex
+                    ? {...card, isFlipped: false}
+                    : card,
             ),
           );
         }, 1000);
@@ -106,7 +112,9 @@ export const MemoryGame: React.FC = () => {
     soundManager.playSound("cardFlip");
 
     setCards((prev) =>
-      prev.map((card, idx) => (idx === index ? { ...card, isFlipped: true } : card)),
+        prev.map((card, idx) =>
+            idx === index ? {...card, isFlipped: true} : card,
+        ),
     );
 
     setFlippedIndices((prev) => [...prev, index]);
@@ -131,10 +139,14 @@ export const MemoryGame: React.FC = () => {
       <div className="p-4">
         {/* Difficulty Selector */}
         <div className="mb-6 text-center">
-          <label className="mr-2 text-gray-700 dark:text-gray-300">Difficulty:</label>
+          <label className="mr-2 text-gray-700 dark:text-gray-300">
+            Difficulty:
+          </label>
           <select
             value={difficulty}
-            onChange={(e) => setDifficulty(e.target.value as "easy" | "medium" | "hard")}
+            onChange={(e) =>
+                setDifficulty(e.target.value as "easy" | "medium" | "hard")
+            }
             className="px-3 py-1 border rounded-md"
             disabled={moves > 0}
           >
@@ -166,7 +178,10 @@ export const MemoryGame: React.FC = () => {
                 ${card.isFlipped ? "rotate-y-180" : ""}
               `}
               style={{
-                transform: card.isFlipped || card.isMatched ? "rotateY(180deg)" : "rotateY(0)",
+                transform:
+                    card.isFlipped || card.isMatched
+                        ? "rotateY(180deg)"
+                        : "rotateY(0)",
                 backfaceVisibility: "hidden",
               }}
             >

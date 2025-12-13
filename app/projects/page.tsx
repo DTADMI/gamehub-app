@@ -19,7 +19,8 @@ type Project = {
 const projects: Project[] = [
   {
     title: "Portfolio Website",
-    description: "Personal website with blog and contact page built with Next.js and TailwindCSS.",
+    description:
+        "Personal website with blog and contact page built with Next.js and TailwindCSS.",
     tags: ["Next.js", "TailwindCSS", "SSR"],
     repo: GITHUB_URL,
     demo: "#",
@@ -27,7 +28,8 @@ const projects: Project[] = [
   },
   {
     title: "Data Viz Dashboard",
-    description: "Interactive charts and analytics with authentication and role-based access.",
+    description:
+        "Interactive charts and analytics with authentication and role-based access.",
     tags: ["Charts", "Auth", "Accessibility"],
     comingSoon: true,
   },
@@ -63,7 +65,9 @@ export default function ProjectsPage() {
                   >
                     <div className="p-5 space-y-3">
                       <h2 className="text-lg font-semibold">{p.title}</h2>
-                      <p className="text-sm text-muted-foreground">{p.description}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {p.description}
+                      </p>
                       <div className="flex flex-wrap gap-2">
                         {p.tags.map((t) => (
                             <span
@@ -77,14 +81,25 @@ export default function ProjectsPage() {
                       <div className="flex items-center gap-2 pt-2">
                         {p.repo && (
                             <Button variant="secondary" asChild>
-                              <a href={p.repo} target="_blank" rel="noopener noreferrer">
+                              <a
+                                  href={p.repo}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                              >
                                 <Github className="h-4 w-4 mr-2"/> View Code
                               </a>
                             </Button>
                         )}
                         {p.demo && (
-                            <Button asChild className="bg-primary hover:bg-primary/90">
-                              <a href={p.demo} target="_blank" rel="noopener noreferrer">
+                            <Button
+                                asChild
+                                className="bg-primary hover:bg-primary/90"
+                            >
+                              <a
+                                  href={p.demo}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                              >
                                 <ExternalLink className="h-4 w-4 mr-2"/> Live Demo
                               </a>
                             </Button>
@@ -109,7 +124,9 @@ export default function ProjectsPage() {
                   >
                     <div className="p-5 space-y-3">
                       <h2 className="text-lg font-semibold">{p.title}</h2>
-                      <p className="text-sm text-muted-foreground">{p.description}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {p.description}
+                      </p>
                       <div className="flex flex-wrap gap-2">
                         {p.tags.map((t) => (
                             <span

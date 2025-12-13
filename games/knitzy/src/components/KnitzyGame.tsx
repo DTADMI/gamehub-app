@@ -93,7 +93,12 @@ export const KnitzyGame: React.FC = () => {
     ctx.fillStyle = "#0b1020";
     ctx.fillRect(0, 0, w, h);
 
-    const drawBoard = (gx: number, gy: number, grid: Grid, showEmpty: boolean) => {
+    const drawBoard = (
+        gx: number,
+        gy: number,
+        grid: Grid,
+        showEmpty: boolean,
+    ) => {
       // panel
       ctx.fillStyle = "#111827";
       ctx.fillRect(gx - gap / 2, gy - gap / 2, boardPx + gap, boardPx + gap);
@@ -150,7 +155,11 @@ export const KnitzyGame: React.FC = () => {
     ctx.font = "14px system-ui, -apple-system, Segoe UI, Roboto";
     ctx.fillText(`Progress: ${pct}%`, gap, boardPx + gap * 2 + 30);
     if (bestMs) {
-      ctx.fillText(`Best: ${(bestMs / 1000).toFixed(1)}s`, gap + 150, boardPx + gap * 2 + 30);
+      ctx.fillText(
+          `Best: ${(bestMs / 1000).toFixed(1)}s`,
+          gap + 150,
+          boardPx + gap * 2 + 30,
+      );
     }
 
     // palette

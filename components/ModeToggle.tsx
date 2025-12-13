@@ -19,7 +19,7 @@ export function ModeToggle() {
     );
   }
 
-  const next = (resolvedTheme === "dark" ? "light" : "dark");
+  const next = resolvedTheme === "dark" ? "light" : "dark";
   return (
     <Button
       variant="ghost"

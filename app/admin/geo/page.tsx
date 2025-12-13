@@ -15,7 +15,5 @@ const AdminGeoPageClient = dynamic(() => import("./AdminGeoPageClient"), {
 });
 
 export default function AdminGeoPage() {
-  return (
-    <AdminGeoPageClient />
-  );
+    return <AdminGeoPageClient/>;
 }

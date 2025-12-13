@@ -30,9 +30,16 @@ export default function BreakoutGamePage() {
           soundManager.preloadSound("wall", "/sounds/wall.mp3"),
           soundManager.preloadSound("loseLife", "/sounds/lose-life.mp3"),
           soundManager.preloadSound("gameOver", "/sounds/game-over.mp3"),
-          soundManager.preloadSound("levelComplete", "/sounds/level-complete.mp3"),
+          soundManager.preloadSound(
+              "levelComplete",
+              "/sounds/level-complete.mp3",
+          ),
           soundManager.preloadSound("powerUp", "/sounds/power-up.mp3"),
-          soundManager.preloadSound("background", "/sounds/breakout-bg.mp3", true),
+          soundManager.preloadSound(
+              "background",
+              "/sounds/breakout-bg.mp3",
+              true,
+          ),
         ]);
       } catch (error) {
         console.warn("Error preloading sounds:", error);

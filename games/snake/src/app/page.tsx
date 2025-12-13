@@ -6,14 +6,17 @@ import dynamic from "next/dynamic";
 import {useEffect} from "react";
 
 // Dynamically import the game component with SSR disabled
-const SnakeGame = dynamic(() => import("@games/snake").then((mod) => mod.SnakeGame), {
-  ssr: false,
-  loading: () => (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-xl">Loading game...</div>
-    </div>
-  ),
-});
+const SnakeGame = dynamic(
+    () => import("@games/snake").then((mod) => mod.SnakeGame),
+    {
+        ssr: false,
+        loading: () => (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-xl">Loading game...</div>
+            </div>
+        ),
+    },
+);
 
 export default function SnakeGamePage() {
   useEffect(() => {

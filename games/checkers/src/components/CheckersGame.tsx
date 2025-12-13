@@ -2,7 +2,7 @@
 "use client";
 
 import {soundManager} from "@games/shared";
-import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useRef, useState,} from "react";
 
 type Color = "w" | "b";
 type Piece = { color: Color; king: boolean } | null;
@@ -10,13 +10,21 @@ type Piece = { color: Color; king: boolean } | null;
 const SIZE = 8;
 
 function initialBoard(): Piece[][] {
-  const board: Piece[][] = Array.from({ length: SIZE }, () => Array<Piece>(SIZE).fill(null));
+  const board: Piece[][] = Array.from({length: SIZE}, () =>
+      Array<Piece>(SIZE).fill(null),
+  );
   for (let r = 0; r < SIZE; r++) {
     for (let c = 0; c < SIZE; c++) {
       const dark = (r + c) % 2 === 1;
-      if (!dark) {continue;}
-      if (r < 3) {board[r][c] = { color: "b", king: false };}
-      if (r > 4) {board[r][c] = { color: "w", king: false };}
+      if (!dark) {
+        continue;
+      }
+      if (r < 3) {
+        board[r][c] = {color: "b", king: false};
+      }
+      if (r > 4) {
+        board[r][c] = {color: "w", king: false};
+      }
     }
   }
   return board;
@@ -32,7 +40,9 @@ type Move = { to: Pos; capture?: Pos };
 
 function legalMoves(board: Piece[][], from: Pos): Move[] {
   const p = board[from.r][from.c];
-  if (!p) {return [];}
+  if (!p) {
+    return [];
+  }
   const dirs: number[] = p.king ? [1, -1] : p.color === "w" ? [-1] : [1];
   const moves: Move[] = [];
   let hasCapture = false;
@@ -84,7 +94,9 @@ export const CheckersGame: React.FC = () => {
       if (selected) {
         const mv = moves.find((m) => m.to.r === r && m.to.c === c);
         if (mv) {
-          const newBoard = board.map((row) => row.map((q) => (q ? { ...q } : null)));
+          const newBoard = board.map((row) =>
+              row.map((q) => (q ? {...q} : null)),
+          );
           const src = newBoard[selected.r][selected.c]!;
           newBoard[selected.r][selected.c] = null;
           newBoard[r][c] = src;
@@ -93,7 +105,10 @@ export const CheckersGame: React.FC = () => {
             newBoard[mv.capture.r][mv.capture.c] = null;
           }
           // kinging
-          if ((src.color === "w" && r === 0) || (src.color === "b" && r === SIZE - 1)) {
+          if (
+              (src.color === "w" && r === 0) ||
+              (src.color === "b" && r === SIZE - 1)
+          ) {
             if (!src.king) {
               newBoard[r][c] = { ...src, king: true };
               soundManager.playSound("king", 0.9);
@@ -104,7 +119,9 @@ export const CheckersGame: React.FC = () => {
 
           // multi-jump
           if (mv.capture) {
-            const further = legalMoves(newBoard, { r, c }).filter((m) => m.capture);
+            const further = legalMoves(newBoard, {r, c}).filter(
+                (m) => m.capture,
+            );
             if (further.length) {
               setSelected({ r, c });
               setMoves(further);
@@ -118,7 +135,10 @@ export const CheckersGame: React.FC = () => {
           setMoves([]);
           setMustContinue(null);
           setTurn((t) => (t === "w" ? "b" : "w"));
-          soundManager.playSound(mv.capture ? "capture" : "move", mv.capture ? 0.8 : 0.5);
+          soundManager.playSound(
+              mv.capture ? "capture" : "move",
+              mv.capture ? 0.8 : 0.5,
+          );
           return;
         }
         // invalid target
@@ -144,7 +164,9 @@ export const CheckersGame: React.FC = () => {
           setMoves(lm);
         } else {
           soundManager.playSound("invalid", 0.5);
-          if (liveRef.current) {liveRef.current.textContent = "No legal moves for selected piece";}
+          if (liveRef.current) {
+            liveRef.current.textContent = "No legal moves for selected piece";
+          }
         }
       }
     },
@@ -161,7 +183,9 @@ export const CheckersGame: React.FC = () => {
   const onSquareKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
     const r = Number(e.currentTarget.getAttribute("data-r"));
     const c = Number(e.currentTarget.getAttribute("data-c"));
-    if (Number.isNaN(r) || Number.isNaN(c)) {return;}
+    if (Number.isNaN(r) || Number.isNaN(c)) {
+      return;
+    }
     switch (e.key) {
       case "Enter":
       case " ":
@@ -223,7 +247,11 @@ export const CheckersGame: React.FC = () => {
       <div className="text-lg font-semibold">
         Checkers — Turn: {turn === "w" ? "White" : "Black"}
       </div>
-      <div ref={boardRef} className="grid" style={{ gridTemplateColumns: `repeat(${SIZE}, 3rem)` }}>
+      <div
+          ref={boardRef}
+          className="grid"
+          style={{gridTemplateColumns: `repeat(${SIZE}, 3rem)`}}
+      >
         {uiBoard.map((row, r) =>
           row.map((sq, c) => {
             const dark = (r + c) % 2 === 1;
@@ -237,7 +265,9 @@ export const CheckersGame: React.FC = () => {
                 data-r={r}
                 data-c={c}
                 className={`w-12 h-12 flex items-center justify-center border text-sm select-none ${
-                  dark ? "bg-stone-700 text-white" : "bg-stone-300 text-stone-900"
+                    dark
+                        ? "bg-stone-700 text-white"
+                        : "bg-stone-300 text-stone-900"
                 } ${isSel ? "outline outline-2 outline-yellow-400" : ""}`}
                 aria-label={`Square ${r},${c}`}
                 disabled={!dark}

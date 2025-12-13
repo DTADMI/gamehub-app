@@ -1,7 +1,7 @@
 // frontend/components/Navbar.tsx
 "use client";
 
-import {Gamepad2, Github, Linkedin, LogIn, Menu, UserPlus, X} from "lucide-react";
+import {Gamepad2, Github, Linkedin, LogIn, Menu, UserPlus, X,} from "lucide-react";
 import Link from "next/link";
 import {usePathname} from "next/navigation";
 import {useEffect, useState} from "react";
@@ -49,7 +49,9 @@ export function Navbar() {
                 href={item.href}
                 className={cn(
                   "text-sm font-medium transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 rounded-md px-1.5 py-1",
-                  pathname === item.href ? "text-primary" : "text-foreground/60",
+                    pathname === item.href
+                        ? "text-primary"
+                        : "text-foreground/60",
                 )}
                 aria-current={pathname === item.href ? "page" : undefined}
               >
@@ -62,7 +64,12 @@ export function Navbar() {
         <div className="flex items-center space-x-2">
           <div className="hidden md:flex items-center space-x-2">
             {hasGithub && (
-              <Button variant="ghost" size="icon" asChild className="focus-visible:ring-2 focus-visible:ring-primary/60">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    asChild
+                    className="focus-visible:ring-2 focus-visible:ring-primary/60"
+                >
                 <a
                   href={GITHUB_URL}
                   aria-label="GitHub profile"
@@ -74,7 +81,12 @@ export function Navbar() {
               </Button>
             )}
             {hasLinkedIn && (
-              <Button variant="ghost" size="icon" asChild className="focus-visible:ring-2 focus-visible:ring-primary/60">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    asChild
+                    className="focus-visible:ring-2 focus-visible:ring-primary/60"
+                >
                 <a
                   href={LINKEDIN_URL}
                   aria-label="LinkedIn profile"
@@ -85,13 +97,20 @@ export function Navbar() {
                 </a>
               </Button>
             )}
-            <Button variant="ghost" asChild className="focus-visible:ring-2 focus-visible:ring-primary/60">
+              <Button
+                  variant="ghost"
+                  asChild
+                  className="focus-visible:ring-2 focus-visible:ring-primary/60"
+              >
               <Link href="/login" className="flex items-center space-x-2">
                 <LogIn className="h-4 w-4" />
                 <span>Sign In</span>
               </Link>
             </Button>
-            <Button asChild className="bg-primary hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-primary/60">
+              <Button
+                  asChild
+                  className="bg-primary hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-primary/60"
+              >
               <Link href="/register" className="flex items-center space-x-2">
                 <UserPlus className="h-4 w-4" />
                 <span>Sign up</span>
@@ -106,7 +125,11 @@ export function Navbar() {
             className="md:hidden"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
-            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {mobileMenuOpen ? (
+                  <X className="h-5 w-5"/>
+              ) : (
+                  <Menu className="h-5 w-5"/>
+              )}
             <span className="sr-only">Toggle menu</span>
           </Button>
         </div>
@@ -135,7 +158,12 @@ export function Navbar() {
               {(hasGithub || hasLinkedIn) && (
                 <div className="flex items-center gap-2 mb-2">
                   {hasGithub && (
-                    <Button variant="ghost" size="icon" asChild className="focus-visible:ring-2 focus-visible:ring-primary/60">
+                      <Button
+                          variant="ghost"
+                          size="icon"
+                          asChild
+                          className="focus-visible:ring-2 focus-visible:ring-primary/60"
+                      >
                       <a
                         href={GITHUB_URL}
                         aria-label="GitHub profile"
@@ -147,7 +175,12 @@ export function Navbar() {
                     </Button>
                   )}
                   {hasLinkedIn && (
-                    <Button variant="ghost" size="icon" asChild className="focus-visible:ring-2 focus-visible:ring-primary/60">
+                      <Button
+                          variant="ghost"
+                          size="icon"
+                          asChild
+                          className="focus-visible:ring-2 focus-visible:ring-primary/60"
+                      >
                       <a
                         href={LINKEDIN_URL}
                         aria-label="LinkedIn profile"
@@ -160,13 +193,20 @@ export function Navbar() {
                   )}
                 </div>
               )}
-              <Button variant="ghost" className="w-full justify-start focus-visible:ring-2 focus-visible:ring-primary/60" asChild>
+                <Button
+                    variant="ghost"
+                    className="w-full justify-start focus-visible:ring-2 focus-visible:ring-primary/60"
+                    asChild
+                >
                 <Link href="/login" className="flex items-center space-x-2">
                   <LogIn className="h-4 w-4" />
                   <span>Sign In</span>
                 </Link>
               </Button>
-              <Button className="w-full justify-start mt-2 bg-primary hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-primary/60" asChild>
+                <Button
+                    className="w-full justify-start mt-2 bg-primary hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-primary/60"
+                    asChild
+                >
                 <Link href="/register" className="flex items-center space-x-2">
                   <UserPlus className="h-4 w-4" />
                   <span>Create Account</span>

@@ -1,9 +1,14 @@
-import { describe, expect, it } from "vitest";
-import { applyMove, type GameState, initialState, legalMoves, type Pos } from "@games/chess";
+import {describe, expect, it} from "vitest";
+import {applyMove, type GameState, initialState, legalMoves, type Pos,} from "@games/chess";
 
 function moveBy(state: GameState, from: Pos, to: Pos) {
-  const m = legalMoves(state, from).find((x) => x.to.r === to.r && x.to.c === to.c);
-  expect(m, `Expected legal move from ${from.r},${from.c} to ${to.r},${to.c}`).toBeTruthy();
+  const m = legalMoves(state, from).find(
+      (x) => x.to.r === to.r && x.to.c === to.c,
+  );
+  expect(
+      m,
+      `Expected legal move from ${from.r},${from.c} to ${to.r},${to.c}`,
+  ).toBeTruthy();
   return applyMove(state, m!);
 }
 
@@ -36,7 +41,9 @@ describe.skip("chess advanced rules", () => {
     s = moveBy(s, { r: 0, c: 6 }, { r: 2, c: 5 }); // Ng1-f3
     s = moveBy(s, { r: 7, c: 2 }, { r: 3, c: 6 }); // Bc8-g4 (approx along our model)
     // Now attempt to castle king side for white
-    const castleK = legalMoves(s, { r: 0, c: 4 }).find((m) => m.castling === "K");
+    const castleK = legalMoves(s, {r: 0, c: 4}).find(
+        (m) => m.castling === "K",
+    );
     // Depending on simplified attack detection coordinates this may not exist; if it exists, ensure applyMove keeps legality check
     if (castleK) {
       // Ensure that squares e1,f1,g1 are not all safe -> legalMoves should already filter it out

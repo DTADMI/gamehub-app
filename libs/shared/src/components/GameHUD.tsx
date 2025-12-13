@@ -30,7 +30,9 @@ export function GameHUD({onPauseToggle, onRestart, tips}: GameHUDProps) {
                 >
                     <RotateCcw className="h-4 w-4"/> Restart
                 </button>
-                {tips ? <span className="ml-2 text-xs text-muted-foreground">{tips}</span> : null}
+                {tips ? (
+                    <span className="ml-2 text-xs text-muted-foreground">{tips}</span>
+                ) : null}
             </div>
         </div>
     );

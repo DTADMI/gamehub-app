@@ -3,9 +3,9 @@
 
 import {useSound} from "@games/shared";
 import {useRouter} from "next/navigation";
-import React, {createContext, useCallback, useContext, useEffect, useState} from "react";
+import React, {createContext, useCallback, useContext, useEffect, useState,} from "react";
 
-import {GameStats, getGameProgress, saveGameProgress} from "@/lib/gameProgress";
+import {GameStats, getGameProgress, saveGameProgress,} from "@/lib/gameProgress";
 import {Game, getGameById} from "@/lib/games";
 
 import {useAuth} from "./AuthContext";
@@ -21,7 +21,13 @@ interface GameContextType {
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
-export function GameProvider({ children, gameId }: { children: React.ReactNode; gameId: string }) {
+export function GameProvider({
+                               children,
+                               gameId,
+                             }: {
+  children: React.ReactNode;
+  gameId: string;
+}) {
   const [game, setGame] = useState<Game | null>(null);
   const [stats, setStats] = useState<GameStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -107,7 +113,10 @@ export function GameProvider({ children, gameId }: { children: React.ReactNode; 
       };
 
       // Play sound for high score
-      if (updates.highScore !== undefined && updates.highScore > (prev.highScore || 0)) {
+      if (
+          updates.highScore !== undefined &&
+          updates.highScore > (prev.highScore || 0)
+      ) {
         playSound("achievement");
       }
 

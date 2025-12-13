@@ -42,7 +42,11 @@ const footerLinks = [
     items: [
       { name: "GitHub", href: GITHUB_URL, icon: Github },
       { name: "LinkedIn", href: LINKEDIN_URL, icon: Linkedin },
-      { name: "Email", href: CONTACT_EMAIL ? mailto(CONTACT_EMAIL) : "", icon: Mail },
+      {
+        name: "Email",
+        href: CONTACT_EMAIL ? mailto(CONTACT_EMAIL) : "",
+        icon: Mail,
+      },
     ],
   },
 ];
@@ -100,7 +104,8 @@ export function Footer() {
                 <ul className="space-y-2">
                   {items.map((item) => {
                     const isExternal =
-                      item.href.startsWith("http") || item.href.startsWith("mailto:");
+                        item.href.startsWith("http") ||
+                        item.href.startsWith("mailto:");
                     return (
                       <li key={item.name}>
                         {isExternal ? (
@@ -129,10 +134,20 @@ export function Footer() {
           })}
 
           <div className="space-y-4">
-              <h4 className="text-sm font-semibold">Subscribe to our newsletter</h4>
-            <p id="newsletter-help" className="text-sm text-muted-foreground">Get the latest updates and news.</p>
-            <form onSubmit={handleSubmit} className="flex space-x-2" aria-describedby="newsletter-help">
-              <label htmlFor="newsletter-email" className="sr-only">Email address</label>
+            <h4 className="text-sm font-semibold">
+              Subscribe to our newsletter
+            </h4>
+            <p id="newsletter-help" className="text-sm text-muted-foreground">
+              Get the latest updates and news.
+            </p>
+            <form
+                onSubmit={handleSubmit}
+                className="flex space-x-2"
+                aria-describedby="newsletter-help"
+            >
+              <label htmlFor="newsletter-email" className="sr-only">
+                Email address
+              </label>
               <input
                 id="newsletter-email"
                 type="email"
@@ -144,7 +159,11 @@ export function Footer() {
                 aria-required="true"
                 suppressHydrationWarning
               />
-              <Button type="submit" size="sm" className="bg-primary hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-primary/60">
+              <Button
+                  type="submit"
+                  size="sm"
+                  className="bg-primary hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-primary/60"
+              >
                 Subscribe
               </Button>
             </form>

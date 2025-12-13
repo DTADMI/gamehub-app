@@ -21,7 +21,9 @@ export function UserMenu() {
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-sm">{session.user?.email || session.user?.name}</span>
+      <span className="text-sm">
+        {session.user?.email || session.user?.name}
+      </span>
       <Button variant="ghost" onClick={() => signOut()}>
         Sign out
       </Button>

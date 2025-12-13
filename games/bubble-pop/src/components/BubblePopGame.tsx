@@ -161,7 +161,10 @@ export const BubblePopGame: React.FC = () => {
 
     const w = COLS * CELL;
     const h = ROWS * CELL;
-    if (canvas.width !== Math.floor(w * dpr) || canvas.height !== Math.floor(h * dpr)) {
+    if (
+        canvas.width !== Math.floor(w * dpr) ||
+        canvas.height !== Math.floor(h * dpr)
+    ) {
       canvas.width = Math.floor(w * dpr);
       canvas.height = Math.floor(h * dpr);
       canvas.style.width = `${w}px`;
@@ -202,7 +205,14 @@ export const BubblePopGame: React.FC = () => {
         const r = Math.floor(CELL * 0.42);
         const color = COLORS[c % COLORS.length];
 
-        const grad = ctx.createRadialGradient(cx - r * 0.4, cy - r * 0.4, r * 0.2, cx, cy, r);
+        const grad = ctx.createRadialGradient(
+            cx - r * 0.4,
+            cy - r * 0.4,
+            r * 0.2,
+            cx,
+            cy,
+            r,
+        );
         grad.addColorStop(0, "white");
         grad.addColorStop(0.2, color);
         grad.addColorStop(1, "#111827");

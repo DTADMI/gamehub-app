@@ -84,4 +84,6 @@ export const TETROMINOS = {
   },
 };
 
-export const TETROMINO_TYPES = Object.keys(TETROMINOS) as Array<keyof typeof TETROMINOS>;
+export const TETROMINO_TYPES = Object.keys(TETROMINOS) as Array<
+    keyof typeof TETROMINOS
+>;

@@ -1,6 +1,6 @@
 "use client";
 
-import React, {createContext, useCallback, useContext, useEffect, useMemo, useState} from "react";
+import React, {createContext, useCallback, useContext, useEffect, useMemo, useState,} from "react";
 
 import {useAuth} from "@/contexts/AuthContext";
 import {fetchViewer, type Plan} from "@/lib/graphql/queries";
@@ -31,13 +31,20 @@ const defaultEntitlements: Entitlements = {
     earlyAccess: false,
 };
 
-const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
+const SubscriptionContext = createContext<SubscriptionContextType | undefined>(
+    undefined,
+);
 
-export function SubscriptionProvider({children}: { children: React.ReactNode }) {
+export function SubscriptionProvider({
+                                         children,
+                                     }: {
+    children: React.ReactNode;
+}) {
     const {user} = useAuth();
     const [loading, setLoading] = useState(false);
     const [subscription, setSubscription] = useState<Subscription | null>(null);
-    const [entitlements, setEntitlements] = useState<Entitlements>(defaultEntitlements);
+    const [entitlements, setEntitlements] =
+        useState<Entitlements>(defaultEntitlements);
 
     const fetchViewerSubscription = useCallback(async () => {
         if (!user) {
@@ -69,14 +76,21 @@ export function SubscriptionProvider({children}: { children: React.ReactNode }) 
         fetchViewerSubscription().catch(console.error);
     }, [fetchViewerSubscription]);
 
-    const value = useMemo<SubscriptionContextType>(() => ({
-        loading,
-        subscription,
-        entitlements,
-        refresh: fetchViewerSubscription,
-    }), [loading, subscription, entitlements, fetchViewerSubscription]);
+    const value = useMemo<SubscriptionContextType>(
+        () => ({
+            loading,
+            subscription,
+            entitlements,
+            refresh: fetchViewerSubscription,
+        }),
+        [loading, subscription, entitlements, fetchViewerSubscription],
+    );
 
-    return <SubscriptionContext.Provider value={value}>{children}</SubscriptionContext.Provider>;
+    return (
+        <SubscriptionContext.Provider value={value}>
+            {children}
+        </SubscriptionContext.Provider>
+    );
 }
 
 export function useSubscription() {

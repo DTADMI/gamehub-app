@@ -15,7 +15,9 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "lint": "eslint .",
+    "lint": "cross-env ESLINT_USE_FLAT_CONFIG=true node ./node_modules/eslint/bin/eslint.js . --ext .ts,.tsx",
+    "lint:fix": "cross-env ESLINT_USE_FLAT_CONFIG=true node ./node_modules/eslint/bin/eslint.js . --ext .ts,.tsx --fix",
+    "lint:ci": "cross-env ESLINT_USE_FLAT_CONFIG=true node ./node_modules/eslint/bin/eslint.js . --ext .ts,.tsx --max-warnings=0",
     "start": "next start",
     "test": "vitest",
     "test:e2e": "playwright install --with-deps && playwright test",
@@ -82,6 +84,7 @@
     "zod": "^4.1.13"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "@eslint/eslintrc": "^3.3.3",
     "@next/eslint-plugin-next": "^16.0.10",
     "@playwright/test": "^1.57.0",

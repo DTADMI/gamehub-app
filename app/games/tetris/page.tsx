@@ -8,14 +8,17 @@ import MiniBoard from "@/components/leaderboards/MiniBoard";
 import {useAuth} from "@/contexts/AuthContext";
 import {submitScore} from "@/lib/graphql/queries";
 
-const TetrisGame = dynamic(() => import("@games/tetris").then((m) => m.TetrisGame), {
-  ssr: false,
-  loading: () => (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-xl">Loading game...</div>
-    </div>
-  ),
-});
+const TetrisGame = dynamic(
+    () => import("@games/tetris").then((m) => m.TetrisGame),
+    {
+        ssr: false,
+        loading: () => (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-xl">Loading game...</div>
+            </div>
+        ),
+    },
+);
 
 export default function TetrisGamePage() {
     const [seed, setSeed] = useState(0);
@@ -23,11 +26,17 @@ export default function TetrisGamePage() {
 
     useEffect(() => {
         const handler = async (e: Event) => {
-            const detail = (e as CustomEvent).detail as { score?: number } | undefined;
+            const detail = (e as CustomEvent).detail as
+                | { score?: number }
+                | undefined;
             const score = detail?.score ?? 0;
             if (user && score > 0) {
                 try {
-                    await submitScore({gameType: "TETRIS", score, metadata: {client: "web"}});
+                    await submitScore({
+                        gameType: "TETRIS",
+                        score,
+                        metadata: {client: "web"},
+                    });
                 } catch (err) {
                     console.warn("submitScore failed (TETRIS)", err);
                 }

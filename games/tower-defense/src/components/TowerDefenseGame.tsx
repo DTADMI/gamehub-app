@@ -19,9 +19,23 @@ const PATH: { x: number; y: number }[] = [
   { x: 19, y: 8 },
 ];
 
-type Creep = { x: number; y: number; hp: number; speed: number; wp: number; alive: boolean };
+type Creep = {
+  x: number;
+  y: number;
+  hp: number;
+  speed: number;
+  wp: number;
+  alive: boolean;
+};
 type Tower = { x: number; y: number; r: number; cd: number; fireRate: number };
-type Shot = { x: number; y: number; vx: number; vy: number; dmg: number; alive: boolean };
+type Shot = {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  dmg: number;
+  alive: boolean;
+};
 
 function dist(ax: number, ay: number, bx: number, by: number) {
   const dx = ax - bx;
@@ -34,7 +48,9 @@ export const TowerDefenseGame: React.FC = () => {
   const [lives, setLives] = useState(20);
   const [money, setMoney] = useState(100);
   const [wave, setWave] = useState(1);
-  const [status, setStatus] = useState<"idle" | "spawning" | "running" | "won" | "lost">("idle");
+  const [status, setStatus] = useState<
+      "idle" | "spawning" | "running" | "won" | "lost"
+  >("idle");
   const creeps = useRef<Creep[]>([]);
   const towers = useRef<Tower[]>([]);
   const shots = useRef<Shot[]>([]);
@@ -59,7 +75,10 @@ export const TowerDefenseGame: React.FC = () => {
           vy = b.y - a.y;
         const wx = cx - a.x,
           wy = cy - a.y;
-        const t = Math.max(0, Math.min(1, (wx * vx + wy * vy) / (vx * vx + vy * vy || 1)));
+        const t = Math.max(
+            0,
+            Math.min(1, (wx * vx + wy * vy) / (vx * vx + vy * vy || 1)),
+        );
         const px = a.x + t * vx,
           py = a.y + t * vy;
         if (dist(cx, cy, px, py) < 0.9) {
@@ -69,7 +88,13 @@ export const TowerDefenseGame: React.FC = () => {
       if (money < 50) {
         return;
       }
-      towers.current.push({ x: tx + 0.5, y: ty + 0.5, r: 3.0, cd: 0, fireRate: 0.6 });
+      towers.current.push({
+        x: tx + 0.5,
+        y: ty + 0.5,
+        r: 3.0,
+        cd: 0,
+        fireRate: 0.6,
+      });
       setMoney((m) => m - 50);
       soundManager.playSound("click", 0.5);
     },
@@ -84,7 +109,11 @@ export const TowerDefenseGame: React.FC = () => {
         const creepCount = 6 + wave * 2;
         const interval = 0.8;
         const toSpawn = Math.floor(spawnTimer.current / interval);
-        for (let i = creeps.current.length; i < Math.min(toSpawn, creepCount); i++) {
+        for (
+            let i = creeps.current.length;
+            i < Math.min(toSpawn, creepCount);
+            i++
+        ) {
           creeps.current.push({
             x: PATH[0].x + 0.5,
             y: PATH[0].y + 0.5,
@@ -307,7 +336,10 @@ export const TowerDefenseGame: React.FC = () => {
       placeTower(x, y);
     };
     const onKey = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === "n" && (status === "idle" || status === "won")) {
+      if (
+          e.key.toLowerCase() === "n" &&
+          (status === "idle" || status === "won")
+      ) {
         startWave();
       }
       if (e.key.toLowerCase() === "r") {

@@ -71,7 +71,9 @@ export default function GamesList({ games }: GamesListProps) {
               </div>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">{game.title}</h3>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                    {game.title}
+                  </h3>
                   <div className="flex flex-wrap gap-1 justify-end">
                     {game.tags.map((tag) => (
                       <span
@@ -83,7 +85,9 @@ export default function GamesList({ games }: GamesListProps) {
                     ))}
                   </div>
                 </div>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">{game.description}</p>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  {game.description}
+                </p>
                 {game.comingSoon ? (
                   <button
                     disabled

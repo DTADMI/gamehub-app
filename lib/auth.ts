@@ -19,7 +19,9 @@ export function useAuth(): AuthState {
   const { data, status } = useSession();
   const user = data?.user ?? null;
   return {
-    user: user ? { id: (user as any).id, name: user.name, email: user.email } : null,
+    user: user
+        ? {id: (user as any).id, name: user.name, email: user.email}
+        : null,
     accessToken: (data as any)?.accessToken,
     refreshToken: (data as any)?.refreshToken,
     status,

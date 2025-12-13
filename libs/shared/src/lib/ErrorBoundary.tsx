@@ -1,5 +1,5 @@
 // libs/shared/src/lib/ErrorBoundary.tsx
-import React, { Component, ErrorInfo, ReactNode } from "react";
+import React, {Component, ErrorInfo, ReactNode} from "react";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -12,7 +12,10 @@ interface ErrorBoundaryState {
   error?: Error;
 }
 
-export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends Component<
+    ErrorBoundaryProps,
+    ErrorBoundaryState
+> {
   public state: ErrorBoundaryState = {
     hasError: false,
   };
@@ -55,7 +58,9 @@ export const withErrorBoundary = <P extends object>(
   return (props: P) => (
     <ErrorBoundary
       fallback={
-        Fallback ? <Fallback error={undefined} reset={() => window.location.reload()} /> : undefined
+        Fallback ? (
+            <Fallback error={undefined} reset={() => window.location.reload()}/>
+        ) : undefined
       }
     >
       <Component {...props} />

@@ -11,29 +11,40 @@ import {useFeature} from "@/lib/flags";
 import {submitScore} from "@/lib/graphql/queries";
 import {useStomp} from "@/lib/realtime/useStomp";
 
-const SnakeGame = dynamic(() => import("@games/snake").then((m) => m.SnakeGame), {
-  ssr: false,
-  loading: () => (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-xl">Loading game...</div>
-    </div>
-  ),
-});
+const SnakeGame = dynamic(
+    () => import("@games/snake").then((m) => m.SnakeGame),
+    {
+        ssr: false,
+        loading: () => (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-xl">Loading game...</div>
+            </div>
+        ),
+    },
+);
 
 const SnakeGame3D = SnakeGame;
 
 function DifficultySelector() {
-  const [difficulty, setDifficulty] = useState<"easy" | "normal" | "hard">(() => {
-    if (typeof window === "undefined") {
-      return "normal";
-    }
-    return (
-      (localStorage.getItem("snakeDifficulty") as "easy" | "normal" | "hard" | null) ?? "normal"
+    const [difficulty, setDifficulty] = useState<"easy" | "normal" | "hard">(
+        () => {
+            if (typeof window === "undefined") {
+                return "normal";
+            }
+            return (
+                (localStorage.getItem("snakeDifficulty") as
+                    | "easy"
+                    | "normal"
+                    | "hard"
+                    | null) ?? "normal"
+            );
+        },
     );
-  });
 
   useEffect(() => {
-    window.dispatchEvent(new CustomEvent("snake:setDifficulty", { detail: { difficulty } }));
+      window.dispatchEvent(
+          new CustomEvent("snake:setDifficulty", {detail: {difficulty}}),
+      );
   }, [difficulty]);
 
   return (
@@ -64,7 +75,9 @@ function LeaderboardPanel() {
       return [];
     }
     try {
-      const parsed = JSON.parse(localStorage.getItem("snakeLeaderboard") || "[]");
+        const parsed = JSON.parse(
+            localStorage.getItem("snakeLeaderboard") || "[]",
+        );
       return Array.isArray(parsed) ? parsed : [];
     } catch {
       return [];
@@ -74,12 +87,15 @@ function LeaderboardPanel() {
   useEffect(() => {
     const refresh = () => {
       try {
-        const parsed = JSON.parse(localStorage.getItem("snakeLeaderboard") || "[]");
+          const parsed = JSON.parse(
+              localStorage.getItem("snakeLeaderboard") || "[]",
+          );
         setScores(Array.isArray(parsed) ? parsed : []);
       } catch {}
     };
     window.addEventListener("snake:leaderboardUpdated", refresh);
-    return () => window.removeEventListener("snake:leaderboardUpdated", refresh);
+      return () =>
+          window.removeEventListener("snake:leaderboardUpdated", refresh);
   }, []);
 
   if (!scores.length) {
@@ -100,23 +116,32 @@ function LeaderboardPanel() {
 }
 
 export default function SnakeGamePage() {
-  const realtimeEnabled = useFeature("realtime_enabled", true, { preferBackend: true });
-  const threeDEnabled = useFeature("snake_3d_mode", false, { preferBackend: true });
+    const realtimeEnabled = useFeature("realtime_enabled", true, {
+        preferBackend: true,
+    });
+    const threeDEnabled = useFeature("snake_3d_mode", false, {
+        preferBackend: true,
+    });
   const [use3D, setUse3D] = useState(
-    () => typeof window !== "undefined" && localStorage.getItem("snake:3d") === "1",
+      () =>
+          typeof window !== "undefined" && localStorage.getItem("snake:3d") === "1",
   );
   const { publish, connected } = useStomp({ enabled: realtimeEnabled });
-  const {user} = useAuth();
+    const {user} = useAuth();
   useEffect(() => {
     // When the game ends, publish the score (WS if enabled) and submit to backend if signed in
     const onGameOver = async (e: Event) => {
       if (!realtimeEnabled) {
         // continue to submitScore if logged in
       }
-      const detail = (e as CustomEvent).detail as { score?: number } | undefined;
+        const detail = (e as CustomEvent).detail as
+            | { score?: number }
+            | undefined;
       const score = detail?.score ?? 0;
       const nickname =
-        (typeof localStorage !== "undefined" && localStorage.getItem("nickname")) || "guest";
+          (typeof localStorage !== "undefined" &&
+              localStorage.getItem("nickname")) ||
+          "guest";
       const env = {
         type: "score",
         room: { id: "snake:global", game: "snake", visibility: "public" },
@@ -136,7 +161,9 @@ export default function SnakeGamePage() {
             gameType: "SNAKE",
             score,
             metadata: {
-              difficulty: (localStorage.getItem("snakeDifficulty") || "normal").toString(),
+                difficulty: (
+                    localStorage.getItem("snakeDifficulty") || "normal"
+                ).toString(),
               client: "web",
               version: process.env.NEXT_PUBLIC_APP_VERSION || "0.1.0",
             },
@@ -161,9 +188,9 @@ export default function SnakeGamePage() {
           ariaLabel="Snake game"
           tips="Arrows to move • Space to pause/resume • Space after Game Over to restart"
           preloadSounds={[
-            {key: "eat", url: "/sounds/eat.mp3"},
-            {key: "gameOver", url: "/sounds/game-over.mp3"},
-            {key: "background", url: "/sounds/snake-bg.mp3", loop: true},
+              {key: "eat", url: "/sounds/eat.mp3"},
+              {key: "gameOver", url: "/sounds/game-over.mp3"},
+              {key: "background", url: "/sounds/snake-bg.mp3", loop: true},
           ]}
       >
       <div className="pt-4">
@@ -173,9 +200,13 @@ export default function SnakeGamePage() {
         {realtimeEnabled ? (
           <PresenceBadge game="snake" />
         ) : (
-          <span className="text-xs text-amber-700">Realtime disabled — using snapshot</span>
+            <span className="text-xs text-amber-700">
+            Realtime disabled — using snapshot
+          </span>
         )}
-        {realtimeEnabled && connected && <span className="text-xs text-gray-500">Realtime on</span>}
+          {realtimeEnabled && connected && (
+              <span className="text-xs text-gray-500">Realtime on</span>
+          )}
       </div>
       {threeDEnabled && (
         <div className="flex items-center justify-center mb-3">
@@ -195,9 +226,9 @@ export default function SnakeGamePage() {
       )}
       {use3D && threeDEnabled ? <SnakeGame3D /> : <SnakeGame />}
       <LeaderboardPanel />
-        <div className="px-4">
-          <MiniBoard gameType="SNAKE" limit={10}/>
-        </div>
+          <div className="px-4">
+              <MiniBoard gameType="SNAKE" limit={10}/>
+          </div>
       </GameShell>
   );
 }

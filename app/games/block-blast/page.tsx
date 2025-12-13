@@ -36,7 +36,12 @@ function emptyBoard(): Cell[][] {
   );
 }
 
-function canPlace(board: Cell[][], piece: Piece, r: number, c: number): boolean {
+function canPlace(
+    board: Cell[][],
+    piece: Piece,
+    r: number,
+    c: number,
+): boolean {
   for (let pr = 0; pr < piece.length; pr++) {
     for (let pc = 0; pc < piece[0].length; pc++) {
       if (piece[pr][pc] === 1) {
@@ -98,7 +103,8 @@ function clearLines(board: Cell[][]): { board: Cell[][]; cleared: number } {
 }
 
 function randomRack(): Piece[] {
-  const pick = () => PRESET_PIECES[Math.floor(Math.random() * PRESET_PIECES.length)];
+  const pick = () =>
+      PRESET_PIECES[Math.floor(Math.random() * PRESET_PIECES.length)];
   return [pick(), pick(), pick()];
 }
 
@@ -200,7 +206,10 @@ export default function BlockBlastPage() {
                 {p.map((row, ri) => (
                   <div key={ri} className="flex gap-0.5">
                     {row.map((v, ci) => (
-                      <div key={ci} className={`h-3 w-3 ${v ? "bg-primary" : "bg-muted"}`} />
+                        <div
+                            key={ci}
+                            className={`h-3 w-3 ${v ? "bg-primary" : "bg-muted"}`}
+                        />
                     ))}
                   </div>
                 ))}
