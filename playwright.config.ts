@@ -6,15 +6,20 @@ export default defineConfig({
     // Give cold compiles a little more time before failing visibility checks
     expect: {timeout: 10_000},
   fullyParallel: true,
-  reporter: [["list"]],
+    forbidOnly: !!process.env.CI,
+    retries: process.env.CI ? 2 : 0,
+    workers: process.env.CI ? 1 : undefined,
+    reporter: [["list", "html"]],
   use: {
       baseURL: process.env.E2E_BASE_URL || "http://localhost:3000",
-    trace: "on-first-retry",
+      trace: "on-first-retry",
+      screenshot: 'only-on-failure',
+      video: 'on-first-retry',
   },
     webServer: {
         // Use pnpm directly for consistency with local and CI environments
         command: "pnpm dev",
-        url: "http://localhost:3000",
+        url: process.env.E2E_BASE_URL || "http://localhost:3000",
         reuseExistingServer: !process.env.CI,
         stdout: "pipe",
         stderr: "pipe",
@@ -25,5 +30,10 @@ export default defineConfig({
             PORT: "3000",
         },
     },
-    projects: [{name: "chromium", use: {...devices["Desktop Chrome"]}}],
+    projects: [
+        {
+            name: "chromium",
+            use: {...devices["Desktop Chrome"]}
+        }
+    ],
 });

@@ -20,7 +20,7 @@
     "lint:ci": "cross-env ESLINT_USE_FLAT_CONFIG=true node ./node_modules/eslint/bin/eslint.js . --ext .ts,.tsx --max-warnings=0",
     "start": "next start",
     "test": "vitest",
-    "test:e2e": "playwright install --with-deps && playwright test",
+    "test:e2e": "playwright install --with-deps && playwright test --config=playwright.config.ts",
     "format": "prettier --write .",
     "prepare": "husky install"
   },
