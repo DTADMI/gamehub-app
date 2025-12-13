@@ -72,8 +72,8 @@ jobs:
       - name: Build Docker image (with public env build args)
         if: ${{ github.ref == 'refs/heads/main' && steps.hubflags.outputs.has_hub == 'true' }}
         run: |
-          IMAGE_DOCKERHUB=${{ vars.DOCKERHUB_USERNAME }}/gamehub-app:${{ github.sha }}
-          IMAGE_DOCKERHUB_LATEST=${{ vars.DOCKERHUB_USERNAME }}/gamehub-app:latest
+          echo "IMAGE_DOCKERHUB=${{ vars.DOCKERHUB_USERNAME }}/gamehub-app:${{ github.sha }}" >> $GITHUB_ENV
+          echo "IMAGE_DOCKERHUB_LATEST=${{ vars.DOCKERHUB_USERNAME }}/gamehub-app:latest }}" >> $GITHUB_ENV
 
           docker build \
             --build-arg NEXT_PUBLIC_API_URL="${{ vars.NEXT_PUBLIC_API_URL }}" \
@@ -96,10 +96,10 @@ jobs:
             -t $IMAGE_DOCKERHUB_LATEST .
 
       - name: Push image
-        if: ${{ github.ref == 'refs/heads/main' && steps.hubflags.outputs.has_hub == 'true' }}
+        if: ${{ github.ref == 'refs/heads/main' && steps.hubflags.outputs.has_hub == 'true' && env.IMAGE_DOCKERHUB != '' }}
         run: docker push $IMAGE_DOCKERHUB
       - name: Push image latest
-        if: ${{ github.ref == 'refs/heads/main' && steps.hubflags.outputs.has_hub == 'true' }}
+        if: ${{ github.ref == 'refs/heads/main' && steps.hubflags.outputs.has_hub == 'true'&& env.IMAGE_DOCKERHUB_LATEST != '' }}
         run: docker push $IMAGE_DOCKERHUB_LATEST
 
   build-and-deploy-cloudrun:
