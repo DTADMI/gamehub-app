@@ -39,7 +39,7 @@ Table of contents
 Create a `.env.local` (for local dev) with at least:
 
 ```
-NEXT_PUBLIC_API_URL=http://localhost:3000/api
+NEXT_PUBLIC_API_URL=http://localhost:8080/api
 NEXT_PUBLIC_GITHUB_URL=https://github.com/DTADMI
 NEXT_PUBLIC_LINKEDIN_URL=https://www.linkedin.com/in/darryl-ulrich-t-62358476/
 NEXT_PUBLIC_CONTACT_EMAIL=dtadmi@gmail.com
@@ -47,7 +47,8 @@ NEXT_PUBLIC_CONTACT_EMAIL=dtadmi@gmail.com
 
 Notes:
 
-- `NEXT_PUBLIC_API_URL` must point to your backend base URL and include the `/api` suffix.
+- `NEXT_PUBLIC_API_URL` must point to your backend base URL and include the `/api` suffix. For local development the
+  backend is expected on port 8080.
 - Additional optional envs are documented in `.env.example`.
 
 3) Local development
@@ -60,10 +61,10 @@ pnpm dev
 # → http://localhost:3000
 ```
 
-Point it to a running backend (port 3000 preferred):
+Point it to a running backend (port 8080):
 
 ```
-export NEXT_PUBLIC_API_URL=http://localhost:3000/api
+export NEXT_PUBLIC_API_URL=http://localhost:8080/api
 ```
 
 4) Testing (Playwright e2e)
