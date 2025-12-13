@@ -1,4 +1,4 @@
-import { defineConfig } from "vitest/config";
+import {defineConfig} from "vitest/config";
 import path from "path";
 import react from "@vitejs/plugin-react";
 
@@ -30,21 +30,21 @@ export default defineConfig({
       { find: "@", replacement: path.resolve(__dirname, ".") },
 
       // Shared library
-      { find: "@games/shared", replacement: path.resolve(__dirname, "../libs/shared/src") },
+      {find: "@games/shared", replacement: path.resolve(__dirname, "libs/shared/src")},
       {
         find: /^@games\/shared\/(.*)$/,
-        replacement: path.resolve(__dirname, "../libs/shared/src") + "/$1",
+        replacement: path.resolve(__dirname, "libs/shared/src") + "/$1",
       },
 
       // Games packages — import from package root
       {
         find: /^@games\/([^/]+)$/,
-        replacement: path.resolve(__dirname, "../games") + "/$1/src",
+        replacement: path.resolve(__dirname, "games") + "/$1/src",
       },
       // Games packages — deep paths inside src
       {
         find: /^@games\/([^/]+)\/(.*)$/,
-        replacement: path.resolve(__dirname, "../games") + "/$1/src/$2",
+        replacement: path.resolve(__dirname, "games") + "/$1/src/$2",
       },
     ],
   },
