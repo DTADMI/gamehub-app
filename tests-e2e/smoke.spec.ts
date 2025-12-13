@@ -23,33 +23,28 @@ const gameRoutes = [
 ];
 
 for (const route of gameRoutes) {
-  test(`game route ${route} renders and Space does not scroll`, async ({
-                                                                         page,
-                                                                       }) => {
+  test(`game route ${route} renders and Space does not scroll`, async ({page}) => {
     await page.goto(route);
     await page.waitForLoadState("networkidle");
 
-    // Prefer the stable application region provided by GameShell
+    // Try to wait for the focusable application region first (preferred)
+    await page.waitForSelector('[role="application"]', {timeout: 10000}).catch(() => {
+    });
     const appRegion = page.getByRole("application");
-    const hasRegion = (await appRegion.count()) > 0;
 
-    if (hasRegion) {
-      await expect(appRegion).toBeVisible({timeout: 10000});
-      await appRegion.focus();
+    if (await appRegion.count().then((c) => c > 0)) {
+      await expect(appRegion.first()).toBeVisible({timeout: 10000});
+      await appRegion.first().focus();
     } else {
-      // Fallback to first canvas if region is unexpectedly missing
+      // Fallback to a canvas element for games that render on <canvas>
       const canvas = page.locator("canvas").first();
       await expect(canvas).toBeVisible({timeout: 10000});
       await canvas.focus();
     }
 
-    const before = await page.evaluate(
-        () => document.scrollingElement?.scrollTop || 0,
-    );
+    const before = await page.evaluate(() => document.scrollingElement?.scrollTop || 0);
     await page.keyboard.press("Space");
-    const after = await page.evaluate(
-        () => document.scrollingElement?.scrollTop || 0,
-    );
+    const after = await page.evaluate(() => document.scrollingElement?.scrollTop || 0);
     expect(after).toBe(before);
   });
 }

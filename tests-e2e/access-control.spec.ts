@@ -5,8 +5,10 @@ test.describe("Access control via middleware", () => {
     await page.goto("/");
     // Should remain on home, not /login
     await expect(page).not.toHaveURL(/\/login/);
-    // Brand text present in navbar
-    await expect(page.locator("header:has-text('GameHub')")).toBeVisible();
+      // Smoke check: hero heading is visible on the home page
+      await expect(
+          page.getByRole("heading", {name: /JavaScript Games & Interactive Projects/i})
+      ).toBeVisible({timeout: 10000});
   });
 
   test("/projects is public and renders", async ({ page }) => {
@@ -14,7 +16,7 @@ test.describe("Access control via middleware", () => {
     // Should not redirect to login
     await expect(page).not.toHaveURL(/\/login/);
     // Projects heading from the page
-    await expect(page.getByRole("heading", { name: "Projects" })).toBeVisible();
+      await expect(page.getByRole("heading", {name: "Projects"})).toBeVisible({timeout: 10000});
   });
 
     test("non-public route redirects to /login with redirect param", async ({

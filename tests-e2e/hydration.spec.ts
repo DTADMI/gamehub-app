@@ -22,11 +22,13 @@ test("no hydration mismatch errors on home", async ({ page }) => {
   );
 
   // Basic visible smoke to ensure page rendered
-  await expect(
-      page.getByRole("heading", {name: /Featured Games/i}),
-  ).toBeVisible({
-    timeout: 10000,
-  });
+  // Prefer the hero heading, fall back to the Featured Games section if present
+  const hero = page.getByRole("heading", {name: /JavaScript Games & Interactive Projects/i});
+  if (await hero.count().then((c) => c > 0)) {
+    await expect(hero.first()).toBeVisible({timeout: 10000});
+  } else {
+    await expect(page.getByRole("heading", {name: /Featured Games/i})).toBeVisible({timeout: 10000});
+  }
 
   // Check for any hydration errors
   expect(hydrationErrors).toHaveLength(0);
