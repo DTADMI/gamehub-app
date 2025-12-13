@@ -7,7 +7,7 @@ import {useEffect} from "react";
 
 // Dynamically import the game component with SSR disabled
 const BreakoutGame = dynamic(
-    () => import("../components/BreakoutGame").then((mod) => mod.BreakoutGame),
+    () => import("@games/breakout").then((mod) => mod.BreakoutGame),
   {
     ssr: false,
     loading: () => (
