@@ -36,6 +36,9 @@ export default defineConfig({
         replacement: path.resolve(__dirname, "libs/shared/src") + "/$1",
       },
 
+      // Specific chess package root (ensure it wins over the generic rule below)
+      {find: /^@games\/chess$/, replacement: path.resolve(__dirname, "games/chess/src")},
+
       // Games packages — import from package root
       {
         find: /^@games\/([^/]+)$/,

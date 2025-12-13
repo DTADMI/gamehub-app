@@ -42,9 +42,34 @@ jobs:
       - name: Build
         run: pnpm build
 
+  test-e2e:
+    name: Playwright E2E
+    needs: [ test-frontend ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node & pnpm (Corepack)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Enable Corepack (pnpm)
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.24.0 --activate
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps
+      - name: Run Playwright tests
+        env:
+          # Ensure access-control redirect expectations are enforced
+          E2E_PUBLIC_MODE: "false"
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api' }}
+        run: pnpm test:e2e
+
   build-local-and-tag-images:
     name: Build once locally and tag images
-    needs: [ test-frontend ]
+    needs: [ test-frontend, test-e2e ]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -129,7 +154,7 @@ jobs:
 
   push-to-dockerhub:
     name: Push to Docker Hub (:sha + :latest)
-    needs: [ test-frontend, build-local-and-tag-images ]
+    needs: [ test-frontend, test-e2e, build-local-and-tag-images ]
     if: ${{ needs.build-local-and-tag-images.outputs.has_hub == 'true' }}
     runs-on: ubuntu-latest
     steps:
@@ -169,7 +194,7 @@ jobs:
 
   push-and-deploy-to-cloud-run:
     name: Push to Artifact Registry (:sha + :latest) and Deploy to Cloud Run
-    needs: [ test-frontend, build-local-and-tag-images ]
+    needs: [ test-frontend, test-e2e, build-local-and-tag-images ]
     if: ${{ needs.build-local-and-tag-images.outputs.has_gcp == 'true' }}
     runs-on: ubuntu-latest
     permissions:

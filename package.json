@@ -18,7 +18,7 @@
     "lint": "eslint .",
     "start": "next start",
     "test": "vitest",
-    "test:e2e": "playwright test",
+    "test:e2e": "playwright install --with-deps && playwright test",
     "format": "prettier --write .",
     "prepare": "husky install"
   },
