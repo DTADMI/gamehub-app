@@ -993,24 +993,63 @@ export default function BreakoutGame() {
           description="Break all the bricks with the ball and don't let it fall!"
       >
       <div className="flex justify-center">
-        <canvas
-          ref={canvasRef}
-          className="rounded-lg shadow-lg"
-          width={CANVAS_WIDTH}
-          height={CANVAS_HEIGHT}
-          style={{ maxWidth: "100%", height: "auto" }}
-          tabIndex={0}
-          onMouseDown={(e) => (e.currentTarget as HTMLCanvasElement).focus()}
-          onClick={() => {
-            if (!gameStarted) {
-              setGameStarted(true);
-              soundManager.playMusic("background");
-            } else {
-              // If sticky captured, clicking releases as well
-              stickyReleasePendingRef.current = true;
-            }
-          }}
-        />
+        <div className="relative">
+          <canvas
+              ref={canvasRef}
+              className="rounded-lg shadow-lg block"
+              width={CANVAS_WIDTH}
+              height={CANVAS_HEIGHT}
+              style={{maxWidth: "100%", height: "auto"}}
+              tabIndex={0}
+              aria-label="Breakout playfield"
+              onMouseDown={(e) => (e.currentTarget as HTMLCanvasElement).focus()}
+              onClick={() => {
+                if (!gameStarted) {
+                  setGameStarted(true);
+                  soundManager.playMusic("background");
+                } else if (isPaused) {
+                  setIsPaused(false);
+                } else {
+                  // If sticky captured, clicking releases as well
+                  stickyReleasePendingRef.current = true;
+                }
+              }}
+          />
+
+          {/* Tap-to-start / pause overlay for mobile-first UX */}
+          {(!gameStarted || isPaused) && !gameOver && (
+              <button
+                  aria-label={!gameStarted ? "Tap to start" : "Tap to resume"}
+                  className="absolute inset-0 flex items-center justify-center bg-black/40 text-white text-base sm:text-lg font-semibold select-none"
+                  onClick={() => {
+                    if (!gameStarted) {
+                      setGameStarted(true);
+                      soundManager.playMusic("background");
+                    } else {
+                      setIsPaused(false);
+                    }
+                  }}
+              >
+                {!gameStarted ? "Tap to start" : "Paused — Tap to resume"}
+              </button>
+          )}
+
+          {/* Game over overlay */}
+          {gameOver && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50 text-white">
+                <div className="text-center space-y-3 p-4">
+                  <div className="text-xl font-bold">Game Over</div>
+                  <div className="opacity-90">Score: {score}</div>
+                  <button
+                      className="mt-2 px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700"
+                      onClick={startGame}
+                  >
+                    Restart
+                  </button>
+                </div>
+              </div>
+          )}
+        </div>
       </div>
 
       <div className="mt-4 text-center">
@@ -1051,16 +1090,60 @@ export default function BreakoutGame() {
         )}
       </div>
 
+        {/* Collapsible help on mobile; expanded sections on larger screens */}
       <div className="mt-6">
-        <h3 className="text-lg font-semibold mb-2">How to Play</h3>
-        <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
-          <li>• Use ← → or A/D to move the paddle</li>
-          <li>• Press Space to start/pause</li>
-          <li>• Break all bricks to advance</li>
-        </ul>
+        {/* Mobile */}
+        <details className="sm:hidden rounded-lg border border-gray-200 dark:border-gray-700">
+          <summary className="cursor-pointer select-none px-4 py-2 text-base font-semibold">How to Play</summary>
+          <ul className="px-4 pb-3 pt-1 text-sm text-gray-600 dark:text-gray-300 space-y-1">
+            <li>• Use ← → or A/D to move the paddle</li>
+            <li>• Press Space to start/pause</li>
+            <li>• Break all bricks to advance</li>
+          </ul>
+        </details>
+        {/* Desktop/tablet */}
+        <div className="hidden sm:block">
+          <h3 className="text-lg font-semibold mb-2">How to Play</h3>
+          <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+            <li>• Use ← → or A/D to move the paddle</li>
+            <li>• Press Space to start/pause</li>
+            <li>• Break all bricks to advance</li>
+          </ul>
+        </div>
       </div>
 
-        <div className="mt-6">
+        <div className="mt-4">
+          {/* Mobile */}
+          <details className="sm:hidden rounded-lg border border-gray-200 dark:border-gray-700">
+            <summary className="cursor-pointer select-none px-4 py-2 text-base font-semibold">Power-Ups</summary>
+            <div className="px-4 pb-3 pt-1 grid grid-cols-1 gap-3 text-sm">
+              <div className="rounded-md px-3 py-2 bg-blue-100 text-blue-900 dark:bg-blue-900/30 dark:text-blue-100">
+                <div className="font-semibold">Expand</div>
+                <div className="opacity-80">Wider paddle</div>
+              </div>
+              <div className="rounded-md px-3 py-2 bg-rose-100 text-rose-900 dark:bg-rose-900/30 dark:text-rose-100">
+                <div className="font-semibold">Shrink</div>
+                <div className="opacity-80">Smaller paddle</div>
+              </div>
+              <div
+                  className="rounded-md px-3 py-2 bg-amber-100 text-amber-900 dark:bg-amber-900/30 dark:text-amber-100">
+                <div className="font-semibold">Slow</div>
+                <div className="opacity-80">Slower ball (timed)</div>
+              </div>
+              <div
+                  className="rounded-md px-3 py-2 bg-violet-100 text-violet-900 dark:bg-violet-900/30 dark:text-violet-100">
+                <div className="font-semibold">Multiball</div>
+                <div className="opacity-80">Extra balls</div>
+              </div>
+              <div
+                  className="rounded-md px-3 py-2 bg-fuchsia-100 text-fuchsia-900 dark:bg-fuchsia-900/30 dark:text-fuchsia-100">
+                <div className="font-semibold">Sticky</div>
+                <div className="opacity-80">Ball sticks; press ↑ or click to release</div>
+              </div>
+            </div>
+          </details>
+          {/* Desktop/tablet */}
+          <div className="hidden sm:block">
           <h3 className="text-lg font-semibold mb-2">Power-Ups</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-sm">
             <div className="rounded-md px-3 py-2 bg-blue-100 text-blue-900 dark:bg-blue-900/30 dark:text-blue-100">
@@ -1086,6 +1169,7 @@ export default function BreakoutGame() {
               <div className="opacity-80">Ball sticks; press ↑ or click to release</div>
             </div>
           </div>
+        </div>
         </div>
     </GameContainer>
   );
