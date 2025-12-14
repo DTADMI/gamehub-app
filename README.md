@@ -172,10 +172,11 @@ This repo includes a single consolidated workflow: `.github/workflows/ci-cd.yml`
 What it does (high level):
 
 - Runs lint, unit/integration tests, and a Playwright E2E smoke suite.
-- Builds the Docker image once, saves it as an artifact, and fan‑out pushes to:
-  - Docker Hub (optional; gated by `DOCKERHUB_USERNAME` + `DOCKERHUB_TOKEN`).
-  - Artifact Registry in GCP (if GCP auth is available).
-- Deploys to Cloud Run (frontend service) on pushes to `main` or manual dispatch.
+- Builds the Docker image once, saves it as an artifact, and pushes to registries:
+  - Primary: Google Artifact Registry (AR) in your GCP project.
+  - Optional mirror: Docker Hub, but only when AR is not available OR if the AR push/deploy step fails (fallback
+    mirror).
+- Deploys to Cloud Run (frontend service) on pushes to `main` or manual dispatch (deploys from AR only).
 
 Environment and gating:
 
@@ -184,6 +185,8 @@ Environment and gating:
 - Deploy runs when either:
   - A valid GCP auth method is present; or
   - You trigger the workflow manually with `force_deploy=true`.
+  - Docker Hub is never used as a deploy source; it serves solely as a mirror for discoverability and as a fallback
+    artifact when AR is unavailable or AR push/deploy fails.
 - Required Google APIs: `run.googleapis.com` and `artifactregistry.googleapis.com`.
   - The workflow attempts to enable them using `gcloud` and fails with clear guidance if it can’t.
 
@@ -226,6 +229,11 @@ Operational notes and safety:
 - We intentionally avoid dumping environment variables or secret contents to logs.
 - Playwright E2E starts the dev server with `NEXT_PUBLIC_DISABLE_PROVIDERS=true` so public pages don’t attempt cloud
   auth during tests.
+- Docker Hub usage is conditional:
+  - When AR auth is unavailable (e.g., missing GCP secrets), the pipeline pushes to Docker Hub if `DOCKERHUB_USERNAME`
+    and `DOCKERHUB_TOKEN` are provided.
+  - If AR push/deploy fails, a fallback step pushes the same image to Docker Hub to ensure an artifact is published for
+    debugging/local pulls. Cloud Run deployments still exclusively use AR.
 
 8. Design choices and trade‑offs
 

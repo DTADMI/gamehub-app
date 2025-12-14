@@ -171,46 +171,6 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-  push-to-dockerhub:
-    name: Push to Docker Hub (:sha + :latest)
-    needs: [ build-local-and-tag-images ]
-    if: ${{ needs.build-local-and-tag-images.outputs.has_hub == 'true' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download built image
-        uses: actions/download-artifact@v4
-        with:
-          name: gamehub-app-image
-          path: ./out
-
-      - name: Load image
-        run: |
-          docker load -i ./out/gamehub-app-image.tar
-          docker images
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Compute and tag images for Docker Hub
-        run: |
-          LOCAL_IMAGE=${{ needs.build-local-and-tag-images.outputs.LOCAL_IMAGE }}
-          HUB_SHA=${{ needs.build-local-and-tag-images.outputs.HUB_SHA }}
-          HUB_LATEST=${{ needs.build-local-and-tag-images.outputs.HUB_LATEST }}
-          docker tag "$LOCAL_IMAGE" "$HUB_SHA"
-          docker tag "$LOCAL_IMAGE" "$HUB_LATEST"
-          echo "HUB_SHA=$HUB_SHA" >> $GITHUB_ENV
-          echo "HUB_LATEST=$HUB_LATEST" >> $GITHUB_ENV
-
-      - name: Push to Docker Hub (:sha)
-        run: docker push "$HUB_SHA"
-
-      - name: Push to Docker Hub (:latest)
-        if: ${{ github.ref == 'refs/heads/main' }}
-        run: docker push "$HUB_LATEST"
-
   push-and-deploy-to-cloud-run:
     name: Push to Artifact Registry (:sha + :latest) and Deploy to Cloud Run
     needs: [ build-local-and-tag-images ]
@@ -445,6 +405,49 @@ jobs:
             --service-account="${{ env.RUNTIME_SA }}" \
             --set-env-vars NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }} \
             --quiet
+
+  # Fallback mirror push: if AR push/deploy fails for any reason but Docker Hub is available,
+  # push the image to Docker Hub so there is at least a published artifact for debugging/local use.
+  push-to-dockerhub:
+    name: Push to Docker Hub as AR fallback (:sha + :latest)
+    needs: [ build-local-and-tag-images, push-and-deploy-to-cloud-run ]
+    # Only use Docker Hub when Artifact Registry (GCP) is NOT available or failed.
+    if: ${{ needs.build-local-and-tag-images.outputs.has_hub == 'true' && ( needs.build-local-and-tag-images.outputs.has_gcp == 'false' || needs.push-and-deploy-to-cloud-run.result == 'failure' ) }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download built image
+        uses: actions/download-artifact@v4
+        with:
+          name: gamehub-app-image
+          path: ./out
+
+      - name: Load image
+        run: |
+          docker load -i ./out/gamehub-app-image.tar
+          docker images
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Compute and tag images for Docker Hub
+        run: |
+          LOCAL_IMAGE=${{ needs.build-local-and-tag-images.outputs.LOCAL_IMAGE }}
+          HUB_SHA=${{ needs.build-local-and-tag-images.outputs.HUB_SHA }}
+          HUB_LATEST=${{ needs.build-local-and-tag-images.outputs.HUB_LATEST }}
+          docker tag "$LOCAL_IMAGE" "$HUB_SHA"
+          docker tag "$LOCAL_IMAGE" "$HUB_LATEST"
+          echo "HUB_SHA=$HUB_SHA" >> $GITHUB_ENV
+          echo "HUB_LATEST=$HUB_LATEST" >> $GITHUB_ENV
+
+      - name: Push to Docker Hub (:sha)
+        run: docker push "$HUB_SHA"
+
+      - name: Push to Docker Hub (:latest)
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: docker push "$HUB_LATEST"
 
   test-e2e:
     name: Playwright E2E
