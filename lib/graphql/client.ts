@@ -12,7 +12,8 @@ export type GraphQLResponse<TData> = {
 };
 
 function getGraphqlUrl(): string {
-    const base = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+    // Default to backend port 8080 per guidelines for local dev
+    const base = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
     const apiBase = base.replace(/\/api$/, "");
     return `${apiBase}/graphql`;
 }

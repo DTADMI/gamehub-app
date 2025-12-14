@@ -8,6 +8,8 @@ export interface GameContainerProps {
   title: string;
   description?: string;
   className?: string;
+    // When true, prevents page scroll/zoom and enables touch-action safety inside the game area (mobile-friendly)
+    lockTouch?: boolean;
 }
 
 // Prefer a standard function component that explicitly returns JSX.Element
@@ -17,7 +19,17 @@ function GameContainer({
                            title,
                            description,
                            className = "",
+                           lockTouch = true,
                        }: GameContainerProps) {
+    // Prevent scroll/zoom gestures while interacting with the game area on mobile
+    const touchHandlers = lockTouch
+        ? {
+            onTouchMove: (e: React.TouchEvent) => e.preventDefault(),
+            onTouchStart: (e: React.TouchEvent) => e.preventDefault(),
+            onTouchEnd: (e: React.TouchEvent) => e.preventDefault(),
+            onWheel: (e: React.WheelEvent) => e.preventDefault(),
+        }
+        : {};
   return (
     <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${className}`}>
       <div className="container mx-auto px-4 py-8">
@@ -34,7 +46,10 @@ function GameContainer({
 
         <ErrorBoundary>
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-              <div className="relative w-full aspect-video max-w-4xl mx-auto">
+              <div
+                  className={`relative w-full aspect-video max-w-4xl mx-auto ${lockTouch ? 'touch-none select-none' : ''}`}
+                  {...touchHandlers}
+              >
                   {children}
               </div>
           </div>
