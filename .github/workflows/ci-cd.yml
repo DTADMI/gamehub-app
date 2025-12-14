@@ -91,12 +91,47 @@ jobs:
 
           # Artifact Registry availability (need project, region, and either SA key or WIF)
           HAS_KEY=false; HAS_WIF=false
-          if [ -n "${{ secrets.GCP_SA_KEY }}" ]; then HAS_KEY=true; fi
-          if [ -n "${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}" ] && [ -n "${{ secrets.GCP_SERVICE_ACCOUNT }}" ]; then HAS_WIF=true; fi
-          if [ -n "${{ secrets.GCP_PROJECT_ID }}" ] && [ -n "${{ secrets.GCP_REGION }}" ] && { [ "$HAS_KEY" = "true" ] || [ "$HAS_WIF" = "true" ]; }; then
+          
+          # Debug: List available environment variables
+          echo "=== Environment Variables ===" >> $GITHUB_STEP_SUMMARY
+          env | sort >> $GITHUB_STEP_SUMMARY
+          echo "============================" >> $GITHUB_STEP_SUMMARY
+          
+          # Debug: List available secrets (names only)
+          echo "=== Available Secrets (names only) ===" >> $GITHUB_STEP_SUMMARY
+          echo "GCP_PROJECT_ID: $([ -n \"$GCP_PROJECT_ID\" ] && echo 'present' || echo 'missing')" >> $GITHUB_STEP_SUMMARY
+          echo "GCP_REGION: $([ -n \"$GCP_REGION\" ] && echo 'present' || echo 'missing')" >> $GITHUB_STEP_SUMMARY
+          echo "GCP_SA_KEY: $([ -n \"$GCP_SA_KEY\" ] && echo 'present' || echo 'missing')" >> $GITHUB_STEP_SUMMARY
+          
+          # Check for service account key (using direct environment variable access)
+          if [ -n "$GCP_SA_KEY" ]; then
+            HAS_KEY=true
+            echo "Found GCP_SA_KEY (${#GCP_SA_KEY} chars)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "GCP_SA_KEY is empty or not set" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Check for Workload Identity Federation
+          if [ -n "$GCP_WORKLOAD_IDENTITY_PROVIDER" ] && [ -n "$GCP_SERVICE_ACCOUNT" ]; then
+            HAS_WIF=true
+            echo "Found WIF configuration" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Debug output
+          echo "HAS_SA_KEY=$HAS_KEY" >> $GITHUB_STEP_SUMMARY
+          echo "HAS_WIF=$HAS_WIF" >> $GITHUB_STEP_SUMMARY
+          
+          # Set outputs
+          echo "HAS_SA_KEY=$HAS_KEY" >> $GITHUB_OUTPUT
+          echo "HAS_WIF=$HAS_WIF" >> $GITHUB_OUTPUT
+          
+          # Set has_gcp based on available authentication methods
+          if [ "$HAS_KEY" = "true" ] || [ "$HAS_WIF" = "true" ]; then
             echo "has_gcp=true" >> $GITHUB_OUTPUT
+            echo "has_gcp: true (GCP authentication available)" >> $GITHUB_STEP_SUMMARY
           else
             echo "has_gcp=false" >> $GITHUB_OUTPUT
+            echo "has_gcp: false (No GCP authentication method available)" >> $GITHUB_STEP_SUMMARY
           fi
 
           # Compute names
