@@ -187,7 +187,13 @@ Environment and gating:
   - Docker Hub is never used as a deploy source; it serves solely as a mirror for discoverability and as a fallback
     artifact when AR is unavailable or AR push/deploy fails.
 - Required Google APIs: `run.googleapis.com` and `artifactregistry.googleapis.com`.
-  - The workflow attempts to enable them using `gcloud` and fails with clear guidance if it can’t.
+  - CI does not auto-enable these APIs by default. A Project Owner should enable them once:
+    ```bash
+    gcloud services enable run.googleapis.com artifactregistry.googleapis.com --project $PROJECT
+    ```
+  - Optional: you may opt‑in to enabling from CI by setting a repository variable `ENABLE_GCP_APIS=true`. Your deploy
+    service account must have sufficient permissions to enable services (typically Project Editor/Owner). For least
+    privilege, prefer enabling once outside CI and leave this flag unset.
 
 Authentication options (choose ONE):
 

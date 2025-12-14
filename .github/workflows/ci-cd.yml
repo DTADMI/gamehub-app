@@ -207,10 +207,12 @@ jobs:
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-      - name: Preflight — required Google APIs (Cloud Run, Artifact Registry)
+      # Optional: enable required Google APIs if explicitly allowed.
+      # By default we DO NOT attempt to enable project services from CI to respect least-privilege SAs.
+      - name: (Optional) Enable Cloud Run & Artifact Registry APIs
+        if: ${{ vars.ENABLE_GCP_APIS == 'true' }}
         env:
           PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-          REGION: ${{ secrets.GCP_REGION }}
         run: |
           set -e
           gcloud services enable run.googleapis.com artifactregistry.googleapis.com --project "$PROJECT_ID" --quiet
