@@ -167,20 +167,65 @@ gcloud run deploy gamehub \
 
 7. Deploy to Google Cloud Run (GitHub Actions)
 
-This repo includes `.github/workflows/deploy-cloud-run.yml` which:
+This repo includes a single consolidated workflow: `.github/workflows/ci-cd.yml`.
 
-- Builds the app and the Docker image.
-- Pushes to Artifact Registry.
-- Deploys to Cloud Run.
+What it does (high level):
 
-Required GitHub repository secrets:
+- Runs lint, unit/integration tests, and a Playwright E2E smoke suite.
+- Builds the Docker image once, saves it as an artifact, and fan‑out pushes to:
+  - Docker Hub (optional; gated by `DOCKERHUB_USERNAME` + `DOCKERHUB_TOKEN`).
+  - Artifact Registry in GCP (if GCP auth is available).
+- Deploys to Cloud Run (frontend service) on pushes to `main` or manual dispatch.
 
-- `GCP_PROJECT_ID` — your project ID
-- `GCP_REGION` — deployment region (e.g., `northamerica-northeast1`)
-- `GCP_ARTIFACT_REPO` — Artifact Registry repo name (e.g., `gamehub`)
-- `GCP_WORKLOAD_IDENTITY_PROVIDER` — OIDC provider resource name
-- `GCP_SERVICE_ACCOUNT` — service account email with `Artifact Registry Writer` and `Cloud Run Admin`
-- `NEXT_PUBLIC_API_URL` — backend API base with `/api` suffix for the deployed service
+Environment and gating:
+
+- Frontend service name: `FRONTEND_SERVICE` repo variable (default `gamehub-app`).
+- Artifact Registry repo: `GCP_ARTIFACT_REPO` repo variable (default `gamehub`).
+- Deploy runs when either:
+  - A valid GCP auth method is present; or
+  - You trigger the workflow manually with `force_deploy=true`.
+- Required Google APIs: `run.googleapis.com` and `artifactregistry.googleapis.com`.
+  - The workflow attempts to enable them using `gcloud` and fails with clear guidance if it can’t.
+
+Authentication options (choose ONE):
+
+1) Service Account key (simple)
+  - Secrets:
+    - `GCP_PROJECT_ID`
+    - `GCP_REGION`
+    - `GCP_SA_KEY` (entire JSON key content, multi‑line supported)
+  - Required SA roles (project level):
+    - Cloud Run Admin
+    - Artifact Registry Writer
+    - Service Account Token Creator
+
+2) Workload Identity Federation (recommended, keyless)
+  - Secrets:
+    - `GCP_PROJECT_ID`
+    - `GCP_REGION`
+    - `GCP_WORKLOAD_IDENTITY_PROVIDER` (full resource name)
+    - `GCP_SERVICE_ACCOUNT` (email)
+  - IAM: grant `roles/iam.workloadIdentityUser` for the GitHub OIDC principal to the service account, plus the roles
+    above.
+
+Runtime service account (Cloud Run):
+
+- By default the workflow deploys with `--service-account` explicitly set to:
+  - The repo variable `CLOUD_RUN_SERVICE_ACCOUNT` if provided; otherwise
+  - The deployer identity (the same SA used to authenticate the job), which avoids extra API calls.
+- If the runtime SA differs from the caller SA, ensure the caller has `roles/iam.serviceAccountUser` on the runtime SA.
+  - The workflow prints an exact `gcloud iam service-accounts add-iam-policy-binding` command if this is missing.
+
+Other required inputs for deploy:
+
+- Repo variable `NEXT_PUBLIC_API_URL` — points to your backend base and must end with `/api`.
+
+Operational notes and safety:
+
+- The workflow prints concise diagnostics only (auth method chosen, active account, APIs enabled, selected runtime SA).
+- We intentionally avoid dumping environment variables or secret contents to logs.
+- Playwright E2E starts the dev server with `NEXT_PUBLIC_DISABLE_PROVIDERS=true` so public pages don’t attempt cloud
+  auth during tests.
 
 8. Design choices and trade‑offs
 

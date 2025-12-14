@@ -97,35 +97,15 @@ jobs:
 
           # Artifact Registry availability (need project, region, and either SA key or WIF)
           HAS_KEY=false; HAS_WIF=false
-          
-          # Debug: List available environment variables
-          echo "=== Environment Variables ===" >> $GITHUB_STEP_SUMMARY
-          env | sort >> $GITHUB_STEP_SUMMARY
-          echo "============================" >> $GITHUB_STEP_SUMMARY
-          
-          # Debug: List available secrets (names only)
-          echo "=== Available Secrets (names only) ===" >> $GITHUB_STEP_SUMMARY
-          echo "GCP_PROJECT_ID: $([ -n \"$GCP_PROJECT_ID\" ] && echo 'present' || echo 'missing')" >> $GITHUB_STEP_SUMMARY
-          echo "GCP_REGION: $([ -n \"$GCP_REGION\" ] && echo 'present' || echo 'missing')" >> $GITHUB_STEP_SUMMARY
-          echo "GCP_SA_KEY: $([ \"$SA_PRESENT\" = 'true' ] && echo 'present' || echo 'missing')" >> $GITHUB_STEP_SUMMARY
-          
           # Check for service account key using boolean flag from expressions (no secret expansion here)
           if [ "$SA_PRESENT" = "true" ]; then
             HAS_KEY=true
-            echo "Found GCP_SA_KEY (non-empty)" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "GCP_SA_KEY is empty or not set" >> $GITHUB_STEP_SUMMARY
           fi
           
           # Check for Workload Identity Federation
           if [ "$WIF_PROVIDER_PRESENT" = "true" ] && [ "$WIF_SA_PRESENT" = "true" ]; then
             HAS_WIF=true
-            echo "Found WIF configuration" >> $GITHUB_STEP_SUMMARY
           fi
-          
-          # Debug output
-          echo "HAS_SA_KEY=$HAS_KEY" >> $GITHUB_STEP_SUMMARY
-          echo "HAS_WIF=$HAS_WIF" >> $GITHUB_STEP_SUMMARY
           
           # Set outputs
           echo "HAS_SA_KEY=$HAS_KEY" >> $GITHUB_OUTPUT
@@ -134,10 +114,8 @@ jobs:
           # Set has_gcp based on available authentication methods
           if [ "$HAS_KEY" = "true" ] || [ "$HAS_WIF" = "true" ]; then
             echo "has_gcp=true" >> $GITHUB_OUTPUT
-            echo "has_gcp: true (GCP authentication available)" >> $GITHUB_STEP_SUMMARY
           else
             echo "has_gcp=false" >> $GITHUB_OUTPUT
-            echo "has_gcp: false (No GCP authentication method available)" >> $GITHUB_STEP_SUMMARY
           fi
 
           # Compute names
@@ -152,53 +130,13 @@ jobs:
           echo "HUB_SHA=docker.io/$HUB_REPO:$SHA" >> $GITHUB_OUTPUT
           echo "HUB_LATEST=docker.io/$HUB_REPO:latest" >> $GITHUB_OUTPUT
 
-          # Enhanced debug information
+          # Concise info only
           {
-            echo "### CI/CD Debug Summary"
-            echo "- Workflow event: $GITHUB_EVENT_NAME"
+            echo "### CI/CD Summary"
+            echo "- Event: $GITHUB_EVENT_NAME"
             echo "- Ref: $GITHUB_REF"
-            echo "- SHA: $GITHUB_SHA"
-          
-            # Check if we're running in a fork
-            if [ "$GITHUB_REPOSITORY" != "$GITHUB_REPOSITORY_OWNER/$(echo $GITHUB_REPOSITORY | cut -d'/' -f2-)" ]; then
-              echo "- Running in a fork"
-            else
-              echo "- Running in the original repository"
-            fi
-          
-            # Check permissions
-            echo "- Permissions:"
-            echo "  - contents: $(if [ -n "$GITHUB_TOKEN" ]; then echo "read (token exists)"; else echo "none"; fi)"
-            echo "  - id-token: $(if [ -n "$ACTIONS_ID_TOKEN_REQUEST_TOKEN" ]; then echo "write"; else echo "none"; fi)"
-          
-            # Check secret access
-            echo "- Secret access check:"
-            echo "  - GCP_PROJECT_ID: $([ -n \"$GCP_PROJECT_ID\" ] && echo 'present' || echo 'missing')"
-            echo "  - GCP_REGION: $([ -n \"$GCP_REGION\" ] && echo 'present' || echo 'missing')"
-            echo "  - GCP_SA_KEY: $([ \"$SA_PRESENT\" = 'true' ] && echo 'present' || echo 'missing')"
-          
-            # Check for common issues
-            echo "- Common issues check:"
-            if [ -z "${{ secrets.GCP_SA_KEY }}" ] && [ "$GITHUB_EVENT_NAME" = "pull_request" ] && [ "$GITHUB_REPOSITORY" != "$GITHUB_REPOSITORY_OWNER/$(echo $GITHUB_REPOSITORY | cut -d'/' -f2-)" ]; then
-              echo "  - ❌ Pull requests from forks don't have access to secrets by default"
-            fi
-            if [ -z "$GITHUB_TOKEN" ]; then
-              echo "  - ❌ GITHUB_TOKEN is not available"
-            fi
-          
-            # Current state
-            echo "- Current state:"
-            echo "  - has_gcp: $(cat $GITHUB_OUTPUT | grep '^has_gcp=' | tail -n1 | cut -d'=' -f2)"
-            echo "  - has_docker_hub: $(cat $GITHUB_OUTPUT | grep '^has_hub=' | tail -n1 | cut -d'=' -f2)"
-            echo "  - HAS_SA_KEY: $HAS_KEY"
-            echo "  - HAS_WIF: $HAS_WIF"
-          
-            # List environment variables (without values for security)
-            echo "- Environment variables (first 10):"
-            env | grep -E '^(GITHUB|GCP_|ACTIONS|RUNNER)' | sort | head -n 10 | while IFS= read -r line; do
-              key=${line%%=*}
-              echo "  - $key"
-            done
+            echo "- has_gcp: $(cat $GITHUB_OUTPUT | grep '^has_gcp=' | tail -n1 | cut -d'=' -f2)"
+            echo "- has_docker_hub: $(cat $GITHUB_OUTPUT | grep '^has_hub=' | tail -n1 | cut -d'=' -f2)"
           } >> $GITHUB_STEP_SUMMARY
 
       - name: Build Docker image once (with public env build args)
