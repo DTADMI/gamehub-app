@@ -11,8 +11,8 @@ on:
 # Set default permissions for all jobs in the workflow
 permissions:
   contents: read
-  id-token: write  # Required for OIDC authentication
-  packages: write  # Required for pushing to container registries
+  id-token: write # Required for OIDC authentication
+  packages: write # Required for pushing to container registries
 
 env:
   DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
@@ -61,7 +61,7 @@ jobs:
       packages: write
     # Make GITHUB_TOKEN available to all steps in this job
     env:
-      GITHUB_TOKEN: ${{ github.token }}  # Use the automatically provided token
+      GITHUB_TOKEN: ${{ github.token }} # Use the automatically provided token
     outputs:
       has_hub: ${{ steps.prep.outputs.has_hub }}
       has_gcp: ${{ steps.prep.outputs.has_gcp }}
@@ -95,16 +95,16 @@ jobs:
           if [ "$SA_PRESENT" = "true" ]; then
             HAS_KEY=true
           fi
-          
+
           # Check for Workload Identity Federation
           if [ "$WIF_PROVIDER_PRESENT" = "true" ] && [ "$WIF_SA_PRESENT" = "true" ]; then
             HAS_WIF=true
           fi
-          
+
           # Set outputs
           echo "HAS_SA_KEY=$HAS_KEY" >> $GITHUB_OUTPUT
           echo "HAS_WIF=$HAS_WIF" >> $GITHUB_OUTPUT
-          
+
           # Set has_gcp based on available authentication methods
           if [ "$HAS_KEY" = "true" ] || [ "$HAS_WIF" = "true" ]; then
             echo "has_gcp=true" >> $GITHUB_OUTPUT
@@ -163,8 +163,8 @@ jobs:
     if: ${{ needs.build-local-and-tag-images.outputs.has_gcp == 'true' }}
     runs-on: ubuntu-latest
     permissions:
-      contents: 'read'
-      id-token: 'write'
+      contents: "read"
+      id-token: "write"
     steps:
       - name: Download built image
         uses: actions/download-artifact@v4

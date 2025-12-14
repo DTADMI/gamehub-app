@@ -18,8 +18,10 @@ test("no hydration mismatch errors on home", async ({ page }) => {
   await expect(body).toBeVisible({timeout: 30000});
 
   // Check for hydration errors
-  const hydrationErrors = errors.filter(error =>
-      /hydration|didn't match|content mismatch|mismatch during hydration|hydration failed|react-dom.development.js/i.test(error)
+  const hydrationErrors = errors.filter((error) =>
+      /hydration|didn't match|content mismatch|mismatch during hydration|hydration failed|react-dom.development.js/i.test(
+          error,
+      ),
   );
 
   if (hydrationErrors.length > 0) {

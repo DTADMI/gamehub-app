@@ -197,24 +197,26 @@ Environment and gating:
 
 Authentication options (choose ONE):
 
-1) Service Account key (simple)
-  - Secrets:
+1. Service Account key (simple)
+
+- Secrets:
     - `GCP_PROJECT_ID`
     - `GCP_REGION`
     - `GCP_SA_KEY` (entire JSON key content, multi‑line supported)
-  - Required SA roles (project level):
+- Required SA roles (project level):
     - Cloud Run Admin
     - Artifact Registry Writer
     - Service Account Token Creator
 
-2) Workload Identity Federation (recommended, keyless)
-  - Secrets:
+2. Workload Identity Federation (recommended, keyless)
+
+- Secrets:
     - `GCP_PROJECT_ID`
     - `GCP_REGION`
     - `GCP_WORKLOAD_IDENTITY_PROVIDER` (full resource name)
     - `GCP_SERVICE_ACCOUNT` (email)
-  - IAM: grant `roles/iam.workloadIdentityUser` for the GitHub OIDC principal to the service account, plus the roles
-    above.
+- IAM: grant `roles/iam.workloadIdentityUser` for the GitHub OIDC principal to the service account, plus the roles
+  above.
 
 Runtime service account (Cloud Run):
 

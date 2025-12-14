@@ -98,19 +98,15 @@ export default function ExplorePage() {
                       <h3 className="text-lg font-semibold">Featured</h3>
                       {useCarousels ? (
                           <Carousel>
-                            {ALL_GAMES.filter((g) => g.featured).map(
-                                (g) => (
-                                    <GameCard key={g.id} game={g} featured={g.featured}/>
-                                ),
-                            )}
+                            {ALL_GAMES.filter((g) => g.featured).map((g) => (
+                                <GameCard key={g.id} game={g} featured={g.featured}/>
+                            ))}
                           </Carousel>
                       ) : (
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {ALL_GAMES.filter((g) => g.featured).map(
-                                (g) => (
-                                    <GameCard key={g.id} game={g} featured={g.featured}/>
-                                ),
-                            )}
+                            {ALL_GAMES.filter((g) => g.featured).map((g) => (
+                                <GameCard key={g.id} game={g} featured={g.featured}/>
+                            ))}
                           </div>
                       )}
                   </>

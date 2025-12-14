@@ -17,22 +17,29 @@ test.describe("Access control via middleware", () => {
     if (hasError) {
       // If there's an error, check if it's just a hydration warning
       const errorText = await error.textContent();
-      if (errorText && errorText.includes('client-side exception')) {
+      if (errorText && errorText.includes("client-side exception")) {
         // If we're in CI, we might want to be more strict
         if (process.env.CI) {
-          throw new Error('Client-side error detected in CI: ' + errorText);
+          throw new Error("Client-side error detected in CI: " + errorText);
         }
         // For local development, we might be more lenient
-        console.warn('Client-side error detected but continuing test:', errorText);
+        console.warn(
+            "Client-side error detected but continuing test:",
+            errorText,
+        );
       }
     }
 
     // Check for any header that might contain GameHub
     await expect(
-        page.locator("h1, h2, h3, header, [data-testid='app-header'], .app-title, .site-title").first()
+        page
+            .locator(
+                "h1, h2, h3, header, [data-testid='app-header'], .app-title, .site-title",
+            )
+            .first(),
     ).toContainText(/GameHub/i, {
       timeout: 30000,
-      ignoreCase: true
+      ignoreCase: true,
     });
   });
 
@@ -47,20 +54,24 @@ test.describe("Access control via middleware", () => {
     const error = page.locator('text="Application error"').first();
     if (await error.isVisible().catch(() => false)) {
       const errorText = await error.textContent();
-      if (process.env.CI && errorText?.includes('client-side exception')) {
-        throw new Error('Client-side error in projects page: ' + errorText);
+      if (process.env.CI && errorText?.includes("client-side exception")) {
+        throw new Error("Client-side error in projects page: " + errorText);
       }
     }
 
     await expect(
-        page.locator("h1, h2, h3, [data-testid='projects-heading'], .page-title").first()
+        page
+            .locator("h1, h2, h3, [data-testid='projects-heading'], .page-title")
+            .first(),
     ).toContainText(/projects/i, {
       timeout: 30000,
-      ignoreCase: true
+      ignoreCase: true,
     });
   });
 
-  test("non-public route redirects to /login with redirect param", async ({page}) => {
+  test("non-public route redirects to /login with redirect param", async ({
+                                                                            page,
+                                                                          }) => {
     await page.goto("/dashboard");
     await expect(page).toHaveURL(/\/login/);
     await expect(page).toHaveURL(/redirect/);
