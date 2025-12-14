@@ -415,7 +415,7 @@ curl -sS "$SERVICE_URL/actuator/health"
 ### GitHub Actions CI/CD
 
 - Repository secrets (Settings → Secrets and variables → Actions):
-  - `GCP_PROJECT_ID`, `GCP_REGION`, `GCP_SA_KEY` (JSON). Prefer WIF for keyless in production.
+  - `GCP_PROJECT_ID`, `GCP_REGION`, `GCP_SERVICE_ACCOUNT_KEY` (JSON). Prefer WIF for keyless in production.
   - Optional variables: `AR_REPO` (default `gamehub`), `BACKEND_SERVICE` (default `gamehub-api`), `FRONTEND_SERVICE` (
     default `gamehub-app`), `NEXT_PUBLIC_API_URL`.
 - The workflow `.github/workflows/ci-cd.yml` builds images, pushes to AR, and deploys to Cloud Run on pushes to `main`
@@ -427,7 +427,8 @@ curl -sS "$SERVICE_URL/actuator/health"
 - If frontend cannot reach backend, verify `BACKEND_URL` and CORS origins
 - When Playwright fails, start dev server before running tests
 - If Testcontainers pulls are slow, pre-pull `postgres:15-alpine`
-- If Cloud Run deploy fails: confirm `GCP_PROJECT_ID`, `GCP_REGION`, and `GCP_SA_KEY` secrets; ensure the Artifact
+- If Cloud Run deploy fails: confirm `GCP_PROJECT_ID`, `GCP_REGION`, and `GCP_SERVICE_ACCOUNT_KEY` secrets; ensure the
+  Artifact
   Registry repo exists and you ran `gcloud auth configure-docker <region>-docker.pkg.dev` locally.
 
 ## Cloud services, variables and secrets
@@ -464,7 +465,8 @@ Below is a checklist of required variables/secrets and how to obtain them.
 
 - `GCP_PROJECT_ID` (secret): GCP project ID (e.g., my-project-123).
 - `GCP_REGION` (secret): GCP region (e.g., us-central1).
-- `GCP_SA_KEY` (secret): JSON key for a service account with roles: Cloud Run Admin, Cloud Build Editor, Artifact
+- `GCP_SERVICE_ACCOUNT_KEY` (secret): JSON key for a service account with roles: Cloud Run Admin, Cloud Build Editor,
+  Artifact
   Registry Writer, Secret Manager Accessor.
   - Recommended: switch to Workload Identity Federation to avoid JSON keys.
 
@@ -626,7 +628,8 @@ This repo ships a single workflow at `.github/workflows/ci-cd.yml` which:
 
 Provide these repository variables and secrets:
 
-- Secrets: `GCP_PROJECT_ID`, `GCP_REGION`, `GCP_SA_KEY` (JSON), and DB secret names used in the backend deploy step
+- Secrets: `GCP_PROJECT_ID`, `GCP_REGION`, `GCP_SERVICE_ACCOUNT_KEY` (JSON), and DB secret names used in the backend
+  deploy step
 - Vars: `AR_REPO=gamehub`, `BACKEND_SERVICE=gamehub-api`, `FRONTEND_SERVICE=gamehub-app`,
   `NEXT_PUBLIC_API_URL=https://gamehub-api-245231653364.northamerica-northeast1.run.app/api`
 

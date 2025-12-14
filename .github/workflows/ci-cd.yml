@@ -80,7 +80,7 @@ jobs:
 
           # Artifact Registry availability (need project, region, and either SA key or WIF)
           HAS_KEY=false; HAS_WIF=false
-          if [ -n "${{ secrets.GCP_SA_KEY }}" ]; then HAS_KEY=true; fi
+          if [ -n "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" ]; then HAS_KEY=true; fi
           if [ -n "${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}" ] && [ -n "${{ secrets.GCP_SERVICE_ACCOUNT }}" ]; then HAS_WIF=true; fi
           if [ -n "${{ secrets.GCP_PROJECT_ID }}" ] && [ -n "${{ secrets.GCP_REGION }}" ] && { [ "$HAS_KEY" = "true" ] || [ "$HAS_WIF" = "true" ]; }; then
             echo "has_gcp=true" >> $GITHUB_OUTPUT
@@ -111,7 +111,7 @@ jobs:
             echo "- Provided vars/secrets (presence only):"
             echo "  - GCP_PROJECT_ID: $([ -n "${{ secrets.GCP_PROJECT_ID }}" ] && echo present || echo missing)"
             echo "  - GCP_REGION: $([ -n "${{ secrets.GCP_REGION }}" ] && echo present || echo missing)"
-            echo "  - GCP_SA_KEY: $([ -n "${{ secrets.GCP_SA_KEY }}" ] && echo present || echo missing)"
+            echo "  - GCP_SERVICE_ACCOUNT_KEY: $([ -n "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" ] && echo present || echo missing)"
             echo "  - GCP_WORKLOAD_IDENTITY_PROVIDER: $([ -n "${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}" ] && echo present || echo missing)"
             echo "  - GCP_SERVICE_ACCOUNT: $([ -n "${{ secrets.GCP_SERVICE_ACCOUNT }}" ] && echo present || echo missing)"
             echo "  - GCP_ARTIFACT_REPO (var): $([ -n "${{ vars.GCP_ARTIFACT_REPO }}" ] && echo present || echo missing)"
@@ -220,7 +220,7 @@ jobs:
           else
             echo "HAS_WIF=false" >> $GITHUB_ENV
           fi
-          if [ -n "${{ secrets.GCP_SA_KEY }}" ]; then
+          if [ -n "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" ]; then
             echo "HAS_SA=true" >> $GITHUB_ENV
           else
             echo "HAS_SA=false" >> $GITHUB_ENV
@@ -237,7 +237,7 @@ jobs:
         if: ${{ env.HAS_WIF != 'true' && env.HAS_SA == 'true' }}
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 
       - name: Set up gcloud SDK
         uses: google-github-actions/setup-gcloud@v2
