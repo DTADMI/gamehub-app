@@ -224,7 +224,7 @@ Other required inputs for deploy:
 
 Operational notes and safety:
 
-- The workflow prints concise diagnostics only (auth method chosen, active account, APIs enabled, selected runtime SA).
+- The workflow uses minimal logging (no job summaries). Failures are reported directly by gcloud/Docker steps.
 - We intentionally avoid dumping environment variables or secret contents to logs.
 - Playwright E2E starts the dev server with `NEXT_PUBLIC_DISABLE_PROVIDERS=true` so public pages don’t attempt cloud
   auth during tests.

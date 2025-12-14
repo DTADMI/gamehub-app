@@ -36,6 +36,8 @@ CI/CD quick facts:
   used. If runtime SA ≠ deployer SA, grant the deployer `roles/iam.serviceAccountUser` on the runtime SA.
 - Required APIs: `run.googleapis.com` and `artifactregistry.googleapis.com`. The workflow attempts to enable them and
   fails with a concise message if it cannot.
+- Minimal logging: the workflow avoids job summaries and verbose environment dumps; errors surface directly from
+  gcloud/Docker steps for clarity.
 - Deploy gating: Deploy runs on `main` (or manual dispatch) only when GCP auth is available. Manual dispatch does not
   bypass authentication. Docker Hub is an optional mirror used only if AR is unavailable or if the AR job fails; Cloud
   Run deploys always pull from Artifact Registry.
