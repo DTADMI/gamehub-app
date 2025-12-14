@@ -1,7 +1,7 @@
 "use client";
 
 import {enableGameKeyCapture, GameHUD, soundManager} from "@games/shared";
-import React, {useCallback, useEffect, useMemo, useRef} from "react";
+import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
 
 type PreloadSound = {
     key: string;
@@ -110,6 +110,7 @@ export function GameShell({
                               onRestart,
                           }: GameShellProps) {
     const rootRef = useRef<HTMLDivElement | null>(null);
+    const [muted, setMuted] = useState<boolean>(false);
 
     useEffect(() => {
         const el = rootRef.current;
@@ -141,6 +142,28 @@ export function GameShell({
         };
     }, [preloadSounds]);
 
+    // Persist and apply mute preference
+    useEffect(() => {
+        try {
+            const saved = localStorage.getItem("gamehub:soundMuted");
+            const initial = saved === "true";
+            setMuted(initial);
+            // Best-effort: apply to sound manager if supported
+            (soundManager as any)?.setMuted?.(initial);
+        } catch {
+            // ignore
+        }
+    }, []);
+
+    useEffect(() => {
+        try {
+            localStorage.setItem("gamehub:soundMuted", String(muted));
+            (soundManager as any)?.setMuted?.(muted);
+        } catch {
+            // ignore
+        }
+    }, [muted]);
+
     const sendKey = useCallback((key: string) => {
         // Try dispatching a keyboard event by default
         window.dispatchEvent(new KeyboardEvent("keydown", {key}));
@@ -170,6 +193,16 @@ export function GameShell({
             role="application"
             aria-label={ariaLabel}
         >
+            {/* Sound toggle (persists to localStorage) */}
+            <div className="absolute right-3 top-3 z-20 flex items-center gap-2">
+                <button
+                    aria-label={muted ? "Unmute sound" : "Mute sound"}
+                    className="rounded-md border bg-background px-2 py-1 text-sm shadow-sm hover:bg-muted"
+                    onClick={() => setMuted((m) => !m)}
+                >
+                    {muted ? "🔇 Mute" : "🔈 Sound"}
+                </button>
+            </div>
             {children}
             {mobileControls && <MobileTouchControls onKey={sendKey}/>}
             <GameHUD

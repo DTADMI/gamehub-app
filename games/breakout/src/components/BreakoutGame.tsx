@@ -20,7 +20,8 @@ const MAX_BALL_SPEED = 6.2;
 // Anti-stall and control feel
 const MIN_BOUNCE_ANGLE = (10 * Math.PI) / 180; // minimum 10° away from vertical
 const MAX_BOUNCE_ANGLE = (75 * Math.PI) / 180; // cap at 75° from vertical
-const PADDLE_INFLUENCE = 0.04; // radians of angle influence per px of paddle movement this frame
+const PADDLE_INFLUENCE_BASE = 0.04; // radians of angle influence per px of paddle movement this frame (desktop)
+const PADDLE_INFLUENCE_MOBILE = 0.05; // a touch more influence on coarse pointers
 const MAX_INFLUENCE_ANGLE = (20 * Math.PI) / 180; // clamp added influence to ±20°
 const MIN_HORIZ_COMPONENT = 1.1; // ensure some horizontal speed exists after collisions
 const NUDGE_EPS = 0.35; // if |dx| falls below this, consider nudging
@@ -76,11 +77,12 @@ type FallingPowerUp = {
 };
 type ActiveModifier = { type: PowerUpType; endTime: number } | null;
 
-const POWERUP_DROP_CHANCE = 0.1; // 10% per brick break
+const POWERUP_DROP_CHANCE = 0.1; // 10% per brick break (desktop baseline)
 const POWERUP_MAX_FALLING = 2;
 const POWERUP_DURATION_MS = 7000; // 7s timed effect
 const FAST_FACTOR = 1.25;
-const SLOW_FACTOR = 0.75;
+const SLOW_FACTOR_DESKTOP = 0.75;
+const SLOW_FACTOR_MOBILE = 0.82; // less harsh slow on mobile for better feel
 
 function pickWeightedPowerUp(current: ActiveModifier): PowerUpType {
   // Slow is rarer and skipped if already active
@@ -104,13 +106,18 @@ function desiredSpeedFromModifier(mod: ActiveModifier, level: number): number {
   // Gentle level-based ramp: +5% per level, capped at +30%
   const levelRamp = 1 + Math.min(Math.max(0, level - 1) * 0.05, 0.3);
   const base = BASE_BALL_SPEED * levelRamp;
+  const slowFactor = slowFactorRef.current;
   const factor =
-      mod?.type === "fast" ? FAST_FACTOR : mod?.type === "slow" ? SLOW_FACTOR : 1;
+      mod?.type === "fast" ? FAST_FACTOR : mod?.type === "slow" ? slowFactor : 1;
   return clamp(base * factor, MIN_BALL_SPEED, MAX_BALL_SPEED);
 }
 
 export default function BreakoutGame() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  // Input device hint: coarse vs fine pointer
+  const isCoarseRef = useRef<boolean>(false);
+  const paddleInfluenceRef = useRef<number>(PADDLE_INFLUENCE_BASE);
+  const slowFactorRef = useRef<number>(SLOW_FACTOR_DESKTOP);
 
   // Paddle state + a ref to move immediately inside RAF
   const [paddle, setPaddle] = useState<Paddle>({
@@ -122,6 +129,7 @@ export default function BreakoutGame() {
   const paddleXRef = useRef<number>(paddle.x);
   const lastPaddleXRef = useRef<number>(paddle.x);
   const lastNudgeAtRef = useRef<number>(0);
+  const paddleRef = useRef<Paddle>({...paddle});
 
   // Simple ball state
   const [ball, setBall] = useState<Ball>({
@@ -131,9 +139,11 @@ export default function BreakoutGame() {
     dy: -BASE_BALL_SPEED,
     radius: BALL_RADIUS,
   });
+  const ballRef = useRef<Ball>({...ball});
 
   // Bricks grid
   const [bricks, setBricks] = useState<Brick[][]>([]);
+  const bricksRef = useRef<Brick[][]>([]);
 
   // Game flags
   const [gameStarted, setGameStarted] = useState(false);
@@ -141,31 +151,39 @@ export default function BreakoutGame() {
   const [gameOver, setGameOver] = useState(false);
   const [level, setLevel] = useState(1);
   const [showLevelComplete, setShowLevelComplete] = useState(false);
+  const gameStartedRef = useRef<boolean>(false);
+  const isPausedRef = useRef<boolean>(false);
+  const gameOverRef = useRef<boolean>(false);
+  const levelRef = useRef<number>(1);
+  const showLevelCompleteRef = useRef<boolean>(false);
 
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
   const [lives, setLives] = useState(3);
+  const scoreRef = useRef<number>(0);
+  const livesRef = useRef<number>(3);
 
   // Power-ups state
   const [fallingPowerUps, setFallingPowerUps] = useState<FallingPowerUp[]>([]);
   const [activeModifier, setActiveModifier] = useState<ActiveModifier>(null);
+  const fallingRef = useRef<FallingPowerUp[]>([]);
+  const activeRef = useRef<ActiveModifier>(null);
 
   // Input cache
   const keysDownRef = useRef<Set<string>>(new Set());
 
-  // Initialize or reinitialize a level
-  const initLevel = useCallback(() => {
+  // Brick factory for a given level (shared by initLevel and level-up path)
+  const buildBricks = useCallback((lvl: number): Brick[][] => {
     const newBricks: Brick[][] = [];
     for (let c = 0; c < BRICK_COLUMN_COUNT; c++) {
-      newBricks[c] = [];
+      newBricks[c] = [] as Brick[];
       for (let r = 0; r < BRICK_ROW_COUNT; r++) {
         const brickX = c * (BRICK_WIDTH + BRICK_PADDING) + BRICK_OFFSET_LEFT;
         const brickY = r * (BRICK_HEIGHT + BRICK_PADDING) + BRICK_OFFSET_TOP;
         const colorIndex = Math.floor(Math.random() * COLORS.length);
-        const basePoints = (BRICK_ROW_COUNT - r) * 10 * level;
-        // From level 2+, introduce tougher bricks with health=2 at a small chance, scaling a bit with level
-        const toughChance = Math.min(0.1 + (level - 2) * 0.04, 0.28);
-        const isTough = level >= 2 && Math.random() < toughChance;
+        const basePoints = (BRICK_ROW_COUNT - r) * 10 * Math.max(1, lvl);
+        const toughChance = Math.min(0.1 + (Math.max(1, lvl) - 2) * 0.04, 0.28);
+        const isTough = lvl >= 2 && Math.random() < toughChance;
         const health = isTough ? 2 : 1;
         const points = isTough ? basePoints * 2 : basePoints;
         newBricks[c][r] = {
@@ -173,34 +191,45 @@ export default function BreakoutGame() {
           y: brickY,
           width: BRICK_WIDTH,
           height: BRICK_HEIGHT,
-          color: isTough
-              ? "#ea580c" /* orange-600 for tough */
-              : COLORS[colorIndex],
+          color: isTough ? "#ea580c" : COLORS[colorIndex],
           points,
           health,
-        };
+        } as Brick;
       }
     }
+    return newBricks;
+  }, []);
+
+  // Initialize or reinitialize a level
+  const initLevel = useCallback(() => {
+    const newBricks = buildBricks(levelRef.current || level);
     setBricks(newBricks);
+    bricksRef.current = newBricks;
 
     // Reset ball and paddle for a fresh serve
-    setBall({
+    const nextBall: Ball = {
       x: CANVAS_WIDTH / 2,
       y: CANVAS_HEIGHT - 30,
       dx: BASE_BALL_SPEED * (Math.random() > 0.5 ? 1 : -1),
       dy: -BASE_BALL_SPEED,
       radius: BALL_RADIUS,
-    });
+    };
+    setBall(nextBall);
+    ballRef.current = nextBall;
 
-    setPaddle((prev) => ({
-      ...prev,
-      x: (CANVAS_WIDTH - PADDLE_WIDTH) / 2,
-      y: CANVAS_HEIGHT - PADDLE_HEIGHT - 10,
-      width: PADDLE_WIDTH,
-      height: PADDLE_HEIGHT,
-    }));
+    setPaddle((prev) => {
+      const np = {
+        ...prev,
+        x: (CANVAS_WIDTH - PADDLE_WIDTH) / 2,
+        y: CANVAS_HEIGHT - PADDLE_HEIGHT - 10,
+        width: PADDLE_WIDTH,
+        height: PADDLE_HEIGHT,
+      };
+      paddleRef.current = np;
+      return np;
+    });
     paddleXRef.current = (CANVAS_WIDTH - PADDLE_WIDTH) / 2;
-  }, [level]);
+  }, [buildBricks, level]);
 
   const startGame = useCallback(() => {
     setScore(0);
@@ -238,6 +267,15 @@ export default function BreakoutGame() {
         } else {
           ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         }
+      }
+      // Update pointer type derived tuning (mobile vs desktop)
+      try {
+        const coarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+        isCoarseRef.current = !!coarse;
+        paddleInfluenceRef.current = coarse ? PADDLE_INFLUENCE_MOBILE : PADDLE_INFLUENCE_BASE;
+        slowFactorRef.current = coarse ? SLOW_FACTOR_MOBILE : SLOW_FACTOR_DESKTOP;
+      } catch {
+        // no-op
       }
     };
     window.addEventListener("resize", handleResize);
@@ -329,6 +367,44 @@ export default function BreakoutGame() {
     };
   }, [isPaused, paddle.width]);
 
+  // Keep refs in sync with state (so RAF loop can read fresh values)
+  useEffect(() => {
+    paddleRef.current = paddle;
+  }, [paddle]);
+  useEffect(() => {
+    ballRef.current = ball;
+  }, [ball]);
+  useEffect(() => {
+    bricksRef.current = bricks;
+  }, [bricks]);
+  useEffect(() => {
+    fallingRef.current = fallingPowerUps;
+  }, [fallingPowerUps]);
+  useEffect(() => {
+    activeRef.current = activeModifier;
+  }, [activeModifier]);
+  useEffect(() => {
+    gameStartedRef.current = gameStarted;
+  }, [gameStarted]);
+  useEffect(() => {
+    isPausedRef.current = isPaused;
+  }, [isPaused]);
+  useEffect(() => {
+    gameOverRef.current = gameOver;
+  }, [gameOver]);
+  useEffect(() => {
+    levelRef.current = level;
+  }, [level]);
+  useEffect(() => {
+    showLevelCompleteRef.current = showLevelComplete;
+  }, [showLevelComplete]);
+  useEffect(() => {
+    scoreRef.current = score;
+  }, [score]);
+  useEffect(() => {
+    livesRef.current = lives;
+  }, [lives]);
+
   // Animation loop
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -343,6 +419,18 @@ export default function BreakoutGame() {
     let raf = 0;
 
     const draw = () => {
+      const stateBall = ballRef.current;
+      const statePaddle = paddleRef.current;
+      const stateBricks = bricksRef.current;
+      const stateFalling = fallingRef.current;
+      const stateActive = activeRef.current;
+      const stateLives = livesRef.current;
+      const stateLevel = levelRef.current;
+      const started = gameStartedRef.current;
+      const paused = isPausedRef.current;
+      const over = gameOverRef.current;
+      const levelDone = showLevelCompleteRef.current;
+
       // background
       ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
       ctx.fillStyle = "#0f172a";
@@ -358,21 +446,25 @@ export default function BreakoutGame() {
         dx += PADDLE_SPEED;
       }
       let newPx = clamp(
-          (paddleXRef.current ?? paddle.x) + dx,
+          (paddleXRef.current ?? statePaddle.x) + dx,
           0,
-          CANVAS_WIDTH - paddle.width,
+          CANVAS_WIDTH - statePaddle.width,
       );
       // Track paddle velocity (px per frame) for collision influence
       const paddleV = newPx - (lastPaddleXRef.current ?? newPx);
       lastPaddleXRef.current = newPx;
       paddleXRef.current = newPx;
-      if (newPx !== paddle.x) {
-        setPaddle((p) => ({...p, x: newPx}));
+      if (newPx !== statePaddle.x) {
+        setPaddle((p) => {
+          const np = {...p, x: newPx};
+          paddleRef.current = np;
+          return np;
+        });
       }
 
       // draw paddle
       ctx.fillStyle = "#3498db";
-      ctx.fillRect(newPx, paddle.y, paddle.width, paddle.height);
+      ctx.fillRect(newPx, statePaddle.y, statePaddle.width, statePaddle.height);
       // Expose paddleX for E2E via data attribute
       if (canvasRef.current) {
         (canvasRef.current as HTMLCanvasElement).dataset.px = String(
@@ -382,13 +474,13 @@ export default function BreakoutGame() {
 
       // draw ball
       ctx.beginPath();
-      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+      ctx.arc(stateBall.x, stateBall.y, stateBall.radius, 0, Math.PI * 2);
       ctx.fillStyle = "#e74c3c";
       ctx.fill();
       ctx.closePath();
 
       // draw bricks
-      for (const col of bricks) {
+      for (const col of stateBricks) {
         for (const b of col) {
           if (b.health <= 0) {
             continue;
@@ -405,8 +497,8 @@ export default function BreakoutGame() {
       }
 
       // draw falling power-ups
-      if (fallingPowerUps.length) {
-        for (const p of fallingPowerUps) {
+      if (stateFalling.length) {
+        for (const p of stateFalling) {
           ctx.beginPath();
           ctx.fillStyle = p.type === "fast" ? "#22c55e" : "#f59e0b"; // green fast, amber slow
           ctx.arc(p.x, p.y, p.size / 2, 0, Math.PI * 2);
@@ -424,23 +516,23 @@ export default function BreakoutGame() {
       ctx.fillStyle = "#fff";
       ctx.font = "12px Arial";
       ctx.textAlign = "left";
-      ctx.fillText(`Score: ${score}`, 8, 8);
+      ctx.fillText(`Score: ${scoreRef.current}`, 8, 8);
       ctx.textAlign = "right";
-      ctx.fillText(`Lives: ${lives}`, CANVAS_WIDTH - 8, 8);
+      ctx.fillText(`Lives: ${stateLives}`, CANVAS_WIDTH - 8, 8);
 
       // HUD: active modifier timer center-top
-      if (activeModifier) {
+      if (stateActive) {
         const now = Date.now();
-        const remaining = Math.max(0, activeModifier.endTime - now);
+        const remaining = Math.max(0, stateActive.endTime - now);
         const secs = Math.ceil(remaining / 1000);
-        const label = activeModifier.type === "fast" ? "FAST" : "SLOW";
+        const label = stateActive.type === "fast" ? "FAST" : "SLOW";
         ctx.textAlign = "center";
-        ctx.fillStyle = activeModifier.type === "fast" ? "#22c55e" : "#f59e0b";
+        ctx.fillStyle = stateActive.type === "fast" ? "#22c55e" : "#f59e0b";
         ctx.fillText(`${label} ${secs}s`, CANVAS_WIDTH / 2, 8);
       }
 
       // overlays
-      if (!gameStarted) {
+      if (!started) {
         ctx.fillStyle = "rgba(0,0,0,0.2)";
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         ctx.fillStyle = "#fff";
@@ -451,25 +543,25 @@ export default function BreakoutGame() {
             CANVAS_WIDTH / 2,
             CANVAS_HEIGHT / 2,
         );
-      } else if (isPaused) {
+      } else if (paused) {
         ctx.fillStyle = "rgba(0,0,0,0.25)";
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         ctx.fillStyle = "#fff";
         ctx.textAlign = "center";
         ctx.font = "20px Arial";
         ctx.fillText("Paused (Space)", CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
-      } else if (showLevelComplete) {
+      } else if (levelDone) {
         ctx.fillStyle = "rgba(0,0,0,0.4)";
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         ctx.fillStyle = "#fff";
         ctx.textAlign = "center";
         ctx.font = "22px Arial";
         ctx.fillText(
-            `Level ${level} Complete!`,
+            `Level ${stateLevel} Complete!`,
             CANVAS_WIDTH / 2,
             CANVAS_HEIGHT / 2,
         );
-      } else if (gameOver) {
+      } else if (over) {
         ctx.fillStyle = "rgba(0,0,0,0.6)";
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         ctx.fillStyle = "#fff";
@@ -483,25 +575,25 @@ export default function BreakoutGame() {
       }
 
       // game updates
-      if (gameStarted && !isPaused && !gameOver) {
+      if (started && !paused && !over) {
         // move ball
-        let nx = ball.x + ball.dx;
-        let ny = ball.y + ball.dy;
-        let ndx = ball.dx;
-        let ndy = ball.dy;
+        let nx = stateBall.x + stateBall.dx;
+        let ny = stateBall.y + stateBall.dy;
+        let ndx = stateBall.dx;
+        let ndy = stateBall.dy;
 
         // walls — reflect AND clamp position inside bounds so the ball never leaves the canvas
-        if (nx + ball.radius > CANVAS_WIDTH) {
-          nx = CANVAS_WIDTH - ball.radius;
+        if (nx + stateBall.radius > CANVAS_WIDTH) {
+          nx = CANVAS_WIDTH - stateBall.radius;
           ndx = -Math.abs(ndx);
           soundManager.playSound("wall");
-        } else if (nx - ball.radius < 0) {
-          nx = ball.radius;
+        } else if (nx - stateBall.radius < 0) {
+          nx = stateBall.radius;
           ndx = Math.abs(ndx);
           soundManager.playSound("wall");
         }
-        if (ny - ball.radius < 0) {
-          ny = ball.radius;
+        if (ny - stateBall.radius < 0) {
+          ny = stateBall.radius;
           ndy = Math.abs(ndy);
           soundManager.playSound("wall");
         }
@@ -509,18 +601,18 @@ export default function BreakoutGame() {
         // paddle
         if (
             // require downward motion to avoid double-hitting from below
-            ball.dy > 0 &&
-            ny + ball.radius > paddle.y &&
-            ny - ball.radius < paddle.y + paddle.height &&
+            stateBall.dy > 0 &&
+            ny + stateBall.radius > statePaddle.y &&
+            ny - stateBall.radius < statePaddle.y + statePaddle.height &&
             nx + ball.radius > newPx &&
-            nx - ball.radius < newPx + paddle.width
+            nx - ball.radius < newPx + statePaddle.width
         ) {
           // Compute bounce angle relative to paddle center (0 is straight up)
           const rel = (nx - (newPx + paddle.width / 2)) / (paddle.width / 2); // -1 .. 1
           const baseAngle = clamp(rel, -1, 1) * MAX_BOUNCE_ANGLE; // -MAX..+MAX
           // Add a small influence based on paddle movement direction/speed this frame
           const influence = clamp(
-              paddleV * PADDLE_INFLUENCE,
+              paddleV * paddleInfluenceRef.current,
               -MAX_INFLUENCE_ANGLE,
               MAX_INFLUENCE_ANGLE,
           );
@@ -547,29 +639,39 @@ export default function BreakoutGame() {
             ndy = ty;
           }
           // Pop the ball just above the paddle to ensure it never gets embedded or appears below
-          ny = paddle.y - ball.radius - 0.01;
+          ny = statePaddle.y - stateBall.radius - 0.01;
           soundManager.playSound("paddle");
         }
 
         // bottom
-        if (ny + ball.radius > CANVAS_HEIGHT) {
+        if (ny + stateBall.radius > CANVAS_HEIGHT) {
           soundManager.playSound("loseLife");
-          if (lives <= 1) {
+          if ((livesRef.current || 0) <= 1) {
             setGameOver(true);
             soundManager.playSound("gameOver");
             soundManager.stopMusic();
           } else {
             setLives((l) => l - 1);
+            livesRef.current = (livesRef.current || 1) - 1;
             setGameStarted(false);
-            nx = CANVAS_WIDTH / 2;
-            ny = CANVAS_HEIGHT - 30;
-            ndx = BASE_BALL_SPEED * (Math.random() > 0.5 ? 1 : -1);
-            ndy = -BASE_BALL_SPEED;
+            const resetBall: Ball = {
+              x: CANVAS_WIDTH / 2,
+              y: CANVAS_HEIGHT - 30,
+              dx: BASE_BALL_SPEED * (Math.random() > 0.5 ? 1 : -1),
+              dy: -BASE_BALL_SPEED,
+              radius: BALL_RADIUS,
+            };
+            nx = resetBall.x;
+            ny = resetBall.y;
+            ndx = resetBall.dx;
+            ndy = resetBall.dy;
+            setBall(resetBall);
+            ballRef.current = resetBall;
           }
         }
 
         // brick collisions (defensive against uninitialized/partial grids)
-        const nextBricks = bricks.map((col) => col.map((b) => ({...b})));
+        const nextBricks = stateBricks.map((col) => col.map((b) => ({...b})));
         let hit = false;
         outer: for (let c = 0; c < nextBricks.length; c++) {
           const col = nextBricks[c];
@@ -582,10 +684,10 @@ export default function BreakoutGame() {
               continue;
             }
             if (
-                nx + ball.radius > b.x &&
-                nx - ball.radius < b.x + b.width &&
-                ny + ball.radius > b.y &&
-                ny - ball.radius < b.y + b.height
+                nx + stateBall.radius > b.x &&
+                nx - stateBall.radius < b.x + b.width &&
+                ny + stateBall.radius > b.y &&
+                ny - stateBall.radius < b.y + b.height
             ) {
               // choose axis by smaller overlap
               const overlapX = Math.min(
@@ -603,6 +705,7 @@ export default function BreakoutGame() {
               }
               b.health -= 1;
               setScore((s) => s + b.points);
+              scoreRef.current = (scoreRef.current || 0) + b.points;
               // Sound feedback: hit vs break
               if (b.health <= 0) {
                 soundManager.playSound("brickBreak");
@@ -611,14 +714,15 @@ export default function BreakoutGame() {
               }
               // maybe drop a power-up
               if (b.health <= 0) {
-                const shouldDrop = Math.random() < POWERUP_DROP_CHANCE;
+                const chance = isCoarseRef.current ? 0.08 : POWERUP_DROP_CHANCE;
+                const shouldDrop = Math.random() < chance;
                 if (shouldDrop) {
                   setFallingPowerUps((prev) => {
                     if (prev.length >= POWERUP_MAX_FALLING) {
                       return prev;
                     }
-                    const type = pickWeightedPowerUp(activeModifier);
-                    return [
+                    const type = pickWeightedPowerUp(activeRef.current);
+                    const next = [
                       ...prev,
                       {
                         x: b.x + b.width / 2,
@@ -628,6 +732,8 @@ export default function BreakoutGame() {
                         size: 14,
                       },
                     ];
+                    fallingRef.current = next;
+                    return next;
                   });
                 }
               }
@@ -638,6 +744,7 @@ export default function BreakoutGame() {
         }
         if (hit) {
           setBricks(nextBricks);
+          bricksRef.current = nextBricks;
         }
 
         // Anti-stall: if horizontal component is too small after a bounce, gently nudge it
@@ -652,7 +759,7 @@ export default function BreakoutGame() {
         }
 
         // normalize ball speed based on active modifier
-        const target = desiredSpeedFromModifier(activeModifier, level);
+        const target = desiredSpeedFromModifier(activeRef.current, stateLevel);
         const len = Math.sqrt(ndx * ndx + ndy * ndy) || 1;
         const scale = target / len;
         ndx *= scale;
@@ -670,16 +777,18 @@ export default function BreakoutGame() {
         }
 
         // Final safety: clamp position inside the canvas so the ball never leaves visible bounds
-        nx = clamp(nx, ball.radius, CANVAS_WIDTH - ball.radius);
-        ny = clamp(ny, ball.radius, CANVAS_HEIGHT - ball.radius);
+        nx = clamp(nx, stateBall.radius, CANVAS_WIDTH - stateBall.radius);
+        ny = clamp(ny, stateBall.radius, CANVAS_HEIGHT - stateBall.radius);
 
-        setBall({x: nx, y: ny, dx: ndx, dy: ndy, radius: ball.radius});
+        const updatedBall: Ball = {x: nx, y: ny, dx: ndx, dy: ndy, radius: stateBall.radius};
+        setBall(updatedBall);
+        ballRef.current = updatedBall;
         // Expose ball position for E2E
         if (canvasRef.current) {
           const el = canvasRef.current as HTMLCanvasElement;
           el.dataset.ballx = String(Math.round(nx));
           el.dataset.bally = String(Math.round(ny));
-          el.dataset.lives = String(lives);
+          el.dataset.lives = String(livesRef.current || 0);
         }
 
         // check level complete (robust against missing rows)
@@ -690,25 +799,51 @@ export default function BreakoutGame() {
         );
         if (nextBricks.length && remaining === 0) {
           setShowLevelComplete(true);
+          showLevelCompleteRef.current = true;
           soundManager.playSound("levelComplete");
           setTimeout(() => {
             setShowLevelComplete(false);
-            setLevel((lv) => lv + 1);
-            initLevel();
+            showLevelCompleteRef.current = false;
+            const nextLevel = (levelRef.current || 1) + 1;
+            setLevel(nextLevel);
+            levelRef.current = nextLevel;
+            // Rebuild bricks for the next level and reset ball/paddle
+            const newGrid = buildBricks(nextLevel);
+            setBricks(newGrid);
+            bricksRef.current = newGrid;
+            const resetBall: Ball = {
+              x: CANVAS_WIDTH / 2,
+              y: CANVAS_HEIGHT - 30,
+              dx: BASE_BALL_SPEED * (Math.random() > 0.5 ? 1 : -1),
+              dy: -BASE_BALL_SPEED,
+              radius: BALL_RADIUS,
+            };
+            setBall(resetBall);
+            ballRef.current = resetBall;
+            const np = {
+              ...paddleRef.current,
+              x: (CANVAS_WIDTH - PADDLE_WIDTH) / 2,
+              y: CANVAS_HEIGHT - PADDLE_HEIGHT - 10,
+              width: PADDLE_WIDTH,
+              height: PADDLE_HEIGHT,
+            };
+            setPaddle(np);
+            paddleRef.current = np;
+            paddleXRef.current = np.x;
           }, 1200);
         }
 
         // update falling power-ups
-        if (fallingPowerUps.length) {
+        if (stateFalling.length) {
           const updated: FallingPowerUp[] = [];
-          for (const p of fallingPowerUps) {
+          for (const p of stateFalling) {
             const nyPU = p.y + p.dy;
             // check catch by paddle
             const caught =
-                nyPU + p.size / 2 >= paddle.y &&
-                nyPU - p.size / 2 <= paddle.y + paddle.height &&
+                nyPU + p.size / 2 >= statePaddle.y &&
+                nyPU - p.size / 2 <= statePaddle.y + statePaddle.height &&
                 p.x + p.size / 2 >= newPx &&
-                p.x - p.size / 2 <= newPx + paddle.width;
+                p.x - p.size / 2 <= newPx + statePaddle.width;
             if (caught) {
               // apply/refresh modifier
               const now = Date.now();
@@ -717,6 +852,7 @@ export default function BreakoutGame() {
                 endTime: now + POWERUP_DURATION_MS,
               };
               setActiveModifier(next);
+              activeRef.current = next;
               soundManager.playSound("powerUp");
               continue; // consumed
             }
@@ -724,17 +860,14 @@ export default function BreakoutGame() {
               updated.push({...p, y: nyPU});
             }
           }
-          if (updated.length !== fallingPowerUps.length) {
-            setFallingPowerUps(updated);
-          } else if (updated.length) {
-            // still assign to trigger redraw positions occasionally
-            setFallingPowerUps(updated);
-          }
+          setFallingPowerUps(updated);
+          fallingRef.current = updated;
         }
 
         // expire active modifier
-        if (activeModifier && Date.now() > activeModifier.endTime) {
+        if (activeRef.current && Date.now() > activeRef.current.endTime) {
           setActiveModifier(null);
+          activeRef.current = null;
         }
       }
 
@@ -742,24 +875,7 @@ export default function BreakoutGame() {
     };
     raf = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(raf);
-  }, [
-    activeModifier,
-    ball,
-    bricks,
-    fallingPowerUps,
-    gameOver,
-    gameStarted,
-    initLevel,
-    isPaused,
-    lives,
-    paddle.height,
-    paddle.width,
-    paddle.x,
-    paddle.y,
-    level,
-    score,
-    showLevelComplete,
-  ]);
+  }, []);
 
   // High score
   useEffect(() => {
