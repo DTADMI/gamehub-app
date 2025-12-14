@@ -355,6 +355,60 @@ jobs:
           gcloud auth list --filter=status:ACTIVE --format='value(account)' | sed 's/$/ (active)/' >> $GITHUB_STEP_SUMMARY || true
           echo "gcloud project: $(gcloud config get-value core/project 2>/dev/null || echo '(unset)')" >> $GITHUB_STEP_SUMMARY
 
+      - name: Determine runtime service account for Cloud Run
+        id: runtime-sa
+        env:
+          PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          OVERRIDE_SA: ${{ vars.CLOUD_RUN_SERVICE_ACCOUNT }}
+        run: |
+          set -e
+          # Caller (deploy identity)
+          CALLER=$(gcloud config get-value account 2>/dev/null || true)
+          echo "CALLER_SA=$CALLER" >> $GITHUB_ENV
+
+          # Compute Project Number (needed for Compute Default SA)
+          PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)')
+          echo "PROJECT_NUMBER=$PROJECT_NUMBER" >> $GITHUB_ENV
+
+          # Decide runtime service account
+          if [ -n "$OVERRIDE_SA" ]; then
+            RUNTIME_SA="$OVERRIDE_SA"
+            SOURCE="override (vars.CLOUD_RUN_SERVICE_ACCOUNT)"
+          else
+            RUNTIME_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+            SOURCE="default (Compute Engine default SA)"
+          fi
+          echo "RUNTIME_SA=$RUNTIME_SA" >> $GITHUB_ENV
+
+          # Summarize
+          {
+            echo "### Cloud Run Runtime Identity"
+            echo "- Selected runtime SA: $RUNTIME_SA"
+            echo "- Source: $SOURCE"
+            echo "- Deployer (caller) account: $CALLER"
+          } >> $GITHUB_STEP_SUMMARY
+
+      - name: Preflight check — iam.serviceAccounts.actAs permission
+        env:
+          RUNTIME_SA: ${{ env.RUNTIME_SA }}
+          CALLER_SA: ${{ env.CALLER_SA }}
+        run: |
+          set +e
+          echo "Checking if caller can actAs: $CALLER_SA -> $RUNTIME_SA" >> $GITHUB_STEP_SUMMARY
+          # Try to read the IAM policy and detect Service Account User binding
+          POLICY_JSON=$(gcloud iam service-accounts get-iam-policy "$RUNTIME_SA" --format=json 2>/dev/null)
+          if [ -n "$POLICY_JSON" ]; then
+            HAS_BINDING=$(echo "$POLICY_JSON" | grep -E 'roles/iam.serviceAccountUser' -A2 | grep -F "serviceAccount:$CALLER_SA" >/dev/null && echo true || echo false)
+            echo "- Has roles/iam.serviceAccountUser on runtime SA for caller: $HAS_BINDING" >> $GITHUB_STEP_SUMMARY
+            if [ "$HAS_BINDING" != "true" ]; then
+              echo "❗ Missing actAs permission. A project owner can grant it with:" >> $GITHUB_STEP_SUMMARY
+              echo "  gcloud iam service-accounts add-iam-policy-binding \"$RUNTIME_SA\" \">> $GITHUB_STEP_SUMMARY
+              echo "    --member=\"serviceAccount:$CALLER_SA\" --role=roles/iam.serviceAccountUser" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "- Could not read IAM policy for $RUNTIME_SA (insufficient permission); continuing" >> $GITHUB_STEP_SUMMARY
+          fi
+
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
 
@@ -388,6 +442,7 @@ jobs:
             --platform=managed \
             --allow-unauthenticated \
             --port=3000 \
+            --service-account="${{ env.RUNTIME_SA }}" \
             --set-env-vars NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
 
   test-e2e:
