@@ -10,8 +10,22 @@ interface Card {
 }
 
 const EMOJIS = [
-    "🍎", "🍌", "🍇", "🍉", "🍓", "🍒", "🍍", "🥝",
-    "🍑", "🥥", "🍋", "🫐", "🍊", "🥕", "🌽", "🍆",
+    "🍎",
+    "🍌",
+    "🍇",
+    "🍉",
+    "🍓",
+    "🍒",
+    "🍍",
+    "🥝",
+    "🍑",
+    "🥥",
+    "🍋",
+    "🫐",
+    "🍊",
+    "🥕",
+    "🌽",
+    "🍆",
 ];
 const MAX_PAIRS = 12; // supports up to hard mode
 const CARD_VALUES = Array.from({length: MAX_PAIRS}, (_, i) => i + 1);
@@ -25,7 +39,8 @@ export const MemoryGame: React.FC = () => {
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">(
       "medium",
   );
-    const [autoCompleteLastPair, setAutoCompleteLastPair] = useState<boolean>(true);
+    const [autoCompleteLastPair, setAutoCompleteLastPair] =
+        useState<boolean>(true);
 
   // Initialize game
   const initializeGame = useCallback(() => {
@@ -104,8 +119,12 @@ export const MemoryGame: React.FC = () => {
 
     // Auto-complete UX: when only two unmatched cards remain, auto-flip them and count as one move
     useEffect(() => {
-        if (!autoCompleteLastPair || gameOver || isProcessing) return;
-        if (cards.length === 0) return;
+        if (!autoCompleteLastPair || gameOver || isProcessing) {
+            return;
+        }
+        if (cards.length === 0) {
+            return;
+        }
         const unmatched = cards
             .map((c, i) => (c.isMatched ? -1 : i))
             .filter((i) => i >= 0);
@@ -116,7 +135,9 @@ export const MemoryGame: React.FC = () => {
             soundManager.playSound("cardFlip");
             setCards((prev) =>
                 prev.map((c, i) =>
-                    i === unmatched[0] || i === unmatched[1] ? {...c, isFlipped: true} : c,
+                    i === unmatched[0] || i === unmatched[1]
+                        ? {...c, isFlipped: true}
+                        : c,
                 ),
             );
             setTimeout(() => {
@@ -125,7 +146,13 @@ export const MemoryGame: React.FC = () => {
                 setTimeout(() => setIsProcessing(false), 50);
             }, 200);
         }
-    }, [autoCompleteLastPair, cards, flippedIndices.length, gameOver, isProcessing]);
+    }, [
+        autoCompleteLastPair,
+        cards,
+        flippedIndices.length,
+        gameOver,
+        isProcessing,
+    ]);
 
   // Handle card click
   const handleCardClick = (index: number) => {
@@ -160,9 +187,15 @@ export const MemoryGame: React.FC = () => {
 
     // Calculate score and pairs in play
   const score = cards.filter((card) => card.isMatched).length / 2;
-    const pairsInPlay = useMemo(() => cards.length / 2 || (difficulty === "easy" ? 6 : difficulty === "medium" ? 8 : 12), [cards.length, difficulty]);
+    const pairsInPlay = useMemo(
+        () =>
+            cards.length / 2 ||
+            (difficulty === "easy" ? 6 : difficulty === "medium" ? 8 : 12),
+        [cards.length, difficulty],
+    );
 
-    const getEmojiForValue = (value: number) => EMOJIS[(value - 1) % EMOJIS.length];
+    const getEmojiForValue = (value: number) =>
+        EMOJIS[(value - 1) % EMOJIS.length];
 
   return (
     <GameContainer
@@ -173,7 +206,9 @@ export const MemoryGame: React.FC = () => {
           {/* Controls */}
           <div className="mb-6 flex flex-col sm:flex-row items-center justify-center gap-4 text-center">
               <div>
-                  <label className="mr-2 text-gray-700 dark:text-gray-300">Difficulty:</label>
+                  <label className="mr-2 text-gray-700 dark:text-gray-300">
+                      Difficulty:
+                  </label>
                   <select
                       value={difficulty}
                       onChange={(e) =>
@@ -220,7 +255,10 @@ export const MemoryGame: React.FC = () => {
                 ${card.isMatched ? "opacity-80" : ""}
               `}
               style={{
-                  transform: card.isFlipped || card.isMatched ? "rotateY(180deg)" : "rotateY(0)",
+                  transform:
+                      card.isFlipped || card.isMatched
+                          ? "rotateY(180deg)"
+                          : "rotateY(0)",
               }}
             >
                 {/* Back */}
@@ -229,10 +267,9 @@ export const MemoryGame: React.FC = () => {
                     ✨
                 </div>
                 {/* Front */}
-              <div
-                  className="absolute inset-0 rounded-xl bg-white dark:bg-gray-800 flex items-center justify-center text-4xl [transform:rotateY(180deg)] [backface-visibility:hidden]"
-              >
-                  <span aria-hidden>{getEmojiForValue(card.value)}</span>
+                <div
+                    className="absolute inset-0 rounded-xl bg-white dark:bg-gray-800 flex items-center justify-center text-4xl [transform:rotateY(180deg)] [backface-visibility:hidden]">
+                    <span aria-hidden>{getEmojiForValue(card.value)}</span>
               </div>
             </div>
           ))}

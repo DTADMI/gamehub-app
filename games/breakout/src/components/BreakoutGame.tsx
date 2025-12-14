@@ -1,7 +1,7 @@
 "use client";
 
-import React, {useCallback, useEffect, useRef, useState} from "react";
 import {GameContainer, soundManager} from "@games/shared";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 
 // Minimal, stable MVP implementation for Breakout
 // Constants (logical canvas size; we apply DPR scaling in a resize handler)
@@ -62,7 +62,8 @@ type Paddle = {
 
 const COLORS = ["#ef4444", "#f59e0b", "#10b981", "#3b82f6", "#a855f7"];
 
-const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
+const clamp = (v: number, min: number, max: number) =>
+    Math.max(min, Math.min(max, v));
 
 // Power-ups (Phase 1: timed Slow/Fast)
 type PowerUpType = "slow" | "fast";
@@ -91,7 +92,9 @@ function pickWeightedPowerUp(current: ActiveModifier): PowerUpType {
   const sum = weights.reduce((a, b) => a + b.w, 0) || 1;
   let r = Math.random() * sum;
   for (const item of weights) {
-    if (r < item.w) return item.t;
+    if (r < item.w) {
+      return item.t;
+    }
     r -= item.w;
   }
   return "fast";
@@ -101,7 +104,8 @@ function desiredSpeedFromModifier(mod: ActiveModifier, level: number): number {
   // Gentle level-based ramp: +5% per level, capped at +30%
   const levelRamp = 1 + Math.min(Math.max(0, level - 1) * 0.05, 0.3);
   const base = BASE_BALL_SPEED * levelRamp;
-  const factor = mod?.type === "fast" ? FAST_FACTOR : mod?.type === "slow" ? SLOW_FACTOR : 1;
+  const factor =
+      mod?.type === "fast" ? FAST_FACTOR : mod?.type === "slow" ? SLOW_FACTOR : 1;
   return clamp(base * factor, MIN_BALL_SPEED, MAX_BALL_SPEED);
 }
 
@@ -169,7 +173,9 @@ export default function BreakoutGame() {
           y: brickY,
           width: BRICK_WIDTH,
           height: BRICK_HEIGHT,
-          color: isTough ? "#ea580c" /* orange-600 for tough */ : COLORS[colorIndex],
+          color: isTough
+              ? "#ea580c" /* orange-600 for tough */
+              : COLORS[colorIndex],
           points,
           health,
         };
@@ -209,10 +215,14 @@ export default function BreakoutGame() {
   // Resize handling for crisp canvas on DPR screens
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {
+      return;
+    }
     const handleResize = () => {
       const container = canvas.parentElement;
-      if (!container) return;
+      if (!container) {
+        return;
+      }
       const containerWidth = container.clientWidth;
       const scale = Math.min(containerWidth / CANVAS_WIDTH, 1);
       canvas.style.width = `${CANVAS_WIDTH * scale}px`;
@@ -241,8 +251,11 @@ export default function BreakoutGame() {
       const key = e.key.toLowerCase();
       if (e.code === "Space") {
         e.preventDefault();
-        if (!gameStarted) startGame();
-        else setIsPaused((p) => !p);
+        if (!gameStarted) {
+          startGame();
+        } else {
+          setIsPaused((p) => !p);
+        }
         return;
       }
       if (e.key === "ArrowLeft" || key === "a") {
@@ -256,37 +269,60 @@ export default function BreakoutGame() {
     };
     const up = (e: KeyboardEvent) => {
       const key = e.key.toLowerCase();
-      if (e.key === "ArrowLeft" || key === "a") keysDownRef.current.delete("left");
-      if (e.key === "ArrowRight" || key === "d") keysDownRef.current.delete("right");
+      if (e.key === "ArrowLeft" || key === "a") {
+        keysDownRef.current.delete("left");
+      }
+      if (e.key === "ArrowRight" || key === "d") {
+        keysDownRef.current.delete("right");
+      }
     };
     document.addEventListener("keydown", down, {capture: true});
     document.addEventListener("keyup", up, {capture: true});
     return () => {
-      document.removeEventListener("keydown", down as any, {capture: true} as any);
-      document.removeEventListener("keyup", up as any, {capture: true} as any);
+      document.removeEventListener(
+          "keydown",
+          down as any,
+          {capture: true} as any,
+      );
+      document.removeEventListener(
+          "keyup",
+          up as any,
+          {capture: true} as any,
+      );
     };
   }, [gameStarted, startGame]);
 
   // Pointer/touch input
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {
+      return;
+    }
     (canvas.style as any).touchAction = "none";
     const moveTo = (clientX: number) => {
       const rect = canvas.getBoundingClientRect();
-      const x = ((clientX - rect.left) / rect.width) * CANVAS_WIDTH - paddle.width / 2;
+      const x =
+          ((clientX - rect.left) / rect.width) * CANVAS_WIDTH - paddle.width / 2;
       const clamped = clamp(x, 0, CANVAS_WIDTH - paddle.width);
       setPaddle((prev) => ({...prev, x: clamped}));
       paddleXRef.current = clamped;
     };
     const onMouseMove = (e: MouseEvent) => !isPaused && moveTo(e.clientX);
     const onTouchMove = (e: TouchEvent) => {
-      if (isPaused) return;
+      if (isPaused) {
+        return;
+      }
       e.preventDefault();
-      if (e.touches?.length) moveTo(e.touches[0].clientX);
+      if (e.touches?.length) {
+        moveTo(e.touches[0].clientX);
+      }
     };
     canvas.addEventListener("mousemove", onMouseMove as any);
-    canvas.addEventListener("touchmove", onTouchMove as any, {passive: false} as any);
+    canvas.addEventListener(
+        "touchmove",
+        onTouchMove as any,
+        {passive: false} as any,
+    );
     return () => {
       canvas.removeEventListener("mousemove", onMouseMove as any);
       canvas.removeEventListener("touchmove", onTouchMove as any);
@@ -296,9 +332,13 @@ export default function BreakoutGame() {
   // Animation loop
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {
+      return;
+    }
     const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    if (!ctx) {
+      return;
+    }
 
     let raf = 0;
 
@@ -311,21 +351,33 @@ export default function BreakoutGame() {
       // update paddle first for immediate response
       const down = keysDownRef.current;
       let dx = 0;
-      if (down.has("left")) dx -= PADDLE_SPEED;
-      if (down.has("right")) dx += PADDLE_SPEED;
-      let newPx = clamp((paddleXRef.current ?? paddle.x) + dx, 0, CANVAS_WIDTH - paddle.width);
+      if (down.has("left")) {
+        dx -= PADDLE_SPEED;
+      }
+      if (down.has("right")) {
+        dx += PADDLE_SPEED;
+      }
+      let newPx = clamp(
+          (paddleXRef.current ?? paddle.x) + dx,
+          0,
+          CANVAS_WIDTH - paddle.width,
+      );
       // Track paddle velocity (px per frame) for collision influence
       const paddleV = newPx - (lastPaddleXRef.current ?? newPx);
       lastPaddleXRef.current = newPx;
       paddleXRef.current = newPx;
-      if (newPx !== paddle.x) setPaddle((p) => ({...p, x: newPx}));
+      if (newPx !== paddle.x) {
+        setPaddle((p) => ({...p, x: newPx}));
+      }
 
       // draw paddle
       ctx.fillStyle = "#3498db";
       ctx.fillRect(newPx, paddle.y, paddle.width, paddle.height);
       // Expose paddleX for E2E via data attribute
       if (canvasRef.current) {
-        (canvasRef.current as HTMLCanvasElement).dataset.px = String(Math.round(newPx));
+        (canvasRef.current as HTMLCanvasElement).dataset.px = String(
+            Math.round(newPx),
+        );
       }
 
       // draw ball
@@ -338,7 +390,9 @@ export default function BreakoutGame() {
       // draw bricks
       for (const col of bricks) {
         for (const b of col) {
-          if (b.health <= 0) continue;
+          if (b.health <= 0) {
+            continue;
+          }
           // body
           ctx.fillStyle = b.color;
           ctx.fillRect(b.x, b.y, b.width, b.height);
@@ -392,7 +446,11 @@ export default function BreakoutGame() {
         ctx.fillStyle = "#fff";
         ctx.textAlign = "center";
         ctx.font = "20px Arial";
-        ctx.fillText("Press Space or Click to Start", CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+        ctx.fillText(
+            "Press Space or Click to Start",
+            CANVAS_WIDTH / 2,
+            CANVAS_HEIGHT / 2,
+        );
       } else if (isPaused) {
         ctx.fillStyle = "rgba(0,0,0,0.25)";
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -406,14 +464,22 @@ export default function BreakoutGame() {
         ctx.fillStyle = "#fff";
         ctx.textAlign = "center";
         ctx.font = "22px Arial";
-        ctx.fillText(`Level ${level} Complete!`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+        ctx.fillText(
+            `Level ${level} Complete!`,
+            CANVAS_WIDTH / 2,
+            CANVAS_HEIGHT / 2,
+        );
       } else if (gameOver) {
         ctx.fillStyle = "rgba(0,0,0,0.6)";
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         ctx.fillStyle = "#fff";
         ctx.textAlign = "center";
         ctx.font = "24px Arial";
-        ctx.fillText("Game Over — Press Space", CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+        ctx.fillText(
+            "Game Over — Press Space",
+            CANVAS_WIDTH / 2,
+            CANVAS_HEIGHT / 2,
+        );
       }
 
       // game updates
@@ -424,28 +490,40 @@ export default function BreakoutGame() {
         let ndx = ball.dx;
         let ndy = ball.dy;
 
-        // walls
-        if (nx + ball.radius > CANVAS_WIDTH || nx - ball.radius < 0) {
-          ndx = -ndx;
+        // walls — reflect AND clamp position inside bounds so the ball never leaves the canvas
+        if (nx + ball.radius > CANVAS_WIDTH) {
+          nx = CANVAS_WIDTH - ball.radius;
+          ndx = -Math.abs(ndx);
+          soundManager.playSound("wall");
+        } else if (nx - ball.radius < 0) {
+          nx = ball.radius;
+          ndx = Math.abs(ndx);
           soundManager.playSound("wall");
         }
         if (ny - ball.radius < 0) {
-          ndy = -ndy;
+          ny = ball.radius;
+          ndy = Math.abs(ndy);
           soundManager.playSound("wall");
         }
 
         // paddle
         if (
+            // require downward motion to avoid double-hitting from below
+            ball.dy > 0 &&
             ny + ball.radius > paddle.y &&
             ny - ball.radius < paddle.y + paddle.height &&
             nx + ball.radius > newPx &&
             nx - ball.radius < newPx + paddle.width
         ) {
           // Compute bounce angle relative to paddle center (0 is straight up)
-          const rel = ((nx - (newPx + paddle.width / 2)) / (paddle.width / 2)); // -1 .. 1
+          const rel = (nx - (newPx + paddle.width / 2)) / (paddle.width / 2); // -1 .. 1
           const baseAngle = clamp(rel, -1, 1) * MAX_BOUNCE_ANGLE; // -MAX..+MAX
           // Add a small influence based on paddle movement direction/speed this frame
-          const influence = clamp(paddleV * PADDLE_INFLUENCE, -MAX_INFLUENCE_ANGLE, MAX_INFLUENCE_ANGLE);
+          const influence = clamp(
+              paddleV * PADDLE_INFLUENCE,
+              -MAX_INFLUENCE_ANGLE,
+              MAX_INFLUENCE_ANGLE,
+          );
           let angle = baseAngle + influence;
           // Enforce a minimum horizontal angle away from vertical
           if (Math.abs(angle) < MIN_BOUNCE_ANGLE) {
@@ -459,13 +537,17 @@ export default function BreakoutGame() {
           if (Math.abs(tx) < MIN_HORIZ_COMPONENT) {
             const sign = tx >= 0 ? 1 : -1;
             const hx = MIN_HORIZ_COMPONENT * sign;
-            const hy = -Math.sign(ty || -1) * Math.sqrt(Math.max(0, speed * speed - hx * hx));
+            const hy =
+                -Math.sign(ty || -1) *
+                Math.sqrt(Math.max(0, speed * speed - hx * hx));
             ndx = hx;
             ndy = hy;
           } else {
             ndx = tx;
             ndy = ty;
           }
+          // Pop the ball just above the paddle to ensure it never gets embedded or appears below
+          ny = paddle.y - ball.radius - 0.01;
           soundManager.playSound("paddle");
         }
 
@@ -491,10 +573,14 @@ export default function BreakoutGame() {
         let hit = false;
         outer: for (let c = 0; c < nextBricks.length; c++) {
           const col = nextBricks[c];
-          if (!col) continue;
+          if (!col) {
+            continue;
+          }
           for (let r = 0; r < col.length; r++) {
             const b = col[r];
-            if (!b || b.health <= 0) continue;
+            if (!b || b.health <= 0) {
+              continue;
+            }
             if (
                 nx + ball.radius > b.x &&
                 nx - ball.radius < b.x + b.width &&
@@ -502,9 +588,19 @@ export default function BreakoutGame() {
                 ny - ball.radius < b.y + b.height
             ) {
               // choose axis by smaller overlap
-              const overlapX = Math.min(Math.abs(nx - (b.x + b.width)), Math.abs(nx - b.x));
-              const overlapY = Math.min(Math.abs(ny - (b.y + b.height)), Math.abs(ny - b.y));
-              if (overlapX < overlapY) ndx = -ndx; else ndy = -ndy;
+              const overlapX = Math.min(
+                  Math.abs(nx - (b.x + b.width)),
+                  Math.abs(nx - b.x),
+              );
+              const overlapY = Math.min(
+                  Math.abs(ny - (b.y + b.height)),
+                  Math.abs(ny - b.y),
+              );
+              if (overlapX < overlapY) {
+                ndx = -ndx;
+              } else {
+                ndy = -ndy;
+              }
               b.health -= 1;
               setScore((s) => s + b.points);
               // Sound feedback: hit vs break
@@ -518,7 +614,9 @@ export default function BreakoutGame() {
                 const shouldDrop = Math.random() < POWERUP_DROP_CHANCE;
                 if (shouldDrop) {
                   setFallingPowerUps((prev) => {
-                    if (prev.length >= POWERUP_MAX_FALLING) return prev;
+                    if (prev.length >= POWERUP_MAX_FALLING) {
+                      return prev;
+                    }
                     const type = pickWeightedPowerUp(activeModifier);
                     return [
                       ...prev,
@@ -538,11 +636,16 @@ export default function BreakoutGame() {
             }
           }
         }
-        if (hit) setBricks(nextBricks);
+        if (hit) {
+          setBricks(nextBricks);
+        }
 
         // Anti-stall: if horizontal component is too small after a bounce, gently nudge it
         const nowTs = Date.now();
-        if (Math.abs(ndx) < NUDGE_EPS && nowTs - (lastNudgeAtRef.current || 0) > NUDGE_COOLDOWN_MS) {
+        if (
+            Math.abs(ndx) < NUDGE_EPS &&
+            nowTs - (lastNudgeAtRef.current || 0) > NUDGE_COOLDOWN_MS
+        ) {
           const dir = nx < CANVAS_WIDTH / 2 ? 1 : -1; // push toward center-ish
           ndx = dir * NUDGE_AMOUNT;
           lastNudgeAtRef.current = nowTs;
@@ -558,11 +661,17 @@ export default function BreakoutGame() {
         // After normalization, still ensure a minimum horizontal component to avoid vertical traps
         if (Math.abs(ndx) < MIN_HORIZ_COMPONENT * 0.5) {
           const sign = ndx >= 0 ? 1 : -1;
-          const hx = (MIN_HORIZ_COMPONENT * 0.5) * sign;
-          const hy = -Math.sign(ndy || -1) * Math.sqrt(Math.max(0, target * target - hx * hx));
+          const hx = MIN_HORIZ_COMPONENT * 0.5 * sign;
+          const hy =
+              -Math.sign(ndy || -1) *
+              Math.sqrt(Math.max(0, target * target - hx * hx));
           ndx = hx;
           ndy = hy;
         }
+
+        // Final safety: clamp position inside the canvas so the ball never leaves visible bounds
+        nx = clamp(nx, ball.radius, CANVAS_WIDTH - ball.radius);
+        ny = clamp(ny, ball.radius, CANVAS_HEIGHT - ball.radius);
 
         setBall({x: nx, y: ny, dx: ndx, dy: ndy, radius: ball.radius});
         // Expose ball position for E2E
@@ -570,10 +679,15 @@ export default function BreakoutGame() {
           const el = canvasRef.current as HTMLCanvasElement;
           el.dataset.ballx = String(Math.round(nx));
           el.dataset.bally = String(Math.round(ny));
+          el.dataset.lives = String(lives);
         }
 
         // check level complete (robust against missing rows)
-        const remaining = nextBricks.reduce((acc, col) => acc + (col?.filter((b) => b && b.health > 0).length || 0), 0);
+        const remaining = nextBricks.reduce(
+            (acc, col) =>
+                acc + (col?.filter((b) => b && b.health > 0).length || 0),
+            0,
+        );
         if (nextBricks.length && remaining === 0) {
           setShowLevelComplete(true);
           soundManager.playSound("levelComplete");
@@ -598,7 +712,10 @@ export default function BreakoutGame() {
             if (caught) {
               // apply/refresh modifier
               const now = Date.now();
-              const next: ActiveModifier = {type: p.type, endTime: now + POWERUP_DURATION_MS};
+              const next: ActiveModifier = {
+                type: p.type,
+                endTime: now + POWERUP_DURATION_MS,
+              };
               setActiveModifier(next);
               soundManager.playSound("powerUp");
               continue; // consumed
@@ -625,17 +742,40 @@ export default function BreakoutGame() {
     };
     raf = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(raf);
-  }, [activeModifier, ball, bricks, fallingPowerUps, gameOver, gameStarted, initLevel, isPaused, lives, paddle.height, paddle.width, paddle.y, score, showLevelComplete]);
+  }, [
+    activeModifier,
+    ball,
+    bricks,
+    fallingPowerUps,
+    gameOver,
+    gameStarted,
+    initLevel,
+    isPaused,
+    lives,
+    paddle.height,
+    paddle.width,
+    paddle.x,
+    paddle.y,
+    level,
+    score,
+    showLevelComplete,
+  ]);
 
   // High score
   useEffect(() => {
-    if (score > highScore) setHighScore(score);
+    if (score > highScore) {
+      setHighScore(score);
+    }
   }, [score, highScore]);
 
   // Dispatch gameover event for leaderboard submission listeners
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (!gameOver) return;
+    if (typeof window === "undefined") {
+      return;
+    }
+    if (!gameOver) {
+      return;
+    }
     const detail = {score} as { score: number };
     try {
       window.dispatchEvent(new CustomEvent("breakout:gameover", {detail}));
@@ -646,7 +786,10 @@ export default function BreakoutGame() {
   }, [gameOver, score]);
 
   return (
-      <GameContainer title="Breakout" description="Break all the bricks with the ball and don't let it fall!">
+      <GameContainer
+          title="Breakout"
+          description="Break all the bricks with the ball and don't let it fall!"
+      >
       <div className="flex justify-center">
         <canvas
           ref={canvasRef}
@@ -686,14 +829,18 @@ export default function BreakoutGame() {
         </div>
 
         {!gameStarted && !gameOver && (
-            <button onClick={startGame}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <button
+                onClick={startGame}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
               Start Game
           </button>
         )}
         {gameStarted && (
-            <button onClick={() => setIsPaused((p) => !p)}
-                    className="ml-4 px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+            <button
+                onClick={() => setIsPaused((p) => !p)}
+                className="ml-4 px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            >
             {isPaused ? "Resume" : "Pause"}
           </button>
         )}
