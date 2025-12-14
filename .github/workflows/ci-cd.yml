@@ -10,7 +10,7 @@ on:
       force_deploy:
         description: "Force run Cloud Run deploy job even if GCP auto-detect says unavailable (for debugging)"
         required: false
-        default: "false"
+        default: "true"
         type: choice
         options: [ "false", "true" ]
 
