@@ -66,6 +66,34 @@ const COLORS = ["#ef4444", "#f59e0b", "#10b981", "#3b82f6", "#a855f7"];
 const clamp = (v: number, min: number, max: number) =>
     Math.max(min, Math.min(max, v));
 
+// Top-level brick factory (pure) to avoid effect dependencies in the game loop
+function buildBricks(lvl: number): Brick[][] {
+  const newBricks: Brick[][] = [];
+  for (let c = 0; c < BRICK_COLUMN_COUNT; c++) {
+    newBricks[c] = [] as Brick[];
+    for (let r = 0; r < BRICK_ROW_COUNT; r++) {
+      const brickX = c * (BRICK_WIDTH + BRICK_PADDING) + BRICK_OFFSET_LEFT;
+      const brickY = r * (BRICK_HEIGHT + BRICK_PADDING) + BRICK_OFFSET_TOP;
+      const colorIndex = Math.floor(Math.random() * COLORS.length);
+      const basePoints = (BRICK_ROW_COUNT - r) * 10 * Math.max(1, lvl);
+      const toughChance = Math.min(0.1 + (Math.max(1, lvl) - 2) * 0.04, 0.28);
+      const isTough = lvl >= 2 && Math.random() < toughChance;
+      const health = isTough ? 2 : 1;
+      const points = isTough ? basePoints * 2 : basePoints;
+      newBricks[c][r] = {
+        x: brickX,
+        y: brickY,
+        width: BRICK_WIDTH,
+        height: BRICK_HEIGHT,
+        color: isTough ? "#ea580c" : COLORS[colorIndex],
+        points,
+        health,
+      } as Brick;
+    }
+  }
+  return newBricks;
+}
+
 // Power-ups (Phase 1: timed Slow/Fast)
 type PowerUpType = "slow" | "fast";
 type FallingPowerUp = {
@@ -102,11 +130,14 @@ function pickWeightedPowerUp(current: ActiveModifier): PowerUpType {
   return "fast";
 }
 
-function desiredSpeedFromModifier(mod: ActiveModifier, level: number): number {
+function desiredSpeedFromModifier(
+    mod: ActiveModifier,
+    level: number,
+    slowFactor: number,
+): number {
   // Gentle level-based ramp: +5% per level, capped at +30%
   const levelRamp = 1 + Math.min(Math.max(0, level - 1) * 0.05, 0.3);
   const base = BASE_BALL_SPEED * levelRamp;
-  const slowFactor = slowFactorRef.current;
   const factor =
       mod?.type === "fast" ? FAST_FACTOR : mod?.type === "slow" ? slowFactor : 1;
   return clamp(base * factor, MIN_BALL_SPEED, MAX_BALL_SPEED);
@@ -172,37 +203,11 @@ export default function BreakoutGame() {
   // Input cache
   const keysDownRef = useRef<Set<string>>(new Set());
 
-  // Brick factory for a given level (shared by initLevel and level-up path)
-  const buildBricks = useCallback((lvl: number): Brick[][] => {
-    const newBricks: Brick[][] = [];
-    for (let c = 0; c < BRICK_COLUMN_COUNT; c++) {
-      newBricks[c] = [] as Brick[];
-      for (let r = 0; r < BRICK_ROW_COUNT; r++) {
-        const brickX = c * (BRICK_WIDTH + BRICK_PADDING) + BRICK_OFFSET_LEFT;
-        const brickY = r * (BRICK_HEIGHT + BRICK_PADDING) + BRICK_OFFSET_TOP;
-        const colorIndex = Math.floor(Math.random() * COLORS.length);
-        const basePoints = (BRICK_ROW_COUNT - r) * 10 * Math.max(1, lvl);
-        const toughChance = Math.min(0.1 + (Math.max(1, lvl) - 2) * 0.04, 0.28);
-        const isTough = lvl >= 2 && Math.random() < toughChance;
-        const health = isTough ? 2 : 1;
-        const points = isTough ? basePoints * 2 : basePoints;
-        newBricks[c][r] = {
-          x: brickX,
-          y: brickY,
-          width: BRICK_WIDTH,
-          height: BRICK_HEIGHT,
-          color: isTough ? "#ea580c" : COLORS[colorIndex],
-          points,
-          health,
-        } as Brick;
-      }
-    }
-    return newBricks;
-  }, []);
+  // Brick factory moved to top-level helper to avoid effect deps; see below usage
 
   // Initialize or reinitialize a level
   const initLevel = useCallback(() => {
-    const newBricks = buildBricks(levelRef.current || level);
+    const newBricks = buildBricks(levelRef.current || 1);
     setBricks(newBricks);
     bricksRef.current = newBricks;
 
@@ -229,7 +234,7 @@ export default function BreakoutGame() {
       return np;
     });
     paddleXRef.current = (CANVAS_WIDTH - PADDLE_WIDTH) / 2;
-  }, [buildBricks, level]);
+  }, []);
 
   const startGame = useCallback(() => {
     setScore(0);
@@ -604,11 +609,11 @@ export default function BreakoutGame() {
             stateBall.dy > 0 &&
             ny + stateBall.radius > statePaddle.y &&
             ny - stateBall.radius < statePaddle.y + statePaddle.height &&
-            nx + ball.radius > newPx &&
-            nx - ball.radius < newPx + statePaddle.width
+            nx + stateBall.radius > newPx &&
+            nx - stateBall.radius < newPx + statePaddle.width
         ) {
           // Compute bounce angle relative to paddle center (0 is straight up)
-          const rel = (nx - (newPx + paddle.width / 2)) / (paddle.width / 2); // -1 .. 1
+          const rel = (nx - (newPx + statePaddle.width / 2)) / (statePaddle.width / 2); // -1 .. 1
           const baseAngle = clamp(rel, -1, 1) * MAX_BOUNCE_ANGLE; // -MAX..+MAX
           // Add a small influence based on paddle movement direction/speed this frame
           const influence = clamp(
@@ -759,7 +764,11 @@ export default function BreakoutGame() {
         }
 
         // normalize ball speed based on active modifier
-        const target = desiredSpeedFromModifier(activeRef.current, stateLevel);
+        const target = desiredSpeedFromModifier(
+            activeRef.current,
+            stateLevel,
+            slowFactorRef.current,
+        );
         const len = Math.sqrt(ndx * ndx + ndy * ndy) || 1;
         const scale = target / len;
         ndx *= scale;
