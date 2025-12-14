@@ -5,8 +5,9 @@ import React, {useCallback, useEffect, useRef, useState} from "react";
 
 // Minimal, stable MVP implementation for Breakout
 // Constants (logical canvas size; we apply DPR scaling in a resize handler)
-const CANVAS_WIDTH = 480;
-const CANVAS_HEIGHT = 320;
+// Increased canvas size to improve play area and match earlier screenshots
+const CANVAS_WIDTH = 640;
+const CANVAS_HEIGHT = 420;
 
 const PADDLE_WIDTH = 75;
 const PADDLE_HEIGHT = 10;
@@ -94,8 +95,8 @@ function buildBricks(lvl: number): Brick[][] {
   return newBricks;
 }
 
-// Power-ups (Phase 1: timed Slow/Fast)
-type PowerUpType = "slow" | "fast";
+// Power-ups (Phase 1+: timed Slow/Fast + Sticky)
+type PowerUpType = "slow" | "fast" | "sticky";
 type FallingPowerUp = {
   x: number;
   y: number;
@@ -115,9 +116,11 @@ const SLOW_FACTOR_MOBILE = 0.82; // less harsh slow on mobile for better feel
 function pickWeightedPowerUp(current: ActiveModifier): PowerUpType {
   // Slow is rarer and skipped if already active
   const allowSlow = !(current && current.type === "slow");
+  const allowSticky = !(current && current.type === "sticky");
   const weights: Array<{ t: PowerUpType; w: number }> = [
-    {t: "fast", w: 0.7},
-    {t: "slow", w: allowSlow ? 0.3 : 0},
+    {t: "fast", w: 0.6},
+    {t: "slow", w: allowSlow ? 0.25 : 0},
+    {t: "sticky", w: allowSticky ? 0.15 : 0},
   ];
   const sum = weights.reduce((a, b) => a + b.w, 0) || 1;
   let r = Math.random() * sum;
@@ -199,6 +202,9 @@ export default function BreakoutGame() {
   const [activeModifier, setActiveModifier] = useState<ActiveModifier>(null);
   const fallingRef = useRef<FallingPowerUp[]>([]);
   const activeRef = useRef<ActiveModifier>(null);
+  // Sticky capture state
+  const stickyStateRef = useRef<{ captured: boolean; offset: number; capturedAt: number } | null>(null);
+  const stickyReleasePendingRef = useRef<boolean>(false);
 
   // Input cache
   const keysDownRef = useRef<Set<string>>(new Set());
@@ -300,6 +306,10 @@ export default function BreakoutGame() {
           setIsPaused((p) => !p);
         }
         return;
+      }
+      if (e.key === "ArrowUp") {
+        // release sticky ball if held
+        stickyReleasePendingRef.current = true;
       }
       if (e.key === "ArrowLeft" || key === "a") {
         e.preventDefault();
@@ -436,9 +446,10 @@ export default function BreakoutGame() {
       const over = gameOverRef.current;
       const levelDone = showLevelCompleteRef.current;
 
-      // background
+      // background (theme-aware: light canvas on dark theme, dark canvas on light theme)
       ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-      ctx.fillStyle = "#0f172a";
+      const isDark = typeof document !== "undefined" && document.documentElement.classList.contains("dark");
+      ctx.fillStyle = isDark ? "#ffffff" : "#0f172a";
       ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
       // update paddle first for immediate response
@@ -480,7 +491,7 @@ export default function BreakoutGame() {
       // draw ball
       ctx.beginPath();
       ctx.arc(stateBall.x, stateBall.y, stateBall.radius, 0, Math.PI * 2);
-      ctx.fillStyle = "#e74c3c";
+      ctx.fillStyle = isDark ? "#e11d48" : "#e74c3c";
       ctx.fill();
       ctx.closePath();
 
@@ -513,12 +524,13 @@ export default function BreakoutGame() {
           ctx.fillStyle = "#0f172a";
           ctx.font = "10px Arial";
           ctx.textAlign = "center";
-          ctx.fillText(p.type === "fast" ? "F" : "S", p.x, p.y + 3);
+          const letter = p.type === "fast" ? "F" : p.type === "slow" ? "S" : "G";
+          ctx.fillText(letter, p.x, p.y + 3);
         }
       }
 
       // HUD (minimal)
-      ctx.fillStyle = "#fff";
+      ctx.fillStyle = isDark ? "#111827" : "#fff";
       ctx.font = "12px Arial";
       ctx.textAlign = "left";
       ctx.fillText(`Score: ${scoreRef.current}`, 8, 8);
@@ -530,9 +542,14 @@ export default function BreakoutGame() {
         const now = Date.now();
         const remaining = Math.max(0, stateActive.endTime - now);
         const secs = Math.ceil(remaining / 1000);
-        const label = stateActive.type === "fast" ? "FAST" : "SLOW";
+        const label = stateActive.type === "fast" ? "FAST" : stateActive.type === "slow" ? "SLOW" : "STICKY";
         ctx.textAlign = "center";
-        ctx.fillStyle = stateActive.type === "fast" ? "#22c55e" : "#f59e0b";
+        ctx.fillStyle =
+            stateActive.type === "fast"
+                ? "#22c55e"
+                : stateActive.type === "slow"
+                    ? "#f59e0b"
+                    : "#8b5cf6";
         ctx.fillText(`${label} ${secs}s`, CANVAS_WIDTH / 2, 8);
       }
 
@@ -540,7 +557,7 @@ export default function BreakoutGame() {
       if (!started) {
         ctx.fillStyle = "rgba(0,0,0,0.2)";
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-        ctx.fillStyle = "#fff";
+        ctx.fillStyle = isDark ? "#111827" : "#fff";
         ctx.textAlign = "center";
         ctx.font = "20px Arial";
         ctx.fillText(
@@ -551,14 +568,14 @@ export default function BreakoutGame() {
       } else if (paused) {
         ctx.fillStyle = "rgba(0,0,0,0.25)";
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-        ctx.fillStyle = "#fff";
+        ctx.fillStyle = isDark ? "#111827" : "#fff";
         ctx.textAlign = "center";
         ctx.font = "20px Arial";
         ctx.fillText("Paused (Space)", CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
       } else if (levelDone) {
         ctx.fillStyle = "rgba(0,0,0,0.4)";
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-        ctx.fillStyle = "#fff";
+        ctx.fillStyle = isDark ? "#111827" : "#fff";
         ctx.textAlign = "center";
         ctx.font = "22px Arial";
         ctx.fillText(
@@ -569,7 +586,7 @@ export default function BreakoutGame() {
       } else if (over) {
         ctx.fillStyle = "rgba(0,0,0,0.6)";
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-        ctx.fillStyle = "#fff";
+        ctx.fillStyle = isDark ? "#111827" : "#fff";
         ctx.textAlign = "center";
         ctx.font = "24px Arial";
         ctx.fillText(
@@ -586,6 +603,49 @@ export default function BreakoutGame() {
         let ny = stateBall.y + stateBall.dy;
         let ndx = stateBall.dx;
         let ndy = stateBall.dy;
+
+        // If sticky captured, follow paddle until release
+        const sticky = stickyStateRef.current;
+        if (sticky && sticky.captured) {
+          const center = newPx + statePaddle.width / 2;
+          nx = center + sticky.offset;
+          ny = statePaddle.y - stateBall.radius - 0.01;
+          ndx = 0;
+          ndy = 0;
+          // Check release input or timeout
+          const now = Date.now();
+          if (stickyReleasePendingRef.current || now - sticky.capturedAt > 1500) {
+            // release upwards with slight angle from offset and paddle velocity
+            stickyReleasePendingRef.current = false;
+            const angleBase = clamp(sticky.offset / (statePaddle.width / 2), -1, 1) * MAX_BOUNCE_ANGLE;
+            const influence = clamp(
+                (newPx - (lastPaddleXRef.current ?? newPx)) * paddleInfluenceRef.current,
+                -MAX_INFLUENCE_ANGLE,
+                MAX_INFLUENCE_ANGLE,
+            );
+            let angle = angleBase + influence;
+            if (Math.abs(angle) < MIN_BOUNCE_ANGLE) {
+              angle = angle >= 0 ? MIN_BOUNCE_ANGLE : -MIN_BOUNCE_ANGLE;
+            }
+            const target = desiredSpeedFromModifier(activeRef.current, stateLevel, slowFactorRef.current);
+            ndx = target * Math.sin(angle);
+            ndy = -target * Math.cos(angle);
+            stickyStateRef.current = {captured: false, offset: 0, capturedAt: 0};
+          } else {
+            // while held, update ball and skip rest of physics except power-ups fall
+            const updatedBallWhileHeld: Ball = {x: nx, y: ny, dx: ndx, dy: ndy, radius: stateBall.radius};
+            setBall(updatedBallWhileHeld);
+            ballRef.current = updatedBallWhileHeld;
+            // Expose data attrs
+            if (canvasRef.current) {
+              const el = canvasRef.current as HTMLCanvasElement;
+              el.dataset.ballx = String(Math.round(nx));
+              el.dataset.bally = String(Math.round(ny));
+              el.dataset.lives = String(livesRef.current || 0);
+            }
+            // We still update falling power-ups and expiry timers below, so continue to that section
+          }
+        }
 
         // walls — reflect AND clamp position inside bounds so the ball never leaves the canvas
         if (nx + stateBall.radius > CANVAS_WIDTH) {
@@ -612,6 +672,17 @@ export default function BreakoutGame() {
             nx + stateBall.radius > newPx &&
             nx - stateBall.radius < newPx + statePaddle.width
         ) {
+          // If sticky modifier is active, capture the ball instead of bouncing
+          if (activeRef.current && activeRef.current.type === "sticky" && !(stickyStateRef.current?.captured)) {
+            const center = newPx + statePaddle.width / 2;
+            const offset = nx - center;
+            stickyStateRef.current = {captured: true, offset, capturedAt: Date.now()};
+            nx = center + offset;
+            ny = statePaddle.y - stateBall.radius - 0.01;
+            ndx = 0;
+            ndy = 0;
+            soundManager.playSound("paddle");
+          } else {
           // Compute bounce angle relative to paddle center (0 is straight up)
           const rel = (nx - (newPx + statePaddle.width / 2)) / (statePaddle.width / 2); // -1 .. 1
           const baseAngle = clamp(rel, -1, 1) * MAX_BOUNCE_ANGLE; // -MAX..+MAX
@@ -646,6 +717,7 @@ export default function BreakoutGame() {
           // Pop the ball just above the paddle to ensure it never gets embedded or appears below
           ny = statePaddle.y - stateBall.radius - 0.01;
           soundManager.playSound("paddle");
+          }
         }
 
         // bottom
@@ -763,7 +835,7 @@ export default function BreakoutGame() {
           lastNudgeAtRef.current = nowTs;
         }
 
-        // normalize ball speed based on active modifier
+        // normalize ball speed based on active modifier (no-op while sticky captured)
         const target = desiredSpeedFromModifier(
             activeRef.current,
             stateLevel,
@@ -862,6 +934,10 @@ export default function BreakoutGame() {
               };
               setActiveModifier(next);
               activeRef.current = next;
+              // clear sticky state on mode change
+              if (p.type !== "sticky") {
+                stickyStateRef.current = {captured: false, offset: 0, capturedAt: 0};
+              }
               soundManager.playSound("powerUp");
               continue; // consumed
             }
@@ -877,6 +953,7 @@ export default function BreakoutGame() {
         if (activeRef.current && Date.now() > activeRef.current.endTime) {
           setActiveModifier(null);
           activeRef.current = null;
+          stickyStateRef.current = {captured: false, offset: 0, capturedAt: 0};
         }
       }
 
@@ -928,6 +1005,9 @@ export default function BreakoutGame() {
             if (!gameStarted) {
               setGameStarted(true);
               soundManager.playMusic("background");
+            } else {
+              // If sticky captured, clicking releases as well
+              stickyReleasePendingRef.current = true;
             }
           }}
         />
@@ -979,6 +1059,34 @@ export default function BreakoutGame() {
           <li>• Break all bricks to advance</li>
         </ul>
       </div>
+
+        <div className="mt-6">
+          <h3 className="text-lg font-semibold mb-2">Power-Ups</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-sm">
+            <div className="rounded-md px-3 py-2 bg-blue-100 text-blue-900 dark:bg-blue-900/30 dark:text-blue-100">
+              <div className="font-semibold">Expand</div>
+              <div className="opacity-80">Wider paddle</div>
+            </div>
+            <div className="rounded-md px-3 py-2 bg-rose-100 text-rose-900 dark:bg-rose-900/30 dark:text-rose-100">
+              <div className="font-semibold">Shrink</div>
+              <div className="opacity-80">Smaller paddle</div>
+            </div>
+            <div className="rounded-md px-3 py-2 bg-amber-100 text-amber-900 dark:bg-amber-900/30 dark:text-amber-100">
+              <div className="font-semibold">Slow</div>
+              <div className="opacity-80">Slower ball (timed)</div>
+            </div>
+            <div
+                className="rounded-md px-3 py-2 bg-violet-100 text-violet-900 dark:bg-violet-900/30 dark:text-violet-100">
+              <div className="font-semibold">Multiball</div>
+              <div className="opacity-80">Extra balls</div>
+            </div>
+            <div
+                className="rounded-md px-3 py-2 bg-fuchsia-100 text-fuchsia-900 dark:bg-fuchsia-900/30 dark:text-fuchsia-100">
+              <div className="font-semibold">Sticky</div>
+              <div className="opacity-80">Ball sticks; press ↑ or click to release</div>
+            </div>
+          </div>
+        </div>
     </GameContainer>
   );
 }

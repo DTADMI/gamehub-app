@@ -47,6 +47,18 @@ export const GAMES: Game[] = [
     component: "TetrisGame",
   },
 
+  // New: Space Invasion (upcoming)
+  {
+    id: "space-invasion",
+    title: "Space Invasion",
+    description: "Blast incoming alien waves and dodge projectiles.",
+    image: "/placeholder.svg",
+    tags: ["Arcade", "Shooter"],
+    featured: false, // will switch to true when MVP is playable
+    route: "/games/space-invasion",
+    component: "SpaceInvasionGame",
+  },
+
   // Puzzles & Casual
   {
     id: "memory",
