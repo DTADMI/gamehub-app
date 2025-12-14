@@ -295,27 +295,51 @@ jobs:
           docker images
 
       - name: GCP auth inputs summary
+        id: gcp-auth-inputs
         env:
-          SA_PRESENT: ${{ secrets.GCP_SA_KEY != '' }}
-          WIF_PROVIDER_PRESENT: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER != '' }}
-          WIF_SA_PRESENT: ${{ secrets.GCP_SERVICE_ACCOUNT != '' }}
+          SA_JSON: ${{ secrets.GCP_SA_KEY }}
+          WIF_PROVIDER: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          WIF_SA_EMAIL: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          PROJ: ${{ secrets.GCP_PROJECT_ID }}
+          REGION: ${{ secrets.GCP_REGION }}
         run: |
+          # Derive boolean flags inside the runner from provided envs (which carry secrets)
+          SA_PRESENT=false
+          [ -n "$SA_JSON" ] && SA_PRESENT=true
+          WIF_PROVIDER_PRESENT=false
+          [ -n "$WIF_PROVIDER" ] && WIF_PROVIDER_PRESENT=true
+          WIF_SA_PRESENT=false
+          [ -n "$WIF_SA_EMAIL" ] && WIF_SA_PRESENT=true
+
+          # Compute HAS_WIF and HAS_SA
+          if [ "$WIF_PROVIDER_PRESENT" = "true" ] && [ "$WIF_SA_PRESENT" = "true" ]; then
+            echo "HAS_WIF=true" >> $GITHUB_ENV
+          else
+            echo "HAS_WIF=false" >> $GITHUB_ENV
+          fi
+          if [ "$SA_PRESENT" = "true" ]; then
+            echo "HAS_SA=true" >> $GITHUB_ENV
+          else
+            echo "HAS_SA=false" >> $GITHUB_ENV
+          fi
+
+          # Human-readable summary (no secret contents)
           echo "### GCP Auth Inputs" >> $GITHUB_STEP_SUMMARY
-          echo "- Project ID present: $([ -n \"${{ secrets.GCP_PROJECT_ID }}\" ] && echo true || echo false)" >> $GITHUB_STEP_SUMMARY
-          echo "- Region present: $([ -n \"${{ secrets.GCP_REGION }}\" ] && echo true || echo false)" >> $GITHUB_STEP_SUMMARY
-          echo "- SA key present: $([ \"$SA_PRESENT\" = 'true' ] && echo true || echo false)" >> $GITHUB_STEP_SUMMARY
-          echo "- WIF provider present: $([ \"$WIF_PROVIDER_PRESENT\" = 'true' ] && echo true || echo false)" >> $GITHUB_STEP_SUMMARY
-          echo "- WIF service account present: $([ \"$WIF_SA_PRESENT\" = 'true' ] && echo true || echo false)" >> $GITHUB_STEP_SUMMARY
+          echo "- Project ID present: $([ -n \"$PROJ\" ] && echo true || echo false)" >> $GITHUB_STEP_SUMMARY
+          echo "- Region present: $([ -n \"$REGION\" ] && echo true || echo false)" >> $GITHUB_STEP_SUMMARY
+          echo "- SA key present: $SA_PRESENT" >> $GITHUB_STEP_SUMMARY
+          echo "- WIF provider present: $WIF_PROVIDER_PRESENT" >> $GITHUB_STEP_SUMMARY
+          echo "- WIF service account present: $WIF_SA_PRESENT" >> $GITHUB_STEP_SUMMARY
 
       - name: Authenticate to Google Cloud (WIF)
-        if: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER != '' && secrets.GCP_SERVICE_ACCOUNT != '' }}
+        if: ${{ env.HAS_WIF == 'true' }}
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
       - name: Authenticate with GCP using service account key (if WIF not available)
-        if: ${{ (secrets.GCP_WORKLOAD_IDENTITY_PROVIDER == '' || secrets.GCP_SERVICE_ACCOUNT == '') && secrets.GCP_SA_KEY != '' }}
+        if: ${{ env.HAS_WIF != 'true' && env.HAS_SA == 'true' }}
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
