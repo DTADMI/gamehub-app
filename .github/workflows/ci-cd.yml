@@ -5,6 +5,14 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: "Force run Cloud Run deploy job even if GCP auto-detect says unavailable (for debugging)"
+        required: false
+        default: "false"
+        type: choice
+        options: [ "false", "true" ]
 
 env:
   DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
@@ -92,6 +100,25 @@ jobs:
           echo "HUB_SHA=docker.io/$HUB_REPO:$SHA" >> $GITHUB_OUTPUT
           echo "HUB_LATEST=docker.io/$HUB_REPO:latest" >> $GITHUB_OUTPUT
 
+          # Emit a helpful summary for debugging why deploy might be skipped
+          {
+            echo "### CI/CD Debug Summary"
+            echo "- has_gcp: $(cat $GITHUB_OUTPUT | grep '^has_gcp=' | tail -n1 | cut -d'=' -f2)"
+            echo "- has_docker_hub: $(cat $GITHUB_OUTPUT | grep '^has_hub=' | tail -n1 | cut -d'=' -f2)"
+            echo "- Detected auth methods:"
+            echo "  - HAS_SA_KEY: $HAS_KEY"
+            echo "  - HAS_WIF: $HAS_WIF"
+            echo "- Provided vars/secrets (presence only):"
+            echo "  - GCP_PROJECT_ID: $([ -n "${{ secrets.GCP_PROJECT_ID }}" ] && echo present || echo missing)"
+            echo "  - GCP_REGION: $([ -n "${{ secrets.GCP_REGION }}" ] && echo present || echo missing)"
+            echo "  - GCP_SA_KEY: $([ -n "${{ secrets.GCP_SA_KEY }}" ] && echo present || echo missing)"
+            echo "  - GCP_WORKLOAD_IDENTITY_PROVIDER: $([ -n "${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}" ] && echo present || echo missing)"
+            echo "  - GCP_SERVICE_ACCOUNT: $([ -n "${{ secrets.GCP_SERVICE_ACCOUNT }}" ] && echo present || echo missing)"
+            echo "  - GCP_ARTIFACT_REPO (var): $([ -n "${{ vars.GCP_ARTIFACT_REPO }}" ] && echo present || echo missing)"
+            echo "  - FRONTEND_SERVICE (var): $([ -n "${{ vars.FRONTEND_SERVICE }}" ] && echo present || echo missing)"
+            echo "  - NEXT_PUBLIC_API_URL (var): $([ -n "${{ vars.NEXT_PUBLIC_API_URL }}" ] && echo present || echo missing)"
+          } >> $GITHUB_STEP_SUMMARY
+
       - name: Build Docker image once (with public env build args)
         env:
           LOCAL_IMAGE: ${{ steps.prep.outputs.LOCAL_IMAGE }}
@@ -167,7 +194,8 @@ jobs:
   push-and-deploy-to-cloud-run:
     name: Push to Artifact Registry (:sha + :latest) and Deploy to Cloud Run
     needs: [ build-local-and-tag-images ]
-    if: ${{ needs.build-local-and-tag-images.outputs.has_gcp == 'true' }}
+    # Run when GCP is available, or when force_deploy is requested via manual dispatch
+    if: ${{ needs.build-local-and-tag-images.outputs.has_gcp == 'true' || (github.event_name == 'workflow_dispatch' && github.event.inputs.force_deploy == 'true') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -241,14 +269,15 @@ jobs:
         run: docker push "$AR_LATEST"
 
       - name: Deploy to Cloud Run (using AR :sha)
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: ${{ github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && github.event.inputs.force_deploy == 'true') }}
         run: |
           gcloud run deploy ${{ env.FRONTEND_SERVICE }} \
             --image="$AR_SHA" \
             --region=${{ secrets.GCP_REGION }} \
             --platform=managed \
             --allow-unauthenticated \
-            --port=3000
+            --port=3000 \
+            --set-env-vars NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
 
   test-e2e:
     name: Playwright E2E
