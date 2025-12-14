@@ -28,6 +28,8 @@ export default defineConfig({
         env: {
             NEXT_PUBLIC_API_URL:
                 process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api",
+            // Disable external providers (Auth/GraphQL) during E2E so public pages are stable
+            NEXT_PUBLIC_DISABLE_PROVIDERS: "true",
             PORT: "3000",
         },
     },

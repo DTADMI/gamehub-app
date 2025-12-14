@@ -1,5 +1,10 @@
 "use client";
 
+// This page depends on runtime session/subscription state and must not be
+// statically prerendered. Mark as dynamic to avoid SSG/Prerender errors when
+// hooks read SubscriptionContext during build.
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import React, {useEffect} from "react";
 

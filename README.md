@@ -82,12 +82,33 @@ pnpm exec playwright install --with-deps
 pnpm test:e2e
 ```
 
+Notes for E2E stability:
+
+- The Playwright webServer in `playwright.config.ts` starts the Next.js dev server with
+  `NEXT_PUBLIC_DISABLE_PROVIDERS=true`.
+  - This intentionally disables external providers (Firebase Auth and the Subscription/GraphQL fetch) during E2E to
+    avoid client‑side exceptions caused by missing cloud credentials, CORS, or backend availability.
+  - Public pages like `/` and `/projects` still render normally; protected routes are tested via middleware redirects.
+  - This flag is only used for E2E. Production builds and normal local dev do not set it.
+
 5. Build & production run
 
 ```
 pnpm build
 pnpm start  # starts on port 3000
 ```
+
+Routing and prerendering notes:
+
+- The page at `/account/subscribe/success` depends on the authenticated user’s subscription at runtime (used to refresh
+  entitlements after checkout).
+  - It is explicitly marked as dynamic via:
+    ```ts
+    // app/account/subscribe/success/page.tsx
+    export const dynamic = "force-dynamic";
+    ```
+  - This prevents static prerender during `next build` and avoids the error
+    `useSubscription must be used within SubscriptionProvider` that can occur when running context hooks at build time.
 
 ### Game controls (quick reference)
 
