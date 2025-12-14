@@ -8,7 +8,6 @@ export interface Game {
     featured?: boolean;
     route: string; // full route, e.g. "/games/snake"
     component?: string; // optional component name in its package
-  comingSoon?: boolean;
 }
 
 export function getGameById(id: string): Game | undefined {
@@ -43,7 +42,7 @@ export const GAMES: Game[] = [
       description: "Classic tile‑matching puzzle game.",
       image: "/colorful-tetris-blocks-falling.jpg",
       tags: ["Puzzle", "Arcade"],
-      featured: true,
+      featured: false,
     route: "/games/tetris",
     component: "TetrisGame",
   },
@@ -55,7 +54,7 @@ export const GAMES: Game[] = [
         description: "Match pairs and train your memory.",
         image: "/colorful-memory-cards-game-interface.jpg",
         tags: ["Puzzle", "Memory"],
-        featured: false,
+        featured: true,
         route: "/games/memory",
         component: "MemoryGame",
     },
@@ -65,6 +64,7 @@ export const GAMES: Game[] = [
         description: "Pop matching bubbles for points.",
         image: "/placeholder.svg",
         tags: ["Casual", "Arcade"],
+        featured: false,
         route: "/games/bubble-pop",
         component: "BubblePopGame",
     },
@@ -74,6 +74,7 @@ export const GAMES: Game[] = [
         description: "Place pieces to clear rows and columns.",
         image: "/placeholder.svg",
         tags: ["Puzzle", "Strategy"],
+        featured: false,
         route: "/games/block-blast",
     },
 
@@ -84,6 +85,7 @@ export const GAMES: Game[] = [
         description: "Classic head‑to‑head strategy.",
         image: "/placeholder.svg",
         tags: ["Board", "Strategy"],
+        featured: false,
         route: "/games/checkers",
         component: "CheckersGame",
     },
@@ -93,6 +95,7 @@ export const GAMES: Game[] = [
         description: "Timeless strategy classic.",
         image: "/placeholder.svg",
         tags: ["Board", "Strategy"],
+        featured: false,
         route: "/games/chess",
         component: "ChessGame",
     },
@@ -104,6 +107,7 @@ export const GAMES: Game[] = [
         description: "Cozy puzzle interactions.",
         image: "/placeholder.jpg",
         tags: ["Puzzle", "Casual"],
+        featured: false,
         route: "/games/knitzy",
         component: "KnitzyGame",
   },
@@ -113,9 +117,9 @@ export const GAMES: Game[] = [
       description: "2D platformer with physics‑based puzzles.",
       image: "/2d-platformer-game-with-character-and-obstacles.jpg",
       tags: ["Platformer", "Puzzle"],
+      featured: false,
     route: "/games/platformer",
     component: "PlatformerGame",
-    comingSoon: true,
   },
     {
         id: "tower-defense",
@@ -123,8 +127,8 @@ export const GAMES: Game[] = [
         description: "Strategic towers vs. waves of enemies.",
         image: "/tower-defense-game-with-towers-and-enemies.jpg",
         tags: ["Strategy", "Tactics"],
+        featured: false,
         route: "/games/tower-defense",
         component: "TowerDefenseGame",
-        comingSoon: true,
   },
 ];

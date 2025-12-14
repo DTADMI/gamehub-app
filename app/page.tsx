@@ -25,7 +25,8 @@ const games: HomeGame[] = GAMES.map((g, idx) => ({
   tags: g.tags,
   slug: g.id,
   featured: !!g.featured,
-  upcoming: !!g.comingSoon,
+  // Upcoming is defined as any game that is NOT featured (MVPs are featured)
+  upcoming: !g.featured,
 }));
 
 export default function HomePage() {
@@ -82,6 +83,8 @@ export default function HomePage() {
               ))}
             </Carousel>
           </section>
+
+          {/* No separate "More Games" section: Upcoming shows all non-featured */}
         </div>
       </main>
     </div>

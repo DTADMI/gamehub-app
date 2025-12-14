@@ -12,7 +12,6 @@ interface Game {
   image: string;
   tags: string[];
   featured?: boolean;
-  comingSoon?: boolean;
 }
 
 interface GamesListProps {
@@ -61,7 +60,7 @@ export default function GamesList({ games }: GamesListProps) {
                     Featured
                   </div>
                 )}
-                {game.comingSoon && (
+                  {!game.featured && (
                   <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
                     <span className="bg-white text-gray-900 px-4 py-2 rounded-full font-bold">
                       Coming Soon
@@ -88,7 +87,7 @@ export default function GamesList({ games }: GamesListProps) {
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
                   {game.description}
                 </p>
-                {game.comingSoon ? (
+                  {!game.featured ? (
                   <button
                     disabled
                     className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-400 cursor-not-allowed"

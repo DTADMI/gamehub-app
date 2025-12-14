@@ -28,9 +28,11 @@ const ALL_GAMES: Game[] = GAMES.map((g, idx) => ({
   image: g.image,
   tags: g.tags,
   slug: g.id,
-  upcoming: !!g.comingSoon,
+  // Upcoming is defined as any game that is NOT featured (MVPs are featured)
+  upcoming: !g.featured,
   featured: !!g.featured,
 }));
+// No OTHER_GAMES: Upcoming covers all non-featured titles
 
 type Project = {
   title: string;
@@ -96,7 +98,7 @@ export default function ExplorePage() {
                       <h3 className="text-lg font-semibold">Featured</h3>
                       {useCarousels ? (
                           <Carousel>
-                            {ALL_GAMES.filter((g) => g.featured && !g.upcoming).map(
+                            {ALL_GAMES.filter((g) => g.featured).map(
                                 (g) => (
                                     <GameCard key={g.id} game={g} featured={g.featured}/>
                                 ),
@@ -104,7 +106,7 @@ export default function ExplorePage() {
                           </Carousel>
                       ) : (
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {ALL_GAMES.filter((g) => g.featured && !g.upcoming).map(
+                            {ALL_GAMES.filter((g) => g.featured).map(
                                 (g) => (
                                     <GameCard key={g.id} game={g} featured={g.featured}/>
                                 ),

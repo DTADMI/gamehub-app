@@ -1,6 +1,6 @@
 // games/memory/src/components/MemoryGame.tsx
 import {GameContainer, soundManager} from "@games/shared";
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useState} from "react";
 
 interface Card {
   id: number;
@@ -9,8 +9,12 @@ interface Card {
   isMatched: boolean;
 }
 
-const CARD_PAIRS = 8; // 16 cards total
-const CARD_VALUES = Array.from({ length: CARD_PAIRS }, (_, i) => i + 1);
+const EMOJIS = [
+    "🍎", "🍌", "🍇", "🍉", "🍓", "🍒", "🍍", "🥝",
+    "🍑", "🥥", "🍋", "🫐", "🍊", "🥕", "🌽", "🍆",
+];
+const MAX_PAIRS = 12; // supports up to hard mode
+const CARD_VALUES = Array.from({length: MAX_PAIRS}, (_, i) => i + 1);
 
 export const MemoryGame: React.FC = () => {
   const [cards, setCards] = useState<Card[]>([]);
@@ -21,6 +25,7 @@ export const MemoryGame: React.FC = () => {
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">(
       "medium",
   );
+    const [autoCompleteLastPair, setAutoCompleteLastPair] = useState<boolean>(true);
 
   // Initialize game
   const initializeGame = useCallback(() => {
@@ -97,6 +102,31 @@ export const MemoryGame: React.FC = () => {
     }
   }, [cards]);
 
+    // Auto-complete UX: when only two unmatched cards remain, auto-flip them and count as one move
+    useEffect(() => {
+        if (!autoCompleteLastPair || gameOver || isProcessing) return;
+        if (cards.length === 0) return;
+        const unmatched = cards
+            .map((c, i) => (c.isMatched ? -1 : i))
+            .filter((i) => i >= 0);
+
+        if (unmatched.length === 2 && flippedIndices.length === 0) {
+            // Flip both, then let the existing match effect handle marking + move increment
+            setIsProcessing(true);
+            soundManager.playSound("cardFlip");
+            setCards((prev) =>
+                prev.map((c, i) =>
+                    i === unmatched[0] || i === unmatched[1] ? {...c, isFlipped: true} : c,
+                ),
+            );
+            setTimeout(() => {
+                setFlippedIndices([unmatched[0], unmatched[1]]);
+                // The match effect will set isProcessing true and clear it; we can clear our guard shortly after
+                setTimeout(() => setIsProcessing(false), 50);
+            }, 200);
+        }
+    }, [autoCompleteLastPair, cards, flippedIndices.length, gameOver, isProcessing]);
+
   // Handle card click
   const handleCardClick = (index: number) => {
     if (
@@ -128,37 +158,51 @@ export const MemoryGame: React.FC = () => {
     };
   }, [initializeGame]);
 
-  // Calculate score
+    // Calculate score and pairs in play
   const score = cards.filter((card) => card.isMatched).length / 2;
+    const pairsInPlay = useMemo(() => cards.length / 2 || (difficulty === "easy" ? 6 : difficulty === "medium" ? 8 : 12), [cards.length, difficulty]);
+
+    const getEmojiForValue = (value: number) => EMOJIS[(value - 1) % EMOJIS.length];
 
   return (
     <GameContainer
       title="Memory Card Game"
-      description={`Match all the pairs in as few moves as possible! Score: ${score} / ${CARD_PAIRS}`}
+      description={`Match all the pairs in as few moves as possible! Matches: ${score} / ${pairsInPlay}`}
     >
       <div className="p-4">
-        {/* Difficulty Selector */}
-        <div className="mb-6 text-center">
-          <label className="mr-2 text-gray-700 dark:text-gray-300">
-            Difficulty:
-          </label>
-          <select
-            value={difficulty}
-            onChange={(e) =>
+          {/* Controls */}
+          <div className="mb-6 flex flex-col sm:flex-row items-center justify-center gap-4 text-center">
+              <div>
+                  <label className="mr-2 text-gray-700 dark:text-gray-300">Difficulty:</label>
+                  <select
+                      value={difficulty}
+                      onChange={(e) =>
                 setDifficulty(e.target.value as "easy" | "medium" | "hard")
-            }
-            className="px-3 py-1 border rounded-md"
-            disabled={moves > 0}
-          >
-            <option value="easy">Easy (6 pairs)</option>
-            <option value="medium">Medium (8 pairs)</option>
-            <option value="hard">Hard (12 pairs)</option>
-          </select>
+                      }
+                      className="px-3 py-1 border rounded-md"
+                      disabled={moves > 0}
+                  >
+                      <option value="easy">Easy (6 pairs)</option>
+                      <option value="medium">Medium (8 pairs)</option>
+                      <option value="hard">Hard (12 pairs)</option>
+                  </select>
+              </div>
+              <label className="inline-flex items-center gap-2 select-none">
+                  <input
+                      type="checkbox"
+                      className="h-4 w-4"
+                      checked={autoCompleteLastPair}
+                      onChange={(e) => setAutoCompleteLastPair(e.target.checked)}
+                  />
+                  <span className="text-sm text-gray-700 dark:text-gray-300">
+              Auto-complete last pair (counts 1 move)
+            </span>
+              </label>
         </div>
 
         {/* Game Board */}
         <div
-          className={`grid gap-3 ${
+            className={`grid gap-4 sm:gap-5 ${
             difficulty === "easy"
               ? "grid-cols-3"
               : difficulty === "medium"
@@ -171,28 +215,24 @@ export const MemoryGame: React.FC = () => {
               key={card.id}
               onClick={() => handleCardClick(index)}
               className={`
-                aspect-square rounded-lg flex items-center justify-center text-3xl font-bold
-                cursor-pointer transition-all duration-300 transform
-                ${card.isFlipped || card.isMatched ? "bg-white" : "bg-blue-600 hover:bg-blue-700"}
-                ${card.isMatched ? "opacity-75" : ""}
-                ${card.isFlipped ? "rotate-y-180" : ""}
+                aspect-square rounded-xl cursor-pointer transition-transform duration-300
+                [transform-style:preserve-3d] relative shadow-md hover:shadow-lg
+                ${card.isMatched ? "opacity-80" : ""}
               `}
               style={{
-                transform:
-                    card.isFlipped || card.isMatched
-                        ? "rotateY(180deg)"
-                        : "rotateY(0)",
-                backfaceVisibility: "hidden",
+                  transform: card.isFlipped || card.isMatched ? "rotateY(180deg)" : "rotateY(0)",
               }}
             >
+                {/* Back */}
+                <div
+                    className="absolute inset-0 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white text-2xl font-semibold [backface-visibility:hidden]">
+                    ✨
+                </div>
+                {/* Front */}
               <div
-                className={`
-                  w-full h-full flex items-center justify-center
-                  ${card.isFlipped || card.isMatched ? "opacity-100" : "opacity-0"}
-                `}
-                style={{ transform: "rotateY(180deg)" }}
+                  className="absolute inset-0 rounded-xl bg-white dark:bg-gray-800 flex items-center justify-center text-4xl [transform:rotateY(180deg)] [backface-visibility:hidden]"
               >
-                {card.value}
+                  <span aria-hidden>{getEmojiForValue(card.value)}</span>
               </div>
             </div>
           ))}
@@ -201,7 +241,7 @@ export const MemoryGame: React.FC = () => {
         {/* Game Info */}
         <div className="mt-6 text-center">
           <p className="text-lg text-gray-700 dark:text-gray-300">
-            Moves: {moves} | Matches: {score} / {CARD_PAIRS}
+              Moves: {moves} | Matches: {score} / {pairsInPlay}
           </p>
 
           {gameOver && (
