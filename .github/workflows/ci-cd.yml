@@ -355,7 +355,7 @@ jobs:
           gcloud auth list --filter=status:ACTIVE --format='value(account)' | sed 's/$/ (active)/' >> $GITHUB_STEP_SUMMARY || true
           echo "gcloud project: $(gcloud config get-value core/project 2>/dev/null || echo '(unset)')" >> $GITHUB_STEP_SUMMARY
 
-      - name: Preflight — required Google APIs (Cloud Run, Artifact Registry, Cloud Resource Manager)
+      - name: Preflight — required Google APIs (Cloud Run, Artifact Registry) and optional (Cloud Resource Manager)
         env:
           PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
           REGION: ${{ secrets.GCP_REGION }}
@@ -364,6 +364,8 @@ jobs:
           REQUIRED=(
             run.googleapis.com
             artifactregistry.googleapis.com
+          )
+          OPTIONAL=(
             cloudresourcemanager.googleapis.com
           )
 
@@ -386,13 +388,30 @@ jobs:
             fi
           done
 
+          # Try to enable optional APIs, but never fail the job on these
+          for API in "${OPTIONAL[@]}"; do
+            STATE=$(gcloud services list --enabled --project "$PROJECT_ID" --format="value(config.name)" | grep -Fx "$API" >/dev/null && echo enabled || echo disabled)
+            echo "- (optional) $API: $STATE" >> $GITHUB_STEP_SUMMARY
+            if [ "$STATE" = "disabled" ]; then
+              echo "Attempting to enable optional $API ..." >> $GITHUB_STEP_SUMMARY
+              gcloud services enable "$API" --project "$PROJECT_ID" --quiet
+              if [ $? -ne 0 ]; then
+                echo "⚠️ Could not enable optional $API. Continuing without it. Some features (like auto-detecting project number) may be limited." >> $GITHUB_STEP_SUMMARY
+              else
+                echo "✅ Enabled optional $API" >> $GITHUB_STEP_SUMMARY
+              fi
+            fi
+          done
+
           if [ "$FAIL_API" = "true" ]; then
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "To enable required APIs manually (must be Project Owner/Editor):" >> $GITHUB_STEP_SUMMARY
-            echo "  gcloud services enable run.googleapis.com artifactregistry.googleapis.com cloudresourcemanager.googleapis.com --project $PROJECT_ID" >> $GITHUB_STEP_SUMMARY
+            echo "  gcloud services enable run.googleapis.com artifactregistry.googleapis.com --project $PROJECT_ID" >> $GITHUB_STEP_SUMMARY
             echo "Exiting because required APIs are not enabled and could not be enabled automatically." >> $GITHUB_STEP_SUMMARY
             exit 1
           fi
+
+          echo "Required APIs present. Proceeding." >> $GITHUB_STEP_SUMMARY
 
       - name: Determine runtime service account for Cloud Run
         id: runtime-sa
@@ -405,29 +424,17 @@ jobs:
           CALLER=$(gcloud config get-value account 2>/dev/null || true)
           echo "CALLER_SA=$CALLER" >> $GITHUB_ENV
 
-          # Compute Project Number (needed for Compute Default SA)
-          PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)' 2>/dev/null || true)
-          echo "PROJECT_NUMBER=$PROJECT_NUMBER" >> $GITHUB_ENV
-
-          # Decide runtime service account
+          # Decide runtime service account with minimal permissions required
+          # Priority:
+          # 1) Explicit override via repo var CLOUD_RUN_SERVICE_ACCOUNT
+          # 2) Fallback to using the caller (deploy) service account as the runtime identity
+          # This avoids the need to read projectNumber (which requires Cloud Resource Manager API)
           if [ -n "$OVERRIDE_SA" ]; then
             RUNTIME_SA="$OVERRIDE_SA"
             SOURCE="override (vars.CLOUD_RUN_SERVICE_ACCOUNT)"
-          elif [ -n "$PROJECT_NUMBER" ]; then
-            RUNTIME_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
-            SOURCE="default (Compute Engine default SA)"
           else
-            # Could not resolve project number (likely Cloud Resource Manager API permission). Fail fast with guidance.
-            {
-              echo "### Runtime SA resolution failed"
-              echo "- Could not resolve project number for $PROJECT_ID."
-              echo "- Ensure Cloud Resource Manager API is enabled and that the deploy service account has permission to read the project."
-              echo "- Workarounds:"
-              echo "  1) Set a repo variable CLOUD_RUN_SERVICE_ACCOUNT with the runtime SA email to skip auto-detection."
-              echo "  2) Or grant the deploy SA Viewer on the project to allow reading projectNumber."
-            } >> $GITHUB_STEP_SUMMARY
-            echo "Missing project number and no override provided; aborting." >&2
-            exit 1
+            RUNTIME_SA="$CALLER"
+            SOURCE="fallback (using deployer identity as runtime SA)"
           fi
           echo "RUNTIME_SA=$RUNTIME_SA" >> $GITHUB_ENV
 
@@ -447,17 +454,21 @@ jobs:
           set +e
           echo "Checking if caller can actAs: $CALLER_SA -> $RUNTIME_SA" >> $GITHUB_STEP_SUMMARY
           # Try to read the IAM policy and detect Service Account User binding
-          POLICY_JSON=$(gcloud iam service-accounts get-iam-policy "$RUNTIME_SA" --format=json 2>/dev/null)
-          if [ -n "$POLICY_JSON" ]; then
-            HAS_BINDING=$(echo "$POLICY_JSON" | grep -E 'roles/iam.serviceAccountUser' -A2 | grep -F "serviceAccount:$CALLER_SA" >/dev/null && echo true || echo false)
-            echo "- Has roles/iam.serviceAccountUser on runtime SA for caller: $HAS_BINDING" >> $GITHUB_STEP_SUMMARY
-            if [ "$HAS_BINDING" != "true" ]; then
-              echo "❗ Missing actAs permission. A project owner can grant it with:" >> $GITHUB_STEP_SUMMARY
-              echo "  gcloud iam service-accounts add-iam-policy-binding \"$RUNTIME_SA\" \">> $GITHUB_STEP_SUMMARY
-              echo "    --member=\"serviceAccount:$CALLER_SA\" --role=roles/iam.serviceAccountUser" >> $GITHUB_STEP_SUMMARY
-            fi
+          if [ "$RUNTIME_SA" = "$CALLER_SA" ]; then
+            echo "- Skipping actAs check because runtime SA equals caller (no actAs needed)." >> $GITHUB_STEP_SUMMARY
           else
-            echo "- Could not read IAM policy for $RUNTIME_SA (insufficient permission); continuing" >> $GITHUB_STEP_SUMMARY
+            POLICY_JSON=$(gcloud iam service-accounts get-iam-policy "$RUNTIME_SA" --format=json 2>/dev/null)
+            if [ -n "$POLICY_JSON" ]; then
+              HAS_BINDING=$(echo "$POLICY_JSON" | grep -E 'roles/iam.serviceAccountUser' -A2 | grep -F "serviceAccount:$CALLER_SA" >/dev/null && echo true || echo false)
+              echo "- Has roles/iam.serviceAccountUser on runtime SA for caller: $HAS_BINDING" >> $GITHUB_STEP_SUMMARY
+              if [ "$HAS_BINDING" != "true" ]; then
+                echo "❗ Missing actAs permission. A project owner can grant it with:" >> $GITHUB_STEP_SUMMARY
+                echo "  gcloud iam service-accounts add-iam-policy-binding \"$RUNTIME_SA\"" >> $GITHUB_STEP_SUMMARY
+                echo "    --member=\"serviceAccount:$CALLER_SA\" --role=roles/iam.serviceAccountUser" >> $GITHUB_STEP_SUMMARY
+              fi
+            else
+              echo "- Could not read IAM policy for $RUNTIME_SA (insufficient permission); continuing" >> $GITHUB_STEP_SUMMARY
+            fi
           fi
 
       - name: Configure Docker for Artifact Registry
