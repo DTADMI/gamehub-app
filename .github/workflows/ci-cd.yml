@@ -80,7 +80,7 @@ jobs:
 
           # Artifact Registry availability (need project, region, and either SA key or WIF)
           HAS_KEY=false; HAS_WIF=false
-          if [ -n "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" ]; then HAS_KEY=true; fi
+          if [ -n "${{ secrets.GCP_SA_KEY }}" ]; then HAS_KEY=true; fi
           if [ -n "${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}" ] && [ -n "${{ secrets.GCP_SERVICE_ACCOUNT }}" ]; then HAS_WIF=true; fi
           if [ -n "${{ secrets.GCP_PROJECT_ID }}" ] && [ -n "${{ secrets.GCP_REGION }}" ] && { [ "$HAS_KEY" = "true" ] || [ "$HAS_WIF" = "true" ]; }; then
             echo "has_gcp=true" >> $GITHUB_OUTPUT
@@ -100,23 +100,54 @@ jobs:
           echo "HUB_SHA=docker.io/$HUB_REPO:$SHA" >> $GITHUB_OUTPUT
           echo "HUB_LATEST=docker.io/$HUB_REPO:latest" >> $GITHUB_OUTPUT
 
-          # Emit a helpful summary for debugging why deploy might be skipped
+          # Enhanced debug information
           {
             echo "### CI/CD Debug Summary"
-            echo "- has_gcp: $(cat $GITHUB_OUTPUT | grep '^has_gcp=' | tail -n1 | cut -d'=' -f2)"
-            echo "- has_docker_hub: $(cat $GITHUB_OUTPUT | grep '^has_hub=' | tail -n1 | cut -d'=' -f2)"
-            echo "- Detected auth methods:"
+            echo "- Workflow event: $GITHUB_EVENT_NAME"
+            echo "- Ref: $GITHUB_REF"
+            echo "- SHA: $GITHUB_SHA"
+          
+            # Check if we're running in a fork
+            if [ "$GITHUB_REPOSITORY" != "$GITHUB_REPOSITORY_OWNER/$(echo $GITHUB_REPOSITORY | cut -d'/' -f2-)" ]; then
+              echo "- Running in a fork"
+            else
+              echo "- Running in the original repository"
+            fi
+          
+            # Check permissions
+            echo "- Permissions:"
+            echo "  - contents: $(if [ -n "$GITHUB_TOKEN" ]; then echo "read (token exists)"; else echo "none"; fi)"
+            echo "  - id-token: $(if [ -n "$ACTIONS_ID_TOKEN_REQUEST_TOKEN" ]; then echo "write"; else echo "none"; fi)"
+          
+            # Check secret access
+            echo "- Secret access check:"
+            echo "  - GCP_PROJECT_ID: $([ -n "${{ secrets.GCP_PROJECT_ID }}" ] && echo "present (${#GCP_PROJECT_ID} chars)" || echo "missing")"
+            echo "  - GCP_REGION: $([ -n "${{ secrets.GCP_REGION }}" ] && echo "present (${#GCP_REGION} chars)" || echo "missing")"
+            echo "  - GCP_SA_KEY: $([ -n "${{ secrets.GCP_SA_KEY }}" ] && echo "present (${#GCP_SA_KEY} chars starting with ${GCP_SA_KEY:0:10}...)" || echo "missing")"
+          
+            # Check for common issues
+            echo "- Common issues check:"
+            if [ -z "${{ secrets.GCP_SA_KEY }}" ] && [ "$GITHUB_EVENT_NAME" = "pull_request" ] && [ "$GITHUB_REPOSITORY" != "$GITHUB_REPOSITORY_OWNER/$(echo $GITHUB_REPOSITORY | cut -d'/' -f2-)" ]; then
+              echo "  - ❌ Pull requests from forks don't have access to secrets by default"
+            fi
+            if [ -z "$GITHUB_TOKEN" ]; then
+              echo "  - ❌ GITHUB_TOKEN is not available"
+            fi
+          
+            # Current state
+            echo "- Current state:"
+            echo "  - has_gcp: $(cat $GITHUB_OUTPUT | grep '^has_gcp=' | tail -n1 | cut -d'=' -f2)"
+            echo "  - has_docker_hub: $(cat $GITHUB_OUTPUT | grep '^has_hub=' | tail -n1 | cut -d'=' -f2)"
             echo "  - HAS_SA_KEY: $HAS_KEY"
             echo "  - HAS_WIF: $HAS_WIF"
-            echo "- Provided vars/secrets (presence only):"
-            echo "  - GCP_PROJECT_ID: $([ -n "${{ secrets.GCP_PROJECT_ID }}" ] && echo present || echo missing)"
-            echo "  - GCP_REGION: $([ -n "${{ secrets.GCP_REGION }}" ] && echo present || echo missing)"
-            echo "  - GCP_SERVICE_ACCOUNT_KEY: $([ -n "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" ] && echo present || echo missing)"
-            echo "  - GCP_WORKLOAD_IDENTITY_PROVIDER: $([ -n "${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}" ] && echo present || echo missing)"
-            echo "  - GCP_SERVICE_ACCOUNT: $([ -n "${{ secrets.GCP_SERVICE_ACCOUNT }}" ] && echo present || echo missing)"
-            echo "  - GCP_ARTIFACT_REPO (var): $([ -n "${{ vars.GCP_ARTIFACT_REPO }}" ] && echo present || echo missing)"
-            echo "  - FRONTEND_SERVICE (var): $([ -n "${{ vars.FRONTEND_SERVICE }}" ] && echo present || echo missing)"
-            echo "  - NEXT_PUBLIC_API_URL (var): $([ -n "${{ vars.NEXT_PUBLIC_API_URL }}" ] && echo present || echo missing)"
+          
+            # List all available secrets (just the keys, not values)
+            echo "- Available secrets (first 10 chars of keys):"
+            for var in $(compgen -v | grep -E '^SECRET_|^GITHUB_|^GCP_'); do
+              if [[ $var =~ ^GCP_ || $var =~ ^SECRET_ ]]; then
+                echo "  - $var (${#!var} chars)"
+              fi
+            done | head -n 10
           } >> $GITHUB_STEP_SUMMARY
 
       - name: Build Docker image once (with public env build args)
@@ -220,7 +251,7 @@ jobs:
           else
             echo "HAS_WIF=false" >> $GITHUB_ENV
           fi
-          if [ -n "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" ]; then
+          if [ -n "${{ secrets.GCP_SA_KEY }}" ]; then
             echo "HAS_SA=true" >> $GITHUB_ENV
           else
             echo "HAS_SA=false" >> $GITHUB_ENV
@@ -233,11 +264,11 @@ jobs:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
-      - name: Authenticate to Google Cloud (Service Account Key)
+      - name: Authenticate with GCP using service account key (if WIF not available)
         if: ${{ env.HAS_WIF != 'true' && env.HAS_SA == 'true' }}
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Set up gcloud SDK
         uses: google-github-actions/setup-gcloud@v2
