@@ -176,15 +176,14 @@ What it does (high level):
   - Primary: Google Artifact Registry (AR) in your GCP project.
   - Optional mirror: Docker Hub, but only when AR is not available OR if the AR push/deploy step fails (fallback
     mirror).
-- Deploys to Cloud Run (frontend service) on pushes to `main` or manual dispatch (deploys from AR only).
+- Deploys to Cloud Run (frontend service) on pushes to `main` or manual dispatch (deploys from AR only and only when GCP
+  auth is available).
 
 Environment and gating:
 
 - Frontend service name: `FRONTEND_SERVICE` repo variable (default `gamehub-app`).
 - Artifact Registry repo: `GCP_ARTIFACT_REPO` repo variable (default `gamehub`).
-- Deploy runs when either:
-  - A valid GCP auth method is present; or
-  - You trigger the workflow manually with `force_deploy=true`.
+- Deploy runs only when a valid GCP auth method is present. Manual dispatch does not bypass authentication.
   - Docker Hub is never used as a deploy source; it serves solely as a mirror for discoverability and as a fallback
     artifact when AR is unavailable or AR push/deploy fails.
 - Required Google APIs: `run.googleapis.com` and `artifactregistry.googleapis.com`.

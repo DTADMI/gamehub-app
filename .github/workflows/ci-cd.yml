@@ -6,13 +6,7 @@ on:
   pull_request:
     branches: [ main ]
   workflow_dispatch:
-    inputs:
-      force_deploy:
-        description: "Force run Cloud Run deploy job even if GCP auto-detect says unavailable (for debugging)"
-        required: false
-        default: "true"
-        type: choice
-        options: [ "false", "true" ]
+  # Manual trigger (no special inputs)
 
 # Set default permissions for all jobs in the workflow
 permissions:
@@ -174,8 +168,8 @@ jobs:
   push-and-deploy-to-cloud-run:
     name: Push to Artifact Registry (:sha + :latest) and Deploy to Cloud Run
     needs: [ build-local-and-tag-images ]
-    # Run when GCP is available, or when force_deploy is requested via manual dispatch
-    if: ${{ needs.build-local-and-tag-images.outputs.has_gcp == 'true' || (github.event_name == 'workflow_dispatch' && github.event.inputs.force_deploy == 'true') }}
+    # Run only when GCP auth is available
+    if: ${{ needs.build-local-and-tag-images.outputs.has_gcp == 'true' }}
     runs-on: ubuntu-latest
     permissions:
       contents: 'read'
@@ -192,42 +186,18 @@ jobs:
           docker load -i ./out/gamehub-app-image.tar
           docker images
 
-      - name: GCP auth inputs summary
-        id: gcp-auth-inputs
+      - name: Select auth method (WIF preferred, fall back to SA key)
         env:
           SA_JSON: ${{ secrets.GCP_SA_KEY }}
           WIF_PROVIDER: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           WIF_SA_EMAIL: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-          PROJ: ${{ secrets.GCP_PROJECT_ID }}
-          REGION: ${{ secrets.GCP_REGION }}
         run: |
-          # Derive boolean flags inside the runner from provided envs (which carry secrets)
-          SA_PRESENT=false
-          [ -n "$SA_JSON" ] && SA_PRESENT=true
-          WIF_PROVIDER_PRESENT=false
-          [ -n "$WIF_PROVIDER" ] && WIF_PROVIDER_PRESENT=true
-          WIF_SA_PRESENT=false
-          [ -n "$WIF_SA_EMAIL" ] && WIF_SA_PRESENT=true
-
-          # Compute HAS_WIF and HAS_SA
-          if [ "$WIF_PROVIDER_PRESENT" = "true" ] && [ "$WIF_SA_PRESENT" = "true" ]; then
-            echo "HAS_WIF=true" >> $GITHUB_ENV
-          else
-            echo "HAS_WIF=false" >> $GITHUB_ENV
-          fi
-          if [ "$SA_PRESENT" = "true" ]; then
-            echo "HAS_SA=true" >> $GITHUB_ENV
-          else
-            echo "HAS_SA=false" >> $GITHUB_ENV
-          fi
-
-          # Human-readable summary (no secret contents)
-          echo "### GCP Auth Inputs" >> $GITHUB_STEP_SUMMARY
-          echo "- Project ID present: $([ -n \"$PROJ\" ] && echo true || echo false)" >> $GITHUB_STEP_SUMMARY
-          echo "- Region present: $([ -n \"$REGION\" ] && echo true || echo false)" >> $GITHUB_STEP_SUMMARY
-          echo "- SA key present: $SA_PRESENT" >> $GITHUB_STEP_SUMMARY
-          echo "- WIF provider present: $WIF_PROVIDER_PRESENT" >> $GITHUB_STEP_SUMMARY
-          echo "- WIF service account present: $WIF_SA_PRESENT" >> $GITHUB_STEP_SUMMARY
+          HAS_WIF=false
+          if [ -n "$WIF_PROVIDER" ] && [ -n "$WIF_SA_EMAIL" ]; then HAS_WIF=true; fi
+          HAS_SA=false
+          if [ -n "$SA_JSON" ]; then HAS_SA=true; fi
+          echo "HAS_WIF=$HAS_WIF" >> $GITHUB_ENV
+          echo "HAS_SA=$HAS_SA" >> $GITHUB_ENV
 
       - name: Authenticate to Google Cloud (WIF)
         if: ${{ env.HAS_WIF == 'true' }}
@@ -253,7 +223,7 @@ jobs:
           gcloud auth list --filter=status:ACTIVE --format='value(account)' | sed 's/$/ (active)/' >> $GITHUB_STEP_SUMMARY || true
           echo "gcloud project: $(gcloud config get-value core/project 2>/dev/null || echo '(unset)')" >> $GITHUB_STEP_SUMMARY
 
-      - name: Preflight — required Google APIs (Cloud Run, Artifact Registry) and optional (Cloud Resource Manager)
+      - name: Preflight — required Google APIs (Cloud Run, Artifact Registry)
         env:
           PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
           REGION: ${{ secrets.GCP_REGION }}
@@ -262,9 +232,6 @@ jobs:
           REQUIRED=(
             run.googleapis.com
             artifactregistry.googleapis.com
-          )
-          OPTIONAL=(
-            cloudresourcemanager.googleapis.com
           )
 
           echo "### GCP API Preflight" >> $GITHUB_STEP_SUMMARY
@@ -282,21 +249,6 @@ jobs:
                 FAIL_API="true"
               else
                 echo "✅ Enabled $API" >> $GITHUB_STEP_SUMMARY
-              fi
-            fi
-          done
-
-          # Try to enable optional APIs, but never fail the job on these
-          for API in "${OPTIONAL[@]}"; do
-            STATE=$(gcloud services list --enabled --project "$PROJECT_ID" --format="value(config.name)" | grep -Fx "$API" >/dev/null && echo enabled || echo disabled)
-            echo "- (optional) $API: $STATE" >> $GITHUB_STEP_SUMMARY
-            if [ "$STATE" = "disabled" ]; then
-              echo "Attempting to enable optional $API ..." >> $GITHUB_STEP_SUMMARY
-              gcloud services enable "$API" --project "$PROJECT_ID" --quiet
-              if [ $? -ne 0 ]; then
-                echo "⚠️ Could not enable optional $API. Continuing without it. Some features (like auto-detecting project number) may be limited." >> $GITHUB_STEP_SUMMARY
-              else
-                echo "✅ Enabled optional $API" >> $GITHUB_STEP_SUMMARY
               fi
             fi
           done
@@ -394,7 +346,7 @@ jobs:
         run: docker push "$AR_LATEST"
 
       - name: Deploy to Cloud Run (using AR :sha)
-        if: ${{ github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && github.event.inputs.force_deploy == 'true') }}
+        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           gcloud run deploy ${{ env.FRONTEND_SERVICE }} \
             --image="$AR_SHA" \
