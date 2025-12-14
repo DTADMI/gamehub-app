@@ -355,6 +355,45 @@ jobs:
           gcloud auth list --filter=status:ACTIVE --format='value(account)' | sed 's/$/ (active)/' >> $GITHUB_STEP_SUMMARY || true
           echo "gcloud project: $(gcloud config get-value core/project 2>/dev/null || echo '(unset)')" >> $GITHUB_STEP_SUMMARY
 
+      - name: Preflight — required Google APIs (Cloud Run, Artifact Registry, Cloud Resource Manager)
+        env:
+          PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          REGION: ${{ secrets.GCP_REGION }}
+        run: |
+          set +e
+          REQUIRED=(
+            run.googleapis.com
+            artifactregistry.googleapis.com
+            cloudresourcemanager.googleapis.com
+          )
+
+          echo "### GCP API Preflight" >> $GITHUB_STEP_SUMMARY
+          echo "Project: $PROJECT_ID" >> $GITHUB_STEP_SUMMARY
+
+          FAIL_API="false"
+          for API in "${REQUIRED[@]}"; do
+            STATE=$(gcloud services list --enabled --project "$PROJECT_ID" --format="value(config.name)" | grep -Fx "$API" >/dev/null && echo enabled || echo disabled)
+            echo "- $API: $STATE" >> $GITHUB_STEP_SUMMARY
+            if [ "$STATE" = "disabled" ]; then
+              echo "Attempting to enable $API ..." >> $GITHUB_STEP_SUMMARY
+              gcloud services enable "$API" --project "$PROJECT_ID" --quiet
+              if [ $? -ne 0 ]; then
+                echo "❌ Failed to enable $API (insufficient permissions?)." >> $GITHUB_STEP_SUMMARY
+                FAIL_API="true"
+              else
+                echo "✅ Enabled $API" >> $GITHUB_STEP_SUMMARY
+              fi
+            fi
+          done
+
+          if [ "$FAIL_API" = "true" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "To enable required APIs manually (must be Project Owner/Editor):" >> $GITHUB_STEP_SUMMARY
+            echo "  gcloud services enable run.googleapis.com artifactregistry.googleapis.com cloudresourcemanager.googleapis.com --project $PROJECT_ID" >> $GITHUB_STEP_SUMMARY
+            echo "Exiting because required APIs are not enabled and could not be enabled automatically." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
       - name: Determine runtime service account for Cloud Run
         id: runtime-sa
         env:
@@ -367,16 +406,28 @@ jobs:
           echo "CALLER_SA=$CALLER" >> $GITHUB_ENV
 
           # Compute Project Number (needed for Compute Default SA)
-          PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)')
+          PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)' 2>/dev/null || true)
           echo "PROJECT_NUMBER=$PROJECT_NUMBER" >> $GITHUB_ENV
 
           # Decide runtime service account
           if [ -n "$OVERRIDE_SA" ]; then
             RUNTIME_SA="$OVERRIDE_SA"
             SOURCE="override (vars.CLOUD_RUN_SERVICE_ACCOUNT)"
-          else
+          elif [ -n "$PROJECT_NUMBER" ]; then
             RUNTIME_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
             SOURCE="default (Compute Engine default SA)"
+          else
+            # Could not resolve project number (likely Cloud Resource Manager API permission). Fail fast with guidance.
+            {
+              echo "### Runtime SA resolution failed"
+              echo "- Could not resolve project number for $PROJECT_ID."
+              echo "- Ensure Cloud Resource Manager API is enabled and that the deploy service account has permission to read the project."
+              echo "- Workarounds:"
+              echo "  1) Set a repo variable CLOUD_RUN_SERVICE_ACCOUNT with the runtime SA email to skip auto-detection."
+              echo "  2) Or grant the deploy SA Viewer on the project to allow reading projectNumber."
+            } >> $GITHUB_STEP_SUMMARY
+            echo "Missing project number and no override provided; aborting." >&2
+            exit 1
           fi
           echo "RUNTIME_SA=$RUNTIME_SA" >> $GITHUB_ENV
 
@@ -443,7 +494,8 @@ jobs:
             --allow-unauthenticated \
             --port=3000 \
             --service-account="${{ env.RUNTIME_SA }}" \
-            --set-env-vars NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
+            --set-env-vars NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }} \
+            --quiet
 
   test-e2e:
     name: Playwright E2E
