@@ -14,6 +14,8 @@ import {
   Position,
 } from "../types/game";
 
+type ControlScheme = "swipe" | "joystick";
+
 export const SnakeGame: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [gameOver, setGameOver] = useState(false);
@@ -38,6 +40,21 @@ export const SnakeGame: React.FC = () => {
   const [obstacles, setObstacles] = useState<Obstacle[]>([]);
   const [portals, setPortals] = useState<Portal[]>([]);
   const [gameLoop, setGameLoop] = useState<NodeJS.Timeout | null>(null);
+  const [controlScheme, setControlScheme] = useState<ControlScheme>(() => {
+    if (typeof window === "undefined") return "swipe";
+    try {
+      const saved = localStorage.getItem("snakeControlScheme");
+      return (saved === "joystick" || saved === "swipe") ? (saved as ControlScheme) : "swipe";
+    } catch {
+      return "swipe";
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem("snakeControlScheme", controlScheme);
+    } catch {
+    }
+  }, [controlScheme]);
 
   // Load persisted scores on mount
   useEffect(() => {
@@ -227,29 +244,77 @@ export const SnakeGame: React.FC = () => {
 
       switch (e.key) {
         case "ArrowUp":
-          if (direction !== "DOWN") {
-            setNextDirection("UP");
-          }
+          if (direction !== "DOWN") setNextDirection("UP");
           break;
         case "ArrowDown":
-          if (direction !== "UP") {
-            setNextDirection("DOWN");
-          }
+          if (direction !== "UP") setNextDirection("DOWN");
           break;
         case "ArrowLeft":
-          if (direction !== "RIGHT") {
-            setNextDirection("LEFT");
-          }
+          if (direction !== "RIGHT") setNextDirection("LEFT");
           break;
         case "ArrowRight":
-          if (direction !== "LEFT") {
-            setNextDirection("RIGHT");
-          }
+          if (direction !== "LEFT") setNextDirection("RIGHT");
           break;
       }
     },
       [direction, gameStarted, gameOver, initGame, config, restartWithConfig],
   );
+
+  // Touch swipe controls when controlScheme === 'swipe'
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    if (controlScheme !== "swipe") return;
+
+    let startX = 0;
+    let startY = 0;
+    let tracking = false;
+    const threshold = Math.max(20, CELL_SIZE * 0.6); // pixels
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (!gameStarted || isPaused || gameOver) return;
+      const t = e.touches[0];
+      startX = t.clientX;
+      startY = t.clientY;
+      tracking = true;
+      e.preventDefault();
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      if (!tracking) return;
+      e.preventDefault();
+    };
+    const commitDirection = (dx: number, dy: number) => {
+      const ax = Math.abs(dx);
+      const ay = Math.abs(dy);
+      if (ax < threshold && ay < threshold) return;
+      if (ax > ay) {
+        if (dx < 0 && direction !== "RIGHT") setNextDirection("LEFT");
+        else if (dx > 0 && direction !== "LEFT") setNextDirection("RIGHT");
+      } else {
+        if (dy < 0 && direction !== "DOWN") setNextDirection("UP");
+        else if (dy > 0 && direction !== "UP") setNextDirection("DOWN");
+      }
+    };
+    const onTouchEnd = (e: TouchEvent) => {
+      if (!tracking) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - startX;
+      const dy = t.clientY - startY;
+      commitDirection(dx, dy);
+      tracking = false;
+      e.preventDefault();
+    };
+
+    canvas.addEventListener("touchstart", onTouchStart, {passive: false});
+    canvas.addEventListener("touchmove", onTouchMove, {passive: false});
+    canvas.addEventListener("touchend", onTouchEnd, {passive: false});
+
+    return () => {
+      canvas.removeEventListener("touchstart", onTouchStart as any);
+      canvas.removeEventListener("touchmove", onTouchMove as any);
+      canvas.removeEventListener("touchend", onTouchEnd as any);
+    };
+  }, [controlScheme, direction, gameStarted, isPaused, gameOver]);
 
   // Game loop
   const gameLoopCallback = useCallback(() => {
@@ -718,6 +783,26 @@ export const SnakeGame: React.FC = () => {
       description={`Eat the food to grow. Avoid walls and yourself! Score: ${score} | High Score: ${highScore}`}
     >
       <div className="p-4">
+        {/* Mobile control mode selector: Swipe vs Joystick */}
+        <div className="mb-3 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+          <span className="text-sm text-gray-600 dark:text-gray-300">Mobile Controls:</span>
+          <div className="inline-flex rounded-md overflow-hidden border border-gray-300 dark:border-gray-700">
+            <button
+                type="button"
+                onClick={() => setControlScheme("swipe")}
+                className={`px-3 py-1.5 text-sm ${controlScheme === 'swipe' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+            >
+              Swipe
+            </button>
+            <button
+                type="button"
+                onClick={() => setControlScheme("joystick")}
+                className={`px-3 py-1.5 text-sm border-l border-gray-300 dark:border-gray-700 ${controlScheme === 'joystick' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+            >
+              Joystick
+            </button>
+          </div>
+        </div>
         {/* Game Mode Selector */}
         <div className="mb-4 flex flex-wrap justify-center gap-2">
           {(["classic", "obstacles", "portal", "speed"] as GameMode[]).map(
@@ -778,6 +863,31 @@ export const SnakeGame: React.FC = () => {
           />
         </div>
 
+        {/* Virtual joystick for mobile when selected */}
+        {controlScheme === "joystick" && (
+            <div className="mt-4 flex justify-center">
+              <VirtualJoystick
+                  onDirection={(dir) => {
+                    // Map to cardinal and avoid 180° reversals
+                    switch (dir) {
+                      case "UP":
+                        if (direction !== "DOWN") setNextDirection("UP");
+                        break;
+                      case "DOWN":
+                        if (direction !== "UP") setNextDirection("DOWN");
+                        break;
+                      case "LEFT":
+                        if (direction !== "RIGHT") setNextDirection("LEFT");
+                        break;
+                      case "RIGHT":
+                        if (direction !== "LEFT") setNextDirection("RIGHT");
+                        break;
+                    }
+                  }}
+              />
+            </div>
+        )}
+
         {/* Controls Info */}
         <div className="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
           <p>
@@ -802,6 +912,92 @@ export const SnakeGame: React.FC = () => {
         </div>
       </div>
     </GameContainer>
+  );
+};
+
+type JoystickProps = {
+  onDirection: (dir: Direction) => void;
+};
+
+const VirtualJoystick: React.FC<JoystickProps> = ({onDirection}) => {
+  const padRef = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(false);
+  const knobRef = useRef<HTMLDivElement>(null);
+
+  // Convert movement vector to a cardinal direction
+  const vectorToDir = (dx: number, dy: number): Direction | null => {
+    const dead = 10; // px deadzone
+    const ax = Math.abs(dx);
+    const ay = Math.abs(dy);
+    if (ax < dead && ay < dead) return null;
+    if (ax > ay) return dx > 0 ? "RIGHT" : "LEFT";
+    return dy > 0 ? "DOWN" : "UP";
+  };
+
+  const handleMoveFromEvent = (clientX: number, clientY: number) => {
+    const pad = padRef.current;
+    const knob = knobRef.current;
+    if (!pad || !knob) return;
+    const rect = pad.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = clientX - cx;
+    const dy = clientY - cy;
+    const maxR = rect.width * 0.32; // knob travel radius
+    const len = Math.hypot(dx, dy) || 1;
+    const nx = (dx / len) * Math.min(maxR, len);
+    const ny = (dy / len) * Math.min(maxR, len);
+    knob.style.transform = `translate(${nx}px, ${ny}px)`;
+    const dir = vectorToDir(dx, dy);
+    if (dir) onDirection(dir);
+  };
+
+  useEffect(() => {
+    const pad = padRef.current;
+    if (!pad) return;
+    const onPointerDown = (e: PointerEvent) => {
+      setActive(true);
+      (e.target as HTMLElement)?.setPointerCapture?.(e.pointerId);
+      handleMoveFromEvent(e.clientX, e.clientY);
+      e.preventDefault();
+    };
+    const onPointerMove = (e: PointerEvent) => {
+      if (!active) return;
+      handleMoveFromEvent(e.clientX, e.clientY);
+      e.preventDefault();
+    };
+    const onPointerUp = (e: PointerEvent) => {
+      setActive(false);
+      if (knobRef.current) knobRef.current.style.transform = `translate(0px, 0px)`;
+      e.preventDefault();
+    };
+
+    pad.addEventListener("pointerdown", onPointerDown as any, {passive: false} as any);
+    window.addEventListener("pointermove", onPointerMove as any, {passive: false} as any);
+    window.addEventListener("pointerup", onPointerUp as any, {passive: false} as any);
+    return () => {
+      pad.removeEventListener("pointerdown", onPointerDown as any);
+      window.removeEventListener("pointermove", onPointerMove as any);
+      window.removeEventListener("pointerup", onPointerUp as any);
+    };
+  }, [active]);
+
+  return (
+      <div className="select-none">
+        <div
+            ref={padRef}
+            aria-label="Virtual joystick"
+            className="relative h-32 w-32 rounded-full bg-gray-200 dark:bg-gray-700 shadow-inner"
+            style={{touchAction: "none"}}
+        >
+          <div
+              ref={knobRef}
+              className={`absolute left-1/2 top-1/2 h-16 w-16 -translate-x-1/2 -translate-y-1/2 rounded-full shadow-md ${
+                  active ? "bg-blue-500" : "bg-white dark:bg-gray-400"
+              }`}
+          />
+        </div>
+      </div>
   );
 };
 
