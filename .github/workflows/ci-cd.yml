@@ -101,14 +101,14 @@ jobs:
           echo "=== Available Secrets (names only) ===" >> $GITHUB_STEP_SUMMARY
           echo "GCP_PROJECT_ID: $([ -n \"$GCP_PROJECT_ID\" ] && echo 'present' || echo 'missing')" >> $GITHUB_STEP_SUMMARY
           echo "GCP_REGION: $([ -n \"$GCP_REGION\" ] && echo 'present' || echo 'missing')" >> $GITHUB_STEP_SUMMARY
-          echo "GCP_SA_KEY: $([ -n \"$GCP_SA_KEY\" ] && echo 'present' || echo 'missing')" >> $GITHUB_STEP_SUMMARY
+          echo "GCP_SA_VAR_KEY: $([ -n \"$GCP_SA_VAR_KEY\" ] && echo 'present' || echo 'missing')" >> $GITHUB_STEP_SUMMARY
           
           # Check for service account key (using direct environment variable access)
-          if [ -n "$GCP_SA_KEY" ]; then
+          if [ -n "$GCP_SA_VAR_KEY" ]; then
             HAS_KEY=true
-            echo "Found GCP_SA_KEY (${#GCP_SA_KEY} chars)" >> $GITHUB_STEP_SUMMARY
+            echo "Found GCP_SA_VAR_KEY (${#GCP_SA_VAR_KEY} chars)" >> $GITHUB_STEP_SUMMARY
           else
-            echo "GCP_SA_KEY is empty or not set" >> $GITHUB_STEP_SUMMARY
+            echo "GCP_SA_VAR_KEY is empty or not set" >> $GITHUB_STEP_SUMMARY
           fi
           
           # Check for Workload Identity Federation
@@ -169,11 +169,11 @@ jobs:
             echo "- Secret access check:"
             echo "  - GCP_PROJECT_ID: $([ -n "${{ secrets.GCP_PROJECT_ID }}" ] && echo "present (${#GCP_PROJECT_ID} chars)" || echo "missing")"
             echo "  - GCP_REGION: $([ -n "${{ secrets.GCP_REGION }}" ] && echo "present (${#GCP_REGION} chars)" || echo "missing")"
-            echo "  - GCP_SA_KEY: $([ -n "${{ secrets.GCP_SA_KEY }}" ] && echo "present (${#GCP_SA_KEY} chars starting with ${GCP_SA_KEY:0:10}...)" || echo "missing")"
+            echo "  - GCP_SA_VAR_KEY: $([ -n "${{ vars.GCP_SA_VAR_KEY }}" ] && echo "present (${#GCP_SA_VAR_KEY} chars starting with ${GCP_SA_VAR_KEY:0:10}...)" || echo "missing")"
           
             # Check for common issues
             echo "- Common issues check:"
-            if [ -z "${{ secrets.GCP_SA_KEY }}" ] && [ "$GITHUB_EVENT_NAME" = "pull_request" ] && [ "$GITHUB_REPOSITORY" != "$GITHUB_REPOSITORY_OWNER/$(echo $GITHUB_REPOSITORY | cut -d'/' -f2-)" ]; then
+            if [ -z "${{ vars.GCP_SA_VAR_KEY }}" ] && [ "$GITHUB_EVENT_NAME" = "pull_request" ] && [ "$GITHUB_REPOSITORY" != "$GITHUB_REPOSITORY_OWNER/$(echo $GITHUB_REPOSITORY | cut -d'/' -f2-)" ]; then
               echo "  - ❌ Pull requests from forks don't have access to secrets by default"
             fi
             if [ -z "$GITHUB_TOKEN" ]; then
@@ -296,7 +296,7 @@ jobs:
           else
             echo "HAS_WIF=false" >> $GITHUB_ENV
           fi
-          if [ -n "${{ secrets.GCP_SA_KEY }}" ]; then
+          if [ -n "${{ vars.GCP_SA_VAR_KEY }}" ]; then
             echo "HAS_SA=true" >> $GITHUB_ENV
           else
             echo "HAS_SA=false" >> $GITHUB_ENV
@@ -313,7 +313,7 @@ jobs:
         if: ${{ env.HAS_WIF != 'true' && env.HAS_SA == 'true' }}
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          credentials_json: ${{ vars.GCP_SA_VAR_KEY }}
 
       - name: Set up gcloud SDK
         uses: google-github-actions/setup-gcloud@v2
