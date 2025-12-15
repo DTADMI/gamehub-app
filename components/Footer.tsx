@@ -53,6 +53,7 @@ const footerLinks = [
 
 export function Footer() {
   const [email, setEmail] = useState("");
+  const [expanded, setExpanded] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,8 +64,9 @@ export function Footer() {
 
   return (
     <footer className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container px-4 py-4 md:py-6">
-        <div className="grid grid-cols-2 gap-6 md:grid-cols-4 lg:grid-cols-5">
+      <div className="container px-4 py-3 md:py-4">
+        {/* Compact header row */}
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="col-span-2 space-y-4">
             <Link href="/" className="flex items-center space-x-2">
               <Gamepad2 className="h-8 w-8 text-primary" />
@@ -76,6 +78,23 @@ export function Footer() {
               A collection of fun and engaging games for everyone.
             </p>
           </div>
+          <div className="flex items-center justify-start md:justify-end gap-3">
+            <ModeToggle/>
+            <Button
+                variant="outline"
+                size="sm"
+                aria-expanded={expanded}
+                aria-controls="footer-more"
+                onClick={() => setExpanded((v) => !v)}
+            >
+              {expanded ? "Hide footer" : "More"}
+            </Button>
+          </div>
+        </div>
+
+        {/* Expandable content */}
+        <div id="footer-more" hidden={!expanded} className="mt-4">
+          <div className="grid grid-cols-2 gap-6 md:grid-cols-4 lg:grid-cols-5">
 
           {footerLinks.map((section) => {
             const items =
@@ -204,15 +223,14 @@ export function Footer() {
               </Button>
             </form>
           </div>
+          </div>
         </div>
-        <div className="mt-6 md:mt-8 border-t pt-4 md:pt-6">
-          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
+
+        <div className="mt-4 md:mt-6 border-t pt-3 md:pt-4">
+          <div className="flex flex-col items-center justify-between gap-3 md:flex-row">
             <p className="text-sm text-muted-foreground">
               &copy; {new Date().getFullYear()} Gamehub. All rights reserved.
             </p>
-            <div className="flex items-center space-x-4">
-              <ModeToggle />
-            </div>
           </div>
         </div>
       </div>

@@ -4,40 +4,50 @@ import React, {createContext, useContext, useEffect, useMemo, useState} from "re
 export type GameSettings = {
     enableParticles: boolean;
     setEnableParticles: (v: boolean) => void;
+  particleEffect: "sparks" | "puff";
+  setParticleEffect: (t: "sparks" | "puff") => void;
 };
 
 const GameSettingsContext = createContext<GameSettings | null>(null);
 
 const STORAGE_KEY = "gamehub:settings";
 
-function loadInitial(): Pick<GameSettings, "enableParticles"> {
+function loadInitial(): Pick<GameSettings, "enableParticles" | "particleEffect"> {
     if (typeof window === "undefined") {
-        return {enableParticles: false};
+      return {enableParticles: false, particleEffect: "sparks"};
     }
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) {
-        return {enableParticles: false};
+        return {enableParticles: false, particleEffect: "sparks"};
       }
         const parsed = JSON.parse(raw);
-        return {enableParticles: !!parsed.enableParticles};
+      return {
+        enableParticles: !!parsed.enableParticles,
+        particleEffect: parsed.particleEffect === "puff" ? "puff" : "sparks",
+      };
     } catch {
-        return {enableParticles: false};
+      return {enableParticles: false, particleEffect: "sparks"};
     }
 }
 
 export function GameSettingsProvider({children}: { children: React.ReactNode }) {
-    const [enableParticles, setEnableParticles] = useState(loadInitial().enableParticles);
+  const initial = loadInitial();
+  const [enableParticles, setEnableParticles] = useState(initial.enableParticles);
+  const [particleEffect, setParticleEffect] = useState<"sparks" | "puff">(initial.particleEffect);
 
     useEffect(() => {
         try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify({enableParticles}));
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({enableParticles, particleEffect}));
         } catch {
             // ignore
         }
-    }, [enableParticles]);
+    }, [enableParticles, particleEffect]);
 
-    const value = useMemo<GameSettings>(() => ({enableParticles, setEnableParticles}), [enableParticles]);
+  const value = useMemo<GameSettings>(
+      () => ({enableParticles, setEnableParticles, particleEffect, setParticleEffect}),
+      [enableParticles, particleEffect],
+  );
     return <GameSettingsContext.Provider value={value}>{children}</GameSettingsContext.Provider>;
 }
 
@@ -48,6 +58,9 @@ export function useGameSettings(): GameSettings {
             enableParticles: false,
             setEnableParticles: () => {
             },
+          particleEffect: "sparks",
+          setParticleEffect: () => {
+          },
         };
     }
     return ctx;

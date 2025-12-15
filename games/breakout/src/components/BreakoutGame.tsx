@@ -848,17 +848,19 @@ export default function BreakoutGame() {
               } else {
                 soundManager.playSound("brickHit");
               }
-              // Optional particles: dust puff on hit; spark burst on break
+              // Optional particles: on brick destruction, emit selected effect
               if (enableParticlesRef.current) {
                 if (!particles) {
                   particles = new ParticlePool({maxParticles: 96});
                 }
-                const cx = b.x + b.width / 2;
-                const cy = b.y + b.height / 2;
                 if (b.health <= 0) {
-                  particles.emitSparkBurst(cx, cy, b.color, 10 + Math.floor(Math.random() * 4));
-                } else {
-                  particles.emitDustPuff(cx, cy, b.color, 4 + Math.floor(Math.random() * 3));
+                  const cx = b.x + b.width / 2;
+                  const cy = b.y + b.height / 2;
+                  if (particleEffectRef.current === "puff") {
+                    particles.emitDustPuff(cx, cy, b.color, 6 + Math.floor(Math.random() * 4));
+                  } else {
+                    particles.emitSparkBurst(cx, cy, b.color, 10 + Math.floor(Math.random() * 6));
+                  }
                 }
               }
               // Light haptics on supported devices
@@ -1065,12 +1067,14 @@ export default function BreakoutGame() {
     el.dataset.lives = String(livesRef.current || lives || 0);
   }, [ball, lives, paddle]);
 
-  // Game settings: particle toggle
-  const {enableParticles} = useGameSettings();
+  // Game settings: particle toggle and effect
+  const {enableParticles, particleEffect} = useGameSettings();
   const enableParticlesRef = useRef<boolean>(false);
+  const particleEffectRef = useRef<"sparks" | "puff">("sparks");
   useEffect(() => {
     enableParticlesRef.current = !!enableParticles;
-  }, [enableParticles]);
+    particleEffectRef.current = particleEffect || "sparks";
+  }, [enableParticles, particleEffect]);
 
   // High score
   useEffect(() => {

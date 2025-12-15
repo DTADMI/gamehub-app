@@ -33,8 +33,8 @@ function GameContainer({
         : {};
   return (
       <GameSettingsProvider>
-          <div className={`min-h-[100svh] bg-gray-50 dark:bg-gray-900 ${className}`}>
-              <div className="container mx-auto px-4 py-3 md:py-4">
+          <div className={`min-h-0 bg-gray-50 dark:bg-gray-900 ${className}`}>
+              <div className="container mx-auto px-3 py-3 md:px-4 md:py-4">
                   <header className="mb-3 md:mb-4 text-center">
                 <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-1 md:mb-2">
                 {title}
@@ -76,16 +76,31 @@ function GameContainer({
 export default GameContainer;
 
 function ParticlesToggle() {
-    const {enableParticles, setEnableParticles} = useGameSettings();
+    const {enableParticles, setEnableParticles, particleEffect, setParticleEffect} = useGameSettings();
     return (
-        <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
-            <input
-                type="checkbox"
-                checked={enableParticles}
-                onChange={(e) => setEnableParticles(e.currentTarget.checked)}
-                className="h-4 w-4 accent-blue-600"
-            />
-            Enable particles (experimental)
-        </label>
+        <div className="flex items-center gap-3">
+            <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+                <input
+                    type="checkbox"
+                    checked={enableParticles}
+                    onChange={(e) => setEnableParticles(e.currentTarget.checked)}
+                    className="h-4 w-4 accent-blue-600"
+                />
+                Particles
+            </label>
+            <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+                <span className="sr-only">Particle effect</span>
+                <select
+                    aria-label="Particle effect"
+                    disabled={!enableParticles}
+                    value={particleEffect}
+                    onChange={(e) => setParticleEffect(e.currentTarget.value as any)}
+                    className="h-8 rounded-md border border-input bg-background px-2 text-sm disabled:opacity-50"
+                >
+                    <option value="sparks">Sparks</option>
+                    <option value="puff">Puff</option>
+                </select>
+            </label>
+        </div>
     );
 }

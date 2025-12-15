@@ -74,6 +74,18 @@ Mobile‑first game UX (important):
 - Canvases are high‑DPI aware and scale crisply on DPR 1/2/3; the CSS size fits the container width.
 - Breakout and Snake include a tap‑to‑start/pause overlay on mobile for smooth interaction.
 
+Layout and footer (UX updates):
+
+- The root layout uses a sticky footer and tighter vertical spacing so most pages fit within a single screen or require
+  at most a short scroll.
+- The footer is compact by default with a “More” toggle to reveal additional links and the newsletter form.
+
+Particles in games:
+
+- Optional particle effects can be toggled per game from the control bar under the canvas.
+- You can also choose the effect style: `Sparks` or `Puff`. Breakout emits your selected effect when bricks are
+  destroyed.
+
 Local backend fallback (optional but recommended):
 
 - Start a local backend automatically (pulls latest image from Artifact Registry, falls back to Docker Hub):
