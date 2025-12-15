@@ -1,6 +1,7 @@
 "use client";
 
 import {GameContainer, soundManager} from "@games/shared";
+import {submitScore} from "@/lib/graphql/queries";
 import React, {useCallback, useEffect, useRef, useState} from "react";
 
 // Minimal, stable MVP implementation for Breakout
@@ -789,6 +790,11 @@ export default function BreakoutGame() {
               } else {
                 soundManager.playSound("brickHit");
               }
+              // Light haptics on supported devices
+              try {
+                (navigator as any)?.vibrate?.(b.health <= 0 ? 15 : 8);
+              } catch {
+              }
               // maybe drop a power-up
               if (b.health <= 0) {
                 const chance = isCoarseRef.current ? 0.08 : POWERUP_DROP_CHANCE;
@@ -985,6 +991,16 @@ export default function BreakoutGame() {
     } catch {
       // no-op
     }
+    // Submit score to backend (best-effort)
+    (async () => {
+      try {
+        if (score > 0) {
+          await submitScore({gameType: "BREAKOUT", score});
+        }
+      } catch {
+        // ignore network/auth errors in game flow
+      }
+    })();
   }, [gameOver, score]);
 
   return (
@@ -1088,6 +1104,7 @@ export default function BreakoutGame() {
             {isPaused ? "Resume" : "Pause"}
           </button>
         )}
+
       </div>
 
         {/* Collapsible help on mobile; expanded sections on larger screens */}

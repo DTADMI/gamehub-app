@@ -35,6 +35,8 @@ export const MemoryGame: React.FC = () => {
   const [flippedIndices, setFlippedIndices] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
   const [gameOver, setGameOver] = useState(false);
+    const [gameStarted, setGameStarted] = useState(false);
+    const [isPaused, setIsPaused] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">(
       "medium",
@@ -68,8 +70,14 @@ export const MemoryGame: React.FC = () => {
     setFlippedIndices([]);
     setMoves(0);
     setGameOver(false);
-    soundManager.playMusic("background");
   }, [difficulty]);
+
+    const startGame = useCallback(() => {
+        setIsPaused(false);
+        setGameStarted(true);
+        initializeGame();
+        soundManager.playMusic("background");
+    }, [initializeGame]);
 
   // Check for matches
   useEffect(() => {
@@ -157,6 +165,8 @@ export const MemoryGame: React.FC = () => {
   // Handle card click
   const handleCardClick = (index: number) => {
     if (
+        !gameStarted ||
+        isPaused ||
       isProcessing ||
       gameOver ||
       flippedIndices.includes(index) ||
@@ -215,7 +225,7 @@ export const MemoryGame: React.FC = () => {
                 setDifficulty(e.target.value as "easy" | "medium" | "hard")
                       }
                       className="px-3 py-1 border rounded-md"
-                      disabled={moves > 0}
+                      disabled={moves > 0 && gameStarted && !gameOver}
                   >
                       <option value="easy">Easy (6 pairs)</option>
                       <option value="medium">Medium (8 pairs)</option>
@@ -233,11 +243,39 @@ export const MemoryGame: React.FC = () => {
               Auto-complete last pair (counts 1 move)
             </span>
               </label>
+              {/* Start / Pause controls */}
+              <div className="flex items-center gap-2">
+                  {!gameStarted || gameOver ? (
+                      <button
+                          onClick={startGame}
+                          className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
+                      >
+                          {gameOver ? "Play Again" : "Start"}
+                      </button>
+                  ) : (
+                      <button
+                          onClick={() => {
+                              setIsPaused((p) => {
+                                  const next = !p;
+                                  if (next) {
+                                      soundManager.stopMusic();
+                                  } else {
+                                      soundManager.playMusic("background");
+                                  }
+                                  return next;
+                              });
+                          }}
+                          className="px-4 py-2 rounded-md bg-gray-600 text-white hover:bg-gray-700"
+                      >
+                          {isPaused ? "Resume" : "Pause"}
+                      </button>
+                  )}
+              </div>
         </div>
 
         {/* Game Board */}
         <div
-            className={`grid gap-4 sm:gap-5 ${
+            className={`relative grid gap-4 sm:gap-5 ${
             difficulty === "easy"
               ? "grid-cols-3"
               : difficulty === "medium"
@@ -245,6 +283,23 @@ export const MemoryGame: React.FC = () => {
                 : "grid-cols-6"
           }`}
         >
+            {/* Tap-to-start / pause overlay for mobile */}
+            {(!gameStarted || isPaused) && !gameOver && (
+                <button
+                    aria-label={!gameStarted ? "Tap to start" : "Tap to resume"}
+                    className="absolute inset-0 z-10 flex items-center justify-center bg-black/40 text-white text-base sm:text-lg font-semibold select-none rounded-xl"
+                    onClick={() => {
+                        if (!gameStarted) {
+                            startGame();
+                        } else {
+                            setIsPaused(false);
+                            soundManager.playMusic("background");
+                        }
+                    }}
+                >
+                    {!gameStarted ? "Tap to start" : "Paused — Tap to resume"}
+                </button>
+            )}
           {cards.map((card, index) => (
             <div
               key={card.id}
@@ -287,7 +342,7 @@ export const MemoryGame: React.FC = () => {
                 Congratulations! You won in {moves} moves!
               </h3>
               <button
-                onClick={initializeGame}
+                  onClick={startGame}
                 className="mt-3 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
               >
                 Play Again

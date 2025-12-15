@@ -1,5 +1,6 @@
 // games/snake/src/components/SnakeGame.tsx
 import {GameContainer, soundManager} from "@games/shared";
+import {submitScore} from "@/lib/graphql/queries";
 import React, {useCallback, useEffect, useRef, useState} from "react";
 
 import {
@@ -609,6 +610,37 @@ export const SnakeGame: React.FC = () => {
     config,
   ]);
 
+  // DPR/responsive scaling: fit canvas to container width while keeping crisp pixels
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const handleResize = () => {
+      const container = canvas.parentElement as HTMLElement | null;
+      if (!container) return;
+      const logicalW = config.gridSize * CELL_SIZE;
+      const logicalH = config.gridSize * CELL_SIZE;
+      const containerWidth = container.clientWidth || logicalW;
+      const scale = Math.min(containerWidth / logicalW, 1);
+      canvas.style.width = `${logicalW * scale}px`;
+      canvas.style.height = `${logicalH * scale}px`;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = logicalW * dpr;
+      canvas.height = logicalH * dpr;
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        // @ts-ignore setTransform vendor differences
+        if (typeof (ctx as any).setTransform === "function") {
+          (ctx as any).setTransform(dpr, 0, 0, dpr, 0, 0);
+        } else {
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    return () => window.removeEventListener("resize", handleResize);
+  }, [config.gridSize]);
+
   // Handle game over
   useEffect(() => {
     if (gameOver) {
@@ -623,6 +655,16 @@ export const SnakeGame: React.FC = () => {
             new CustomEvent("snake:gameover", {detail: {score}}),
         );
       } catch {}
+      // Submit score to backend (best-effort)
+      (async () => {
+        try {
+          if (score > 0) {
+            await submitScore({gameType: "SNAKE", score});
+          }
+        } catch {
+          // ignore network/auth errors in game flow
+        }
+      })();
       // Update local high score and leaderboard
       try {
         // Save high score
@@ -889,14 +931,14 @@ export const SnakeGame: React.FC = () => {
         )}
 
         {/* Controls Info */}
-        <div className="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
+        <div className="mt-4 text-center text-base sm:text-sm text-gray-600 dark:text-gray-400">
           <p>
             Use arrow keys to move | Space to {isPaused ? "resume" : "pause"}
           </p>
         </div>
 
         {/* Game Stats */}
-        <div className="mt-4 flex justify-between text-sm">
+        <div className="mt-4 flex justify-between text-base sm:text-sm">
           <div>
             Score: <span className="font-bold">{score}</span>
           </div>
