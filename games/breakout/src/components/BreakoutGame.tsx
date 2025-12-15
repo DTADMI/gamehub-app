@@ -139,7 +139,19 @@ function buildBricks(lvl: number, layout: BrickLayout = computeBrickLayout(CANVA
 // Power-ups
 // Existing: slow/fast/sticky
 // New: thru (pierce bricks), bomb (AoE), fireball (one-hit), laser (paddle shots), extraLife
-type PowerUpType = "slow" | "fast" | "sticky" | "thru" | "bomb" | "fireball" | "laser" | "extraLife";
+// Restored: expand (wider paddle), shrink (narrow paddle)
+type PowerUpType =
+    | "slow"
+    | "fast"
+    | "sticky"
+    | "thru"
+    | "bomb"
+    | "fireball"
+    | "laser"
+    | "extraLife"
+    | "expand"
+    | "shrink"
+    | "multiball";
 type FallingPowerUp = {
   x: number;
   y: number;
@@ -156,13 +168,18 @@ const POWERUP_DURATION_LONG_MS = 9500; // for premium ones
 const FAST_FACTOR = 1.25;
 const SLOW_FACTOR_DESKTOP = 0.75;
 const SLOW_FACTOR_MOBILE = 0.9; // make slow less harsh on mobile to avoid sluggish feel
+const PADDLE_EXPAND_FACTOR = 1.5;
+const PADDLE_SHRINK_FACTOR = 0.7;
 
 function pickWeightedPowerUp(current: ActiveModifier, entitled: { auth: boolean; sub: boolean }): PowerUpType {
   // Availability by entitlement
   const available: Array<{ t: PowerUpType; w: number }> = [];
   // Public
-  if (!(current && current.type === "fast")) available.push({t: "fast", w: 0.5});
-  if (!(current && current.type === "slow")) available.push({t: "slow", w: 0.22});
+  if (!(current && current.type === "fast")) available.push({t: "fast", w: 0.32});
+  if (!(current && current.type === "slow")) available.push({t: "slow", w: 0.18});
+  available.push({t: "expand", w: 0.18});
+  available.push({t: "shrink", w: 0.12});
+  available.push({t: "multiball", w: 0.12});
   // Auth-only
   if (entitled.auth && !(current && current.type === "sticky")) available.push({t: "sticky", w: 0.15});
   // Subscriber-only (heavier features)
@@ -262,6 +279,8 @@ export default function BreakoutGame() {
   const activeRef = useRef<ActiveModifier>(null);
   const lastLaserAtRef = useRef<number>(0);
   const modifierTimerRef = useRef<number>(0);
+  // Extra balls for Multiball (do not cost lives when missed)
+  const extraBallsRef = useRef<Ball[]>([]);
   // Sticky capture state
   const stickyStateRef = useRef<{ captured: boolean; offset: number; capturedAt: number } | null>(null);
   const stickyReleasePendingRef = useRef<boolean>(false);
@@ -632,6 +651,17 @@ export default function BreakoutGame() {
       ctx.fill();
       ctx.closePath();
 
+      // draw extra balls
+      if (extraBallsRef.current.length) {
+        for (const eb of extraBallsRef.current) {
+          ctx.beginPath();
+          ctx.arc(eb.x, eb.y, eb.radius, 0, Math.PI * 2);
+          ctx.fillStyle = isDark ? "#22c55e" : "#10b981"; // emerald for extra balls
+          ctx.fill();
+          ctx.closePath();
+        }
+      }
+
       // draw bricks
       for (const col of stateBricks) {
         for (const b of col) {
@@ -663,6 +693,9 @@ export default function BreakoutGame() {
             fireball: "#fb923c",   // orange
             laser: "#67e8f9",      // cyan
             extraLife: "#10b981",  // emerald
+            expand: "#60a5fa",     // sky
+            shrink: "#94a3b8",     // slate
+            multiball: "#a78bfa",  // violet
           } as const;
           ctx.fillStyle = colorMap[p.type] || "#94a3b8";
           ctx.arc(p.x, p.y, p.size / 2, 0, Math.PI * 2);
@@ -681,6 +714,9 @@ export default function BreakoutGame() {
             fireball: "🔥",
             laser: "L",
             extraLife: "+",
+            expand: "><",
+            shrink: "<>",
+            multiball: "×2",
           } as const;
           const letter = letterMap[p.type] || "?";
           ctx.fillText(letter, p.x, p.y + 3);
@@ -1061,6 +1097,60 @@ export default function BreakoutGame() {
           el.dataset.lives = String(livesRef.current || 0);
         }
 
+        // Update extra balls physics (simplified) — no life loss when missed
+        if (extraBallsRef.current.length) {
+          const nextExtras: Ball[] = [];
+          for (const eb of extraBallsRef.current) {
+            let ex = eb.x + eb.dx;
+            let ey = eb.y + eb.dy;
+            let edx = eb.dx;
+            let edy = eb.dy;
+            // walls
+            if (ex + eb.radius > CANVAS_WIDTH || ex - eb.radius < 0) edx = -edx;
+            if (ey - eb.radius < 0) edy = -edy;
+            // paddle bounce
+            if (
+                ey + eb.radius >= statePaddle.y &&
+                ey - eb.radius <= statePaddle.y + statePaddle.height &&
+                ex >= newPx && ex <= newPx + statePaddle.width &&
+                edy > 0
+            ) {
+              const rel = (ex - (newPx + statePaddle.width / 2)) / (statePaddle.width / 2);
+              const angle = clamp(rel, -1, 1) * MAX_BOUNCE_ANGLE;
+              const speed = Math.sqrt(edx * edx + edy * edy) || BASE_BALL_SPEED;
+              edx = speed * Math.sin(angle);
+              edy = -speed * Math.cos(angle);
+              // small nudge to avoid vertical traps
+              if (Math.abs(edx) < MIN_HORIZ_COMPONENT * 0.5) edx = (edx >= 0 ? 1 : -1) * MIN_HORIZ_COMPONENT * 0.5;
+              ey = statePaddle.y - eb.radius - 0.01;
+            }
+            // bricks
+            outerExtra: for (let c = 0; c < nextBricks.length; c++) {
+              const col = nextBricks[c];
+              if (!col) continue;
+              for (let r = 0; r < col.length; r++) {
+                const b = col[r];
+                if (!b || b.health <= 0) continue;
+                if (ex + eb.radius > b.x && ex - eb.radius < b.x + b.width && ey + eb.radius > b.y && ey - eb.radius < b.y + b.height) {
+                  const ox = Math.min(Math.abs(ex - (b.x + b.width)), Math.abs(ex - b.x));
+                  const oy = Math.min(Math.abs(ey - (b.y + b.height)), Math.abs(ey - b.y));
+                  if (ox < oy) edx = -edx; else edy = -edy;
+                  b.health -= 1;
+                  if (b.health <= 0) soundManager.playSound("brickBreak"); else soundManager.playSound("brickHit");
+                  break outerExtra;
+                }
+              }
+            }
+            // clamp and keep
+            ex = clamp(ex, eb.radius, CANVAS_WIDTH - eb.radius);
+            ey = clamp(ey, eb.radius, CANVAS_HEIGHT + eb.radius);
+            if (ey - eb.radius <= CANVAS_HEIGHT) {
+              nextExtras.push({x: ex, y: ey, dx: edx, dy: edy, radius: eb.radius});
+            }
+          }
+          extraBallsRef.current = nextExtras;
+        }
+
         // check level complete (robust against missing rows)
         const remaining = nextBricks.reduce(
             (acc, col) =>
@@ -1139,6 +1229,39 @@ export default function BreakoutGame() {
               if (p.type === "extraLife") {
                 setLives((lv) => Math.min(5, lv + 1));
                 livesRef.current = Math.min(5, (livesRef.current || 0) + 1);
+              } else if (p.type === "expand" || p.type === "shrink") {
+                const base = PADDLE_WIDTH;
+                const factor = p.type === "expand" ? PADDLE_EXPAND_FACTOR : PADDLE_SHRINK_FACTOR;
+                const newW = clamp(base * factor, base * 0.6, base * 1.8);
+                // Keep paddle within bounds when width changes
+                setPaddle((prev) => {
+                  const nx = clamp(prev.x, 0, CANVAS_WIDTH - newW);
+                  const np = {...prev, width: newW, x: nx};
+                  paddleRef.current = np;
+                  return np;
+                });
+                const dur = POWERUP_DURATION_MS;
+                const next: ActiveModifier = {type: p.type, endTime: now + dur};
+                setActiveModifier(next);
+                activeRef.current = next;
+              } else if (p.type === "multiball") {
+                // Spawn two additional balls from current main ball with slight angles
+                const mb = ballRef.current;
+                const speed = Math.sqrt(mb.dx * mb.dx + mb.dy * mb.dy) || BASE_BALL_SPEED;
+                const angles = [-0.25, 0.25];
+                for (const a of angles) {
+                  const ca = Math.atan2(mb.dy, mb.dx) + a;
+                  extraBallsRef.current.push({
+                    x: mb.x,
+                    y: mb.y,
+                    dx: speed * Math.cos(ca),
+                    dy: speed * Math.sin(ca),
+                    radius: BALL_RADIUS * 0.9,
+                  });
+                }
+                const next: ActiveModifier = {type: p.type, endTime: now + POWERUP_DURATION_MS};
+                setActiveModifier(next);
+                activeRef.current = next;
               } else {
                 const dur = (p.type === "laser" || p.type === "thru" || p.type === "fireball") ? POWERUP_DURATION_LONG_MS : POWERUP_DURATION_MS;
                 const next: ActiveModifier = {type: p.type, endTime: now + dur};
@@ -1162,6 +1285,16 @@ export default function BreakoutGame() {
 
         // expire active modifier
         if (activeRef.current && Date.now() > activeRef.current.endTime) {
+          // Reset paddle size when expand/shrink ends
+          if (activeRef.current.type === "expand" || activeRef.current.type === "shrink") {
+            setPaddle((prev) => {
+              const w = PADDLE_WIDTH;
+              const nx = clamp(prev.x, 0, CANVAS_WIDTH - w);
+              const np = {...prev, width: w, x: nx};
+              paddleRef.current = np;
+              return np;
+            });
+          }
           setActiveModifier(null);
           activeRef.current = null;
           stickyStateRef.current = {captured: false, offset: 0, capturedAt: 0};
@@ -1347,6 +1480,9 @@ export default function BreakoutGame() {
                       fireball: "bg-orange-600",
                       laser: "bg-cyan-600",
                       extraLife: "bg-emerald-700",
+                      expand: "bg-sky-600",
+                      shrink: "bg-slate-600",
+                      multiball: "bg-violet-600",
                     } as const;
                     return (
                         <span
