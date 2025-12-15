@@ -6,28 +6,58 @@ export type GameSettings = {
     setEnableParticles: (v: boolean) => void;
   particleEffect: "sparks" | "puff";
   setParticleEffect: (t: "sparks" | "puff") => void;
+    // Gameplay mode and entitlements used for gating
+    mode: "classic" | "hard" | "chaos";
+    setMode: (m: "classic" | "hard" | "chaos") => void;
+    isAuthenticated: boolean;
+    isSubscriber: boolean;
+    setAuthState: (auth: boolean, sub: boolean) => void;
 };
 
 const GameSettingsContext = createContext<GameSettings | null>(null);
 
 const STORAGE_KEY = "gamehub:settings";
 
-function loadInitial(): Pick<GameSettings, "enableParticles" | "particleEffect"> {
+function loadInitial(): Pick<GameSettings, "enableParticles" | "particleEffect" | "mode"> & {
+    isAuthenticated: boolean;
+    isSubscriber: boolean
+} {
     if (typeof window === "undefined") {
-      return {enableParticles: false, particleEffect: "sparks"};
+        return {
+            enableParticles: false,
+            particleEffect: "sparks",
+            mode: "classic",
+            isAuthenticated: false,
+            isSubscriber: false
+        };
     }
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) {
-        return {enableParticles: false, particleEffect: "sparks"};
+          return {
+              enableParticles: false,
+              particleEffect: "sparks",
+              mode: "classic",
+              isAuthenticated: false,
+              isSubscriber: false
+          };
       }
         const parsed = JSON.parse(raw);
       return {
         enableParticles: !!parsed.enableParticles,
         particleEffect: parsed.particleEffect === "puff" ? "puff" : "sparks",
+          mode: parsed.mode === "hard" || parsed.mode === "chaos" ? parsed.mode : "classic",
+          isAuthenticated: !!parsed.isAuthenticated,
+          isSubscriber: !!parsed.isSubscriber,
       };
     } catch {
-      return {enableParticles: false, particleEffect: "sparks"};
+        return {
+            enableParticles: false,
+            particleEffect: "sparks",
+            mode: "classic",
+            isAuthenticated: false,
+            isSubscriber: false
+        };
     }
 }
 
@@ -35,18 +65,35 @@ export function GameSettingsProvider({children}: { children: React.ReactNode }) 
   const initial = loadInitial();
   const [enableParticles, setEnableParticles] = useState(initial.enableParticles);
   const [particleEffect, setParticleEffect] = useState<"sparks" | "puff">(initial.particleEffect);
+    const [mode, setMode] = useState<"classic" | "hard" | "chaos">(initial.mode);
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(initial.isAuthenticated);
+    const [isSubscriber, setIsSubscriber] = useState<boolean>(initial.isSubscriber);
 
     useEffect(() => {
         try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify({enableParticles, particleEffect}));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                enableParticles,
+                particleEffect,
+                mode,
+                isAuthenticated,
+                isSubscriber
+            }));
         } catch {
             // ignore
         }
-    }, [enableParticles, particleEffect]);
+    }, [enableParticles, particleEffect, mode, isAuthenticated, isSubscriber]);
+
+    const setAuthState = (auth: boolean, sub: boolean) => {
+        setIsAuthenticated(!!auth);
+        setIsSubscriber(!!sub);
+    };
 
   const value = useMemo<GameSettings>(
-      () => ({enableParticles, setEnableParticles, particleEffect, setParticleEffect}),
-      [enableParticles, particleEffect],
+      () => ({
+          enableParticles, setEnableParticles, particleEffect, setParticleEffect,
+          mode, setMode, isAuthenticated, isSubscriber, setAuthState,
+      }),
+      [enableParticles, particleEffect, mode, isAuthenticated, isSubscriber],
   );
     return <GameSettingsContext.Provider value={value}>{children}</GameSettingsContext.Provider>;
 }
@@ -61,6 +108,13 @@ export function useGameSettings(): GameSettings {
           particleEffect: "sparks",
           setParticleEffect: () => {
           },
+            mode: "classic",
+            setMode: () => {
+            },
+            isAuthenticated: false,
+            isSubscriber: false,
+            setAuthState: () => {
+            },
         };
     }
     return ctx;

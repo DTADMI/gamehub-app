@@ -136,8 +136,10 @@ function buildBricks(lvl: number, layout: BrickLayout = computeBrickLayout(CANVA
   return newBricks;
 }
 
-// Power-ups (Phase 1+: timed Slow/Fast + Sticky)
-type PowerUpType = "slow" | "fast" | "sticky";
+// Power-ups
+// Existing: slow/fast/sticky
+// New: thru (pierce bricks), bomb (AoE), fireball (one-hit), laser (paddle shots), extraLife
+type PowerUpType = "slow" | "fast" | "sticky" | "thru" | "bomb" | "fireball" | "laser" | "extraLife";
 type FallingPowerUp = {
   x: number;
   y: number;
@@ -149,29 +151,35 @@ type ActiveModifier = { type: PowerUpType; endTime: number } | null;
 
 const POWERUP_DROP_CHANCE = 0.1; // 10% per brick break (desktop baseline)
 const POWERUP_MAX_FALLING = 2;
-const POWERUP_DURATION_MS = 7000; // 7s timed effect
+const POWERUP_DURATION_MS = 7000; // 7s timed effect (default)
+const POWERUP_DURATION_LONG_MS = 9500; // for premium ones
 const FAST_FACTOR = 1.25;
 const SLOW_FACTOR_DESKTOP = 0.75;
 const SLOW_FACTOR_MOBILE = 0.9; // make slow less harsh on mobile to avoid sluggish feel
 
-function pickWeightedPowerUp(current: ActiveModifier): PowerUpType {
-  // Slow is rarer and skipped if already active
-  const allowSlow = !(current && current.type === "slow");
-  const allowSticky = !(current && current.type === "sticky");
-  const weights: Array<{ t: PowerUpType; w: number }> = [
-    {t: "fast", w: 0.6},
-    {t: "slow", w: allowSlow ? 0.25 : 0},
-    {t: "sticky", w: allowSticky ? 0.15 : 0},
-  ];
-  const sum = weights.reduce((a, b) => a + b.w, 0) || 1;
+function pickWeightedPowerUp(current: ActiveModifier, entitled: { auth: boolean; sub: boolean }): PowerUpType {
+  // Availability by entitlement
+  const available: Array<{ t: PowerUpType; w: number }> = [];
+  // Public
+  if (!(current && current.type === "fast")) available.push({t: "fast", w: 0.5});
+  if (!(current && current.type === "slow")) available.push({t: "slow", w: 0.22});
+  // Auth-only
+  if (entitled.auth && !(current && current.type === "sticky")) available.push({t: "sticky", w: 0.15});
+  // Subscriber-only (heavier features)
+  if (entitled.sub) {
+    available.push({t: "thru", w: 0.10});
+    available.push({t: "bomb", w: 0.06});
+    available.push({t: "fireball", w: 0.06});
+    available.push({t: "laser", w: 0.05});
+    available.push({t: "extraLife", w: 0.06});
+  }
+  const sum = available.reduce((a, b) => a + b.w, 0) || 1;
   let r = Math.random() * sum;
-  for (const item of weights) {
-    if (r < item.w) {
-      return item.t;
-    }
+  for (const item of available) {
+    if (r < item.w) return item.t;
     r -= item.w;
   }
-  return "fast";
+  return available[0]?.t ?? "fast";
 }
 
 function desiredSpeedFromModifier(
@@ -184,7 +192,14 @@ function desiredSpeedFromModifier(
   const base = BASE_BALL_SPEED * levelRamp;
   const factor =
       mod?.type === "fast" ? FAST_FACTOR : mod?.type === "slow" ? slowFactor : 1;
-  return clamp(base * factor, MIN_BALL_SPEED, MAX_BALL_SPEED);
+  // Mode scaling: Hard slightly faster; Chaos fastest
+  const mode = (typeof window !== "undefined" && (window as any).__gh_mode) as
+      | "classic"
+      | "hard"
+      | "chaos"
+      | undefined;
+  const modeScale = mode === "hard" ? 1.1 : mode === "chaos" ? 1.25 : 1;
+  return clamp(base * factor * modeScale, MIN_BALL_SPEED, MAX_BALL_SPEED);
 }
 
 export default function BreakoutGame() {
@@ -226,11 +241,13 @@ export default function BreakoutGame() {
   const [gameOver, setGameOver] = useState(false);
   const [level, setLevel] = useState(1);
   const [showLevelComplete, setShowLevelComplete] = useState(false);
+  const [awaitingNext, setAwaitingNext] = useState(false);
   const gameStartedRef = useRef<boolean>(false);
   const isPausedRef = useRef<boolean>(false);
   const gameOverRef = useRef<boolean>(false);
   const levelRef = useRef<number>(1);
   const showLevelCompleteRef = useRef<boolean>(false);
+  const awaitingNextRef = useRef<boolean>(false);
 
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
@@ -243,6 +260,7 @@ export default function BreakoutGame() {
   const [activeModifier, setActiveModifier] = useState<ActiveModifier>(null);
   const fallingRef = useRef<FallingPowerUp[]>([]);
   const activeRef = useRef<ActiveModifier>(null);
+  const lastLaserAtRef = useRef<number>(0);
   // Sticky capture state
   const stickyStateRef = useRef<{ captured: boolean; offset: number; capturedAt: number } | null>(null);
   const stickyReleasePendingRef = useRef<boolean>(false);
@@ -294,6 +312,42 @@ export default function BreakoutGame() {
     soundManager.playMusic("background");
   }, [initLevel]);
 
+  // Helper: advance to next level (used by Space and button when awaitingNext)
+  const advanceToNextLevel = useCallback(() => {
+    // Stop any ongoing fireworks immediately
+    fireworksUntilRef.current = 0;
+    const nextLevel = (levelRef.current || 1) + 1;
+    setLevel(nextLevel);
+    levelRef.current = nextLevel;
+    const newGrid = buildBricks(nextLevel, computeBrickLayout(CANVAS_WIDTH));
+    setBricks(newGrid);
+    bricksRef.current = newGrid;
+    const resetBall: Ball = {
+      x: CANVAS_WIDTH / 2,
+      y: CANVAS_HEIGHT - 30,
+      dx: BASE_BALL_SPEED * (Math.random() > 0.5 ? 1 : -1),
+      dy: -BASE_BALL_SPEED,
+      radius: BALL_RADIUS,
+    };
+    setBall(resetBall);
+    ballRef.current = resetBall;
+    const np = {
+      ...paddleRef.current,
+      x: (CANVAS_WIDTH - PADDLE_WIDTH) / 2,
+      y: CANVAS_HEIGHT - PADDLE_HEIGHT - 10,
+      width: PADDLE_WIDTH,
+      height: PADDLE_HEIGHT,
+    };
+    setPaddle(np);
+    paddleRef.current = np;
+    paddleXRef.current = np.x;
+    setShowLevelComplete(false);
+    showLevelCompleteRef.current = false;
+    setAwaitingNext(false);
+    awaitingNextRef.current = false;
+    setIsPaused(false);
+  }, []);
+
   // Resize handling for crisp canvas on DPR screens
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -344,6 +398,11 @@ export default function BreakoutGame() {
       const key = e.key.toLowerCase();
       if (e.code === "Space") {
         e.preventDefault();
+        if (awaitingNextRef.current) {
+          // Space advances to next level when awaiting start
+          advanceToNextLevel();
+          return;
+        }
         if (!gameStarted) {
           startGame();
         } else {
@@ -387,7 +446,7 @@ export default function BreakoutGame() {
           {capture: true} as any,
       );
     };
-  }, [gameStarted, startGame]);
+  }, [gameStarted, startGame, advanceToNextLevel]);
 
   // Pointer/touch input
   useEffect(() => {
@@ -401,10 +460,18 @@ export default function BreakoutGame() {
       const x =
           ((clientX - rect.left) / rect.width) * CANVAS_WIDTH - paddle.width / 2;
       const clamped = clamp(x, 0, CANVAS_WIDTH - paddle.width);
-      setPaddle((prev) => ({...prev, x: clamped}));
       paddleXRef.current = clamped;
     };
     const onMouseMove = (e: MouseEvent) => !isPaused && moveTo(e.clientX);
+    const onTouchStart = (e: TouchEvent) => {
+      if (isPaused) {
+        return;
+      }
+      e.preventDefault();
+      if (e.touches?.length) {
+        moveTo(e.touches[0].clientX);
+      }
+    };
     const onTouchMove = (e: TouchEvent) => {
       if (isPaused) {
         return;
@@ -420,9 +487,15 @@ export default function BreakoutGame() {
         onTouchMove as any,
         {passive: false} as any,
     );
+    canvas.addEventListener(
+        "touchstart",
+        onTouchStart as any,
+        {passive: false} as any,
+    );
     return () => {
       canvas.removeEventListener("mousemove", onMouseMove as any);
       canvas.removeEventListener("touchmove", onTouchMove as any);
+      canvas.removeEventListener("touchstart", onTouchStart as any);
     };
   }, [isPaused, paddle.width]);
 
@@ -457,6 +530,9 @@ export default function BreakoutGame() {
   useEffect(() => {
     showLevelCompleteRef.current = showLevelComplete;
   }, [showLevelComplete]);
+  useEffect(() => {
+    awaitingNextRef.current = awaitingNext;
+  }, [awaitingNext]);
   useEffect(() => {
     scoreRef.current = score;
   }, [score]);
@@ -589,29 +665,7 @@ export default function BreakoutGame() {
         }
       }
 
-      // HUD (minimal)
-      ctx.fillStyle = isDark ? "#111827" : "#fff";
-      ctx.font = "12px Arial";
-      ctx.textAlign = "left";
-      ctx.fillText(`Score: ${scoreRef.current}`, 8, 8);
-      ctx.textAlign = "right";
-      ctx.fillText(`Lives: ${stateLives}`, CANVAS_WIDTH - 8, 8);
-
-      // HUD: active modifier timer center-top
-      if (stateActive) {
-        const now = Date.now();
-        const remaining = Math.max(0, stateActive.endTime - now);
-        const secs = Math.ceil(remaining / 1000);
-        const label = stateActive.type === "fast" ? "FAST" : stateActive.type === "slow" ? "SLOW" : "STICKY";
-        ctx.textAlign = "center";
-        ctx.fillStyle =
-            stateActive.type === "fast"
-                ? "#22c55e"
-                : stateActive.type === "slow"
-                    ? "#f59e0b"
-                    : "#8b5cf6";
-        ctx.fillText(`${label} ${secs}s`, CANVAS_WIDTH / 2, 8);
-      }
+      // In-canvas HUD text removed (external HUD bar handles score/lives/modifiers)
 
       // overlays
       if (!started) {
@@ -674,7 +728,7 @@ export default function BreakoutGame() {
           ndy = 0;
           // Check release input or timeout
           const now = Date.now();
-          if (stickyReleasePendingRef.current || now - sticky.capturedAt > 1500) {
+          if (!awaitingNextRef.current && (stickyReleasePendingRef.current || now - sticky.capturedAt > 1500)) {
             // release upwards with slight angle from offset and paddle velocity
             stickyReleasePendingRef.current = false;
             const angleBase = clamp(sticky.offset / (statePaddle.width / 2), -1, 1) * MAX_BOUNCE_ANGLE;
@@ -835,12 +889,19 @@ export default function BreakoutGame() {
                   Math.abs(ny - (b.y + b.height)),
                   Math.abs(ny - b.y),
               );
-              if (overlapX < overlapY) {
-                ndx = -ndx;
-              } else {
-                ndy = -ndy;
+              const thru = activeRef.current?.type === "thru";
+              if (!thru) {
+                if (overlapX < overlapY) {
+                  ndx = -ndx;
+                } else {
+                  ndy = -ndy;
+                }
               }
               b.health -= 1;
+              // Fireball: one-hit kill
+              if (activeRef.current?.type === "fireball") {
+                b.health = 0;
+              }
               setScore((s) => s + b.points);
               scoreRef.current = (scoreRef.current || 0) + b.points;
               // Sound feedback: hit vs break
@@ -873,14 +934,38 @@ export default function BreakoutGame() {
               }
               // maybe drop a power-up
               if (b.health <= 0) {
-                const chance = isCoarseRef.current ? 0.08 : POWERUP_DROP_CHANCE;
+                // Bomb: simple AoE around the destroyed brick and consume modifier
+                if (activeRef.current?.type === "bomb") {
+                  const R = 46;
+                  for (let cc = 0; cc < nextBricks.length; cc++) {
+                    const col2 = nextBricks[cc];
+                    if (!col2) continue;
+                    for (let rr = 0; rr < col2.length; rr++) {
+                      const bb = col2[rr];
+                      if (!bb || bb.health <= 0) continue;
+                      const cx = bb.x + bb.width / 2;
+                      const cy = bb.y + bb.height / 2;
+                      const dx2 = (b.x + b.width / 2) - cx;
+                      const dy2 = (b.y + b.height / 2) - cy;
+                      if (dx2 * dx2 + dy2 * dy2 <= R * R) {
+                        bb.health = 0;
+                      }
+                    }
+                  }
+                  setActiveModifier(null);
+                  activeRef.current = null;
+                }
+                let chance = isCoarseRef.current ? 0.08 : POWERUP_DROP_CHANCE;
+                // Mode adjusts drop rate slightly
+                if (modeRef.current === "hard") chance *= 1.2;
+                if (modeRef.current === "chaos") chance *= 1.5;
                 const shouldDrop = Math.random() < chance;
                 if (shouldDrop) {
                   setFallingPowerUps((prev) => {
                     if (prev.length >= POWERUP_MAX_FALLING) {
                       return prev;
                     }
-                    const type = pickWeightedPowerUp(activeRef.current);
+                    const type = pickWeightedPowerUp(activeRef.current, authRef.current);
                     const next = [
                       ...prev,
                       {
@@ -963,37 +1048,56 @@ export default function BreakoutGame() {
         if (nextBricks.length && remaining === 0) {
           setShowLevelComplete(true);
           showLevelCompleteRef.current = true;
+          setAwaitingNext(true);
+          awaitingNextRef.current = true;
           soundManager.playSound("levelComplete");
-          setTimeout(() => {
-            setShowLevelComplete(false);
-            showLevelCompleteRef.current = false;
-            const nextLevel = (levelRef.current || 1) + 1;
-            setLevel(nextLevel);
-            levelRef.current = nextLevel;
-            // Rebuild bricks for the next level (responsive/centered) and reset ball/paddle
-            const newGrid = buildBricks(nextLevel, computeBrickLayout(CANVAS_WIDTH));
-            setBricks(newGrid);
-            bricksRef.current = newGrid;
-            const resetBall: Ball = {
-              x: CANVAS_WIDTH / 2,
-              y: CANVAS_HEIGHT - 30,
-              dx: BASE_BALL_SPEED * (Math.random() > 0.5 ? 1 : -1),
-              dy: -BASE_BALL_SPEED,
-              radius: BALL_RADIUS,
-            };
-            setBall(resetBall);
-            ballRef.current = resetBall;
-            const np = {
-              ...paddleRef.current,
-              x: (CANVAS_WIDTH - PADDLE_WIDTH) / 2,
-              y: CANVAS_HEIGHT - PADDLE_HEIGHT - 10,
-              width: PADDLE_WIDTH,
-              height: PADDLE_HEIGHT,
-            };
-            setPaddle(np);
-            paddleRef.current = np;
-            paddleXRef.current = np.x;
-          }, 1200);
+          // Fireworks window
+          fireworksUntilRef.current = Date.now() + 2500;
+          // Park ball on paddle center until user starts next level
+          const centerX = newPx + statePaddle.width / 2;
+          const parkedBall: Ball = {
+            x: centerX,
+            y: statePaddle.y - stateBall.radius - 0.01,
+            dx: 0,
+            dy: 0,
+            radius: stateBall.radius,
+          };
+          setBall(parkedBall);
+          ballRef.current = parkedBall;
+          stickyStateRef.current = {captured: true, offset: 0, capturedAt: Date.now()};
+        }
+
+        // Laser: periodically zap bricks above paddle while active
+        if (activeRef.current?.type === "laser") {
+          const nowMs = Date.now();
+          const interval = modeRef.current === "chaos" ? 280 : 380;
+          if (nowMs - (lastLaserAtRef.current || 0) > interval) {
+            lastLaserAtRef.current = nowMs;
+            const aimXs = [statePaddle.x + statePaddle.width * 0.25, statePaddle.x + statePaddle.width * 0.75];
+            for (const ax of aimXs) {
+              // Find the nearest brick intersecting ax (lowest y)
+              let target: { c: number; r: number } | null = null;
+              let minY = Infinity;
+              for (let c = 0; c < nextBricks.length; c++) {
+                const col = nextBricks[c];
+                if (!col) continue;
+                for (let r = 0; r < col.length; r++) {
+                  const bb = col[r];
+                  if (!bb || bb.health <= 0) continue;
+                  if (ax >= bb.x && ax <= bb.x + bb.width) {
+                    if (bb.y < minY) {
+                      minY = bb.y;
+                      target = {c, r};
+                    }
+                  }
+                }
+              }
+              if (target) {
+                const bb = nextBricks[target.c][target.r];
+                if (bb) bb.health = 0;
+              }
+            }
+          }
         }
 
         // update falling power-ups
@@ -1010,12 +1114,15 @@ export default function BreakoutGame() {
             if (caught) {
               // apply/refresh modifier
               const now = Date.now();
-              const next: ActiveModifier = {
-                type: p.type,
-                endTime: now + POWERUP_DURATION_MS,
-              };
-              setActiveModifier(next);
-              activeRef.current = next;
+              if (p.type === "extraLife") {
+                setLives((lv) => Math.min(5, lv + 1));
+                livesRef.current = Math.min(5, (livesRef.current || 0) + 1);
+              } else {
+                const dur = (p.type === "laser" || p.type === "thru" || p.type === "fireball") ? POWERUP_DURATION_LONG_MS : POWERUP_DURATION_MS;
+                const next: ActiveModifier = {type: p.type, endTime: now + dur};
+                setActiveModifier(next);
+                activeRef.current = next;
+              }
               // clear sticky state on mode change
               if (p.type !== "sticky") {
                 stickyStateRef.current = {captured: false, offset: 0, capturedAt: 0};
@@ -1039,8 +1146,33 @@ export default function BreakoutGame() {
         }
       }
 
-      // Draw particles last (overlay). Update only when enabled.
-      if (enableParticlesRef.current && particles) {
+      // Fireworks emission window on victory
+      if (fireworksUntilRef.current > Date.now()) {
+        if (!particles) {
+          particles = new ParticlePool({maxParticles: 192});
+        }
+        const tnow = Date.now();
+        if (tnow - (fireworksTickRef.current || 0) > 120) {
+          fireworksTickRef.current = tnow;
+          // random position near top half
+          const fx = 40 + Math.random() * (CANVAS_WIDTH - 80);
+          const fy = 40 + Math.random() * (CANVAS_HEIGHT * 0.5);
+          const colors = ["#f97316", "#22c55e", "#3b82f6", "#e11d48", "#a855f7", "#f59e0b"];
+          const color = colors[(Math.random() * colors.length) | 0];
+          if (particleEffectRef.current === "puff") {
+            particles.emitDustPuff(fx, fy, color, 10 + Math.floor(Math.random() * 6));
+          } else {
+            particles.emitSparkBurst(fx, fy, color, 18 + Math.floor(Math.random() * 10));
+          }
+        }
+      }
+
+      // Draw particles last (overlay). Update only when enabled or during fireworks.
+      // Ensure pool exists when we need to draw (also for fireworks)
+      if ((enableParticlesRef.current || fireworksUntilRef.current > Date.now()) && !particles) {
+        particles = new ParticlePool({maxParticles: 192});
+      }
+      if ((enableParticlesRef.current || fireworksUntilRef.current > Date.now()) && particles) {
         const now = performance.now();
         const dt = lastTs === 0 ? 16 : now - lastTs;
         lastTs = now;
@@ -1070,14 +1202,26 @@ export default function BreakoutGame() {
     el.dataset.lives = String(livesRef.current || lives || 0);
   }, [ball, lives, paddle]);
 
-  // Game settings: particle toggle and effect
-  const {enableParticles, particleEffect} = useGameSettings();
+  // Ensure particle pool uses device pixel ratio and draws after setting transform
+  // Also reset globalAlpha each frame to avoid accidental 0 alpha from other ops
+  const dprRef = useRef<number>(typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1);
+
+  // Game settings: particle toggle/effect and mode/entitlements
+  const {enableParticles, particleEffect, mode, isAuthenticated, isSubscriber} = useGameSettings();
   const enableParticlesRef = useRef<boolean>(false);
   const particleEffectRef = useRef<"sparks" | "puff">("sparks");
+  const modeRef = useRef<"classic" | "hard" | "chaos">("classic");
+  const authRef = useRef<{ auth: boolean; sub: boolean }>({auth: false, sub: false});
   useEffect(() => {
     enableParticlesRef.current = !!enableParticles;
     particleEffectRef.current = particleEffect || "sparks";
-  }, [enableParticles, particleEffect]);
+    modeRef.current = mode || "classic";
+    authRef.current = {auth: !!isAuthenticated, sub: !!isSubscriber};
+  }, [enableParticles, particleEffect, mode, isAuthenticated, isSubscriber]);
+
+  // Fireworks management during level completion
+  const fireworksUntilRef = useRef<number>(0);
+  const fireworksTickRef = useRef<number>(0);
 
   // High score
   useEffect(() => {
@@ -1146,6 +1290,41 @@ export default function BreakoutGame() {
           title="Breakout"
           description="Break all the bricks with the ball and don't let it fall!"
       >
+        {/* Compact HUD above the canvas for better ergonomics */}
+        <div className="mb-3">
+          <div
+              className="mx-auto max-w-[960px] rounded-md bg-gray-100 dark:bg-gray-800/80 px-3 py-2 shadow-sm flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-baseline gap-1.5">
+              <div className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Score</div>
+              <div className="text-lg md:text-xl font-bold tabular-nums">{score}</div>
+            </div>
+            <div className="hidden sm:flex items-baseline gap-1.5">
+              <div className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">High</div>
+              <div className="text-base md:text-lg font-semibold tabular-nums">{highScore}</div>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Lives</div>
+              <div className="text-lg md:text-xl" aria-live="polite"
+                   aria-label={`Lives ${lives}`}>{"❤️".repeat(lives)}</div>
+            </div>
+            <div className="flex items-baseline gap-1.5">
+              <div className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Level</div>
+              <div className="text-base md:text-lg font-semibold">{level}</div>
+            </div>
+            {activeRef.current && (
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Mod</span>
+                  <span
+                      className="inline-flex items-center rounded bg-blue-600/90 text-white px-1.5 py-0.5 text-[11px] md:text-xs">
+                {activeRef.current.type}
+                    <span className="ml-1 rounded bg-black/20 px-1 tabular-nums">
+                  {Math.max(0, Math.ceil((activeRef.current.endTime - Date.now()) / 1000))}s
+                </span>
+              </span>
+                </div>
+            )}
+          </div>
+        </div>
       <div className="flex justify-center">
         <div className="relative">
           <canvas
@@ -1206,58 +1385,61 @@ export default function BreakoutGame() {
         </div>
       </div>
 
-        <div className="mt-4">
-          {/* External HUD bar */}
-          <div
-              className="mx-auto max-w-[960px] rounded-lg bg-gray-100 dark:bg-gray-800/90 px-4 py-3 shadow flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-baseline gap-2">
-              <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Score</div>
-              <div className="text-2xl md:text-3xl font-bold tabular-nums">{score}</div>
-          </div>
-            <div className="hidden sm:flex items-baseline gap-2">
-              <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">High Score</div>
-              <div className="text-xl md:text-2xl font-semibold tabular-nums">{highScore}</div>
-          </div>
-            <div className="flex items-center gap-2">
-              <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Lives</div>
-              <div className="text-2xl md:text-3xl" aria-live="polite"
-                   aria-label={`Lives ${lives}`}>{"❤️".repeat(lives)}</div>
-          </div>
-            <div className="flex items-baseline gap-2">
-              <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Level</div>
-              <div className="text-xl md:text-2xl font-semibold">{level}</div>
-            </div>
-            {activeRef.current && (
-                <div className="flex items-center gap-2">
-                  <span className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Modifier</span>
-                  <span
-                      className="inline-flex items-center rounded bg-blue-600/90 text-white px-2 py-1 text-xs md:text-sm">
-                {activeRef.current.type}
-                    <span className="ml-2 rounded bg-black/20 px-1.5 py-0.5 tabular-nums">
-                  {Math.max(0, Math.ceil((activeRef.current.endTime - Date.now()) / 1000))}s
-                </span>
-              </span>
-                </div>
-            )}
-        </div>
-
-        {!gameStarted && !gameOver && (
-            <button
-                onClick={startGame}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Start Game
+        {/* Centered controls below the canvas */}
+        <div className="mt-3 text-center">
+          {!gameStarted && !gameOver && !awaitingNext && (
+              <button
+                  onClick={startGame}
+                  className="px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              >
+                Start Game
           </button>
         )}
-        {gameStarted && (
-            <button
-                onClick={() => setIsPaused((p) => !p)}
-                className="ml-4 px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-            >
-            {isPaused ? "Resume" : "Pause"}
+          {(gameStarted || awaitingNext) && (
+              <button
+                  onClick={() => {
+                    if (awaitingNextRef.current) {
+                      // advance to next level manually
+                      const nextLevel = (levelRef.current || 1) + 1;
+                      setLevel(nextLevel);
+                      levelRef.current = nextLevel;
+                      const newGrid = buildBricks(nextLevel, computeBrickLayout(CANVAS_WIDTH));
+                      setBricks(newGrid);
+                      bricksRef.current = newGrid;
+                      const resetBall: Ball = {
+                        x: CANVAS_WIDTH / 2,
+                        y: CANVAS_HEIGHT - 30,
+                        dx: BASE_BALL_SPEED * (Math.random() > 0.5 ? 1 : -1),
+                        dy: -BASE_BALL_SPEED,
+                        radius: BALL_RADIUS,
+                      };
+                      setBall(resetBall);
+                      ballRef.current = resetBall;
+                      const np = {
+                        ...paddleRef.current,
+                        x: (CANVAS_WIDTH - PADDLE_WIDTH) / 2,
+                        y: CANVAS_HEIGHT - PADDLE_HEIGHT - 10,
+                        width: PADDLE_WIDTH,
+                        height: PADDLE_HEIGHT,
+                      };
+                      setPaddle(np);
+                      paddleRef.current = np;
+                      paddleXRef.current = np.x;
+                      setShowLevelComplete(false);
+                      showLevelCompleteRef.current = false;
+                      setAwaitingNext(false);
+                      awaitingNextRef.current = false;
+                      // resume game
+                      setIsPaused(false);
+                    } else {
+                      setIsPaused((p) => !p);
+                    }
+                  }}
+                  className={`px-5 py-2 text-white rounded-md transition-colors ${awaitingNext ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-gray-600 hover:bg-gray-700'}`}
+              >
+                {awaitingNext ? "Next Level" : isPaused ? "Resume" : "Pause"}
           </button>
         )}
-
       </div>
 
         {/* Collapsible help on mobile; expanded sections on larger screens */}

@@ -112,26 +112,34 @@ export class ParticlePool {
     }
 
     draw(ctx: CanvasRenderingContext2D) {
+        ctx.save();
+        // Slightly additive look for sparks and round caps for visibility
+        const prevComp = ctx.globalCompositeOperation;
+        ctx.globalCompositeOperation = "lighter";
+        ctx.globalAlpha = 1;
+        ctx.lineCap = "round";
         for (const p of this.pool) {
             if (!p.active) {
                 continue;
             }
             const t = 1 - p.life / p.maxLife;
-            const alpha = Math.max(0, 1 - t);
+            const alpha = Math.max(0, 1 - t * 0.9);
             if (p.type === "spark") {
                 ctx.strokeStyle = this.withAlpha(p.color, alpha);
-                ctx.lineWidth = p.size;
+                ctx.lineWidth = Math.max(2, p.size * 1.2);
                 ctx.beginPath();
                 ctx.moveTo(p.x, p.y);
-                ctx.lineTo(p.x - p.vx * 12, p.y - p.vy * 12);
+                ctx.lineTo(p.x - p.vx * 20, p.y - p.vy * 20);
                 ctx.stroke();
             } else {
-                ctx.fillStyle = this.withAlpha(p.color, alpha * 0.9);
+                ctx.fillStyle = this.withAlpha(p.color, alpha);
                 ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.arc(p.x, p.y, Math.max(2, p.size), 0, Math.PI * 2);
                 ctx.fill();
             }
         }
+        ctx.globalCompositeOperation = prevComp;
+        ctx.restore();
     }
 
     private withAlpha(color: string, alpha: number): string {

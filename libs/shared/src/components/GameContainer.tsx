@@ -23,11 +23,11 @@ function GameContainer({
                            lockTouch = true,
                        }: GameContainerProps) {
     // Prevent scroll/zoom gestures while interacting with the game area on mobile
+    // Avoid calling preventDefault in React synthetic handlers (which are passive by default
+    // on some browsers) to prevent the warning. Instead, we rely on per‑canvas listeners in
+    // each game (added with `{ passive: false }`) and only stop wheel scrolling here.
     const touchHandlers = lockTouch
         ? {
-            onTouchMove: (e: React.TouchEvent) => e.preventDefault(),
-            onTouchStart: (e: React.TouchEvent) => e.preventDefault(),
-            onTouchEnd: (e: React.TouchEvent) => e.preventDefault(),
             onWheel: (e: React.WheelEvent) => e.preventDefault(),
         }
         : {};
@@ -57,7 +57,8 @@ function GameContainer({
           </div>
         </ErrorBoundary>
 
-                  <div className="mt-3 md:mt-4 flex items-center justify-center gap-4">
+                  <div className="mt-3 md:mt-4 flex items-center justify-center gap-4 flex-wrap">
+                      <ModeSelector/>
               <ParticlesToggle/>
                       <button
                           onClick={() => window.location.reload()}
@@ -100,6 +101,44 @@ function ParticlesToggle() {
                     <option value="sparks">Sparks</option>
                     <option value="puff">Puff</option>
                 </select>
+            </label>
+        </div>
+    );
+}
+
+function ModeSelector() {
+    const {mode, setMode, isAuthenticated, isSubscriber, setAuthState} = useGameSettings();
+    React.useEffect(() => {
+        if (typeof window !== "undefined") {
+            // Expose globally for game loops that read fast mode hints
+            (window as any).__gh_mode = mode;
+        }
+    }, [mode]);
+    return (
+        <div className="flex items-center gap-3">
+            <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+                <span className="sr-only">Game mode</span>
+                <select
+                    aria-label="Game mode"
+                    value={mode}
+                    onChange={(e) => setMode(e.currentTarget.value as any)}
+                    className="h-8 rounded-md border border-input bg-background px-2 text-sm"
+                >
+                    <option value="classic">Classic</option>
+                    <option value="hard">Hard</option>
+                    <option value="chaos">Chaos</option>
+                </select>
+            </label>
+            {/* Lightweight entitlement toggles for local testing (no external providers during dev/E2E) */}
+            <label className="inline-flex items-center gap-2 text-xs text-gray-700 dark:text-gray-200">
+                <input type="checkbox" className="h-4 w-4 accent-blue-600" checked={isAuthenticated}
+                       onChange={(e) => setAuthState(e.currentTarget.checked, isSubscriber)}/>
+                Signed in
+            </label>
+            <label className="inline-flex items-center gap-2 text-xs text-gray-700 dark:text-gray-200">
+                <input type="checkbox" className="h-4 w-4 accent-blue-600" checked={isSubscriber}
+                       onChange={(e) => setAuthState(isAuthenticated, e.currentTarget.checked)}/>
+                Subscriber
             </label>
         </div>
     );
