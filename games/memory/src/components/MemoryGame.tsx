@@ -248,7 +248,7 @@ export const MemoryGame: React.FC = () => {
                   {!gameStarted || gameOver ? (
                       <button
                           onClick={startGame}
-                          className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
+                          className="px-4 py-2 rounded-md min-h-11 bg-blue-600 text-white hover:bg-blue-700"
                       >
                           {gameOver ? "Play Again" : "Start"}
                       </button>
@@ -265,7 +265,7 @@ export const MemoryGame: React.FC = () => {
                                   return next;
                               });
                           }}
-                          className="px-4 py-2 rounded-md bg-gray-600 text-white hover:bg-gray-700"
+                          className="px-4 py-2 rounded-md min-h-11 bg-gray-600 text-white hover:bg-gray-700"
                       >
                           {isPaused ? "Resume" : "Pause"}
                       </button>

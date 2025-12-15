@@ -832,14 +832,14 @@ export const SnakeGame: React.FC = () => {
             <button
                 type="button"
                 onClick={() => setControlScheme("swipe")}
-                className={`px-3 py-1.5 text-sm ${controlScheme === 'swipe' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                className={`px-4 py-2 text-sm min-h-11 ${controlScheme === 'swipe' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
             >
               Swipe
             </button>
             <button
                 type="button"
                 onClick={() => setControlScheme("joystick")}
-                className={`px-3 py-1.5 text-sm border-l border-gray-300 dark:border-gray-700 ${controlScheme === 'joystick' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                className={`px-4 py-2 text-sm min-h-11 border-l border-gray-300 dark:border-gray-700 ${controlScheme === 'joystick' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
             >
               Joystick
             </button>
@@ -852,7 +852,7 @@ export const SnakeGame: React.FC = () => {
                   <button
                       key={mode}
                       onClick={() => handleModeChange(mode)}
-                      className={`px-3 py-1 rounded-md ${
+                      className={`px-4 py-2 rounded-md min-h-11 ${
                           config.mode === mode
                               ? "bg-blue-600 text-white"
                               : "bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600"
@@ -873,7 +873,7 @@ export const SnakeGame: React.FC = () => {
               </p>
               <div className="flex gap-2 justify-end">
                 <button
-                    className="px-3 py-1.5 text-sm rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                    className="px-4 py-2 text-sm rounded-md min-h-11 bg-secondary text-secondary-foreground hover:bg-secondary/80"
                     onClick={() => {
                       setPendingMode(null);
                       setIsPaused(false);
@@ -882,7 +882,7 @@ export const SnakeGame: React.FC = () => {
                   Cancel
                 </button>
                 <button
-                    className="px-3 py-1.5 text-sm rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
+                    className="px-4 py-2 text-sm rounded-md min-h-11 bg-primary text-primary-foreground hover:bg-primary/90"
                     onClick={() => {
                       const nextCfg = buildConfigForMode(config, pendingMode);
                       setPendingMode(null);
@@ -901,9 +901,35 @@ export const SnakeGame: React.FC = () => {
             ref={canvasRef}
             width={config.gridSize * CELL_SIZE}
             height={config.gridSize * CELL_SIZE}
-            className="bg-white rounded-lg shadow-md"
+            className="bg-white rounded-lg shadow-md block"
+            aria-label="Snake playfield"
+            tabIndex={0}
+            onClick={() => {
+              if (!gameStarted) {
+                setGameStarted(true);
+              } else if (isPaused) {
+                setIsPaused(false);
+              }
+            }}
           />
         </div>
+
+        {/* Tap-to-start / pause overlay for mobile-first UX */}
+        {(!gameStarted || isPaused) && !gameOver && (
+            <button
+                aria-label={!gameStarted ? "Tap to start" : "Tap to resume"}
+                className="mt-3 w-full max-w-xl mx-auto flex items-center justify-center bg-black/40 text-white text-base sm:text-lg font-semibold select-none rounded-md h-16"
+                onClick={() => {
+                  if (!gameStarted) {
+                    setGameStarted(true);
+                  } else {
+                    setIsPaused(false);
+                  }
+                }}
+            >
+              {!gameStarted ? "Tap to start" : "Paused — Tap to resume"}
+            </button>
+        )}
 
         {/* Virtual joystick for mobile when selected */}
         {controlScheme === "joystick" && (
