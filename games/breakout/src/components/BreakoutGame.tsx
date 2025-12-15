@@ -261,6 +261,7 @@ export default function BreakoutGame() {
   const fallingRef = useRef<FallingPowerUp[]>([]);
   const activeRef = useRef<ActiveModifier>(null);
   const lastLaserAtRef = useRef<number>(0);
+  const modifierTimerRef = useRef<number>(0);
   // Sticky capture state
   const stickyStateRef = useRef<{ captured: boolean; offset: number; capturedAt: number } | null>(null);
   const stickyReleasePendingRef = useRef<boolean>(false);
@@ -648,11 +649,22 @@ export default function BreakoutGame() {
         }
       }
 
-      // draw falling power-ups
+      // draw falling power-ups (color‑mapped, labeled)
       if (stateFalling.length) {
         for (const p of stateFalling) {
           ctx.beginPath();
-          ctx.fillStyle = p.type === "fast" ? "#22c55e" : "#f59e0b"; // green fast, amber slow
+          // Palette mapping
+          const colorMap: Record<PowerUpType, string> = {
+            fast: "#22c55e",       // green
+            slow: "#f59e0b",       // amber
+            sticky: "#f0abfc",     // fuchsia-300
+            thru: "#84cc16",       // lime
+            bomb: "#ef4444",       // red
+            fireball: "#fb923c",   // orange
+            laser: "#67e8f9",      // cyan
+            extraLife: "#10b981",  // emerald
+          } as const;
+          ctx.fillStyle = colorMap[p.type] || "#94a3b8";
           ctx.arc(p.x, p.y, p.size / 2, 0, Math.PI * 2);
           ctx.fill();
           ctx.closePath();
@@ -660,7 +672,17 @@ export default function BreakoutGame() {
           ctx.fillStyle = "#0f172a";
           ctx.font = "10px Arial";
           ctx.textAlign = "center";
-          const letter = p.type === "fast" ? "F" : p.type === "slow" ? "S" : "G";
+          const letterMap: Record<PowerUpType, string> = {
+            fast: "F",
+            slow: "S",
+            sticky: "G",
+            thru: "T",
+            bomb: "B",
+            fireball: "🔥",
+            laser: "L",
+            extraLife: "+",
+          } as const;
+          const letter = letterMap[p.type] || "?";
           ctx.fillText(letter, p.x, p.y + 3);
         }
       }
@@ -1314,13 +1336,28 @@ export default function BreakoutGame() {
             {activeRef.current && (
                 <div className="flex items-center gap-1.5">
                   <span className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Mod</span>
-                  <span
-                      className="inline-flex items-center rounded bg-blue-600/90 text-white px-1.5 py-0.5 text-[11px] md:text-xs">
-                {activeRef.current.type}
-                    <span className="ml-1 rounded bg-black/20 px-1 tabular-nums">
-                  {Math.max(0, Math.ceil((activeRef.current.endTime - Date.now()) / 1000))}s
-                </span>
-              </span>
+                  {(() => {
+                    const t = activeRef.current!.type as PowerUpType;
+                    const colorClass: Record<PowerUpType, string> = {
+                      fast: "bg-emerald-600",
+                      slow: "bg-amber-600",
+                      sticky: "bg-fuchsia-600",
+                      thru: "bg-lime-600",
+                      bomb: "bg-red-600",
+                      fireball: "bg-orange-600",
+                      laser: "bg-cyan-600",
+                      extraLife: "bg-emerald-700",
+                    } as const;
+                    return (
+                        <span
+                            className={`inline-flex items-center rounded ${colorClass[t]} text-white px-1.5 py-0.5 text-[11px] md:text-xs`}>
+                          {t}
+                          <span className="ml-1 rounded bg-black/20 px-1 tabular-nums">
+                          {Math.max(0, Math.ceil((activeRef.current!.endTime - Date.now()) / 1000))}s
+                        </span>
+                      </span>
+                    );
+                  })()}
                 </div>
             )}
           </div>
@@ -1469,60 +1506,79 @@ export default function BreakoutGame() {
           <details className="sm:hidden rounded-lg border border-gray-200 dark:border-gray-700">
             <summary className="cursor-pointer select-none px-4 py-2 text-base font-semibold">Power-Ups</summary>
             <div className="px-4 pb-3 pt-1 grid grid-cols-1 gap-3 text-sm">
-              <div className="rounded-md px-3 py-2 bg-blue-100 text-blue-900 dark:bg-blue-900/30 dark:text-blue-100">
-                <div className="font-semibold">Expand</div>
-                <div className="opacity-80">Wider paddle</div>
-              </div>
-              <div className="rounded-md px-3 py-2 bg-rose-100 text-rose-900 dark:bg-rose-900/30 dark:text-rose-100">
-                <div className="font-semibold">Shrink</div>
-                <div className="opacity-80">Smaller paddle</div>
-              </div>
-              <div
-                  className="rounded-md px-3 py-2 bg-amber-100 text-amber-900 dark:bg-amber-900/30 dark:text-amber-100">
-                <div className="font-semibold">Slow</div>
-                <div className="opacity-80">Slower ball (timed)</div>
-              </div>
-              <div
-                  className="rounded-md px-3 py-2 bg-violet-100 text-violet-900 dark:bg-violet-900/30 dark:text-violet-100">
-                <div className="font-semibold">Multiball</div>
-                <div className="opacity-80">Extra balls</div>
-              </div>
-              <div
-                  className="rounded-md px-3 py-2 bg-fuchsia-100 text-fuchsia-900 dark:bg-fuchsia-900/30 dark:text-fuchsia-100">
-                <div className="font-semibold">Sticky</div>
-                <div className="opacity-80">Ball sticks; press ↑ or click to release</div>
-              </div>
+              <PowerUpCardMobile title="Fast" desc="Faster ball (timed)"
+                                 className="bg-emerald-100 text-emerald-900 dark:bg-emerald-900/30 dark:text-emerald-100"/>
+              <PowerUpCardMobile title="Slow" desc="Slower ball (timed)"
+                                 className="bg-amber-100 text-amber-900 dark:bg-amber-900/30 dark:text-amber-100"/>
+              <PowerUpCardMobile title="Sticky" desc="Ball sticks; press ↑ or click to release"
+                                 className="bg-fuchsia-100 text-fuchsia-900 dark:bg-fuchsia-900/30 dark:text-fuchsia-100"
+                                 gated="auth"/>
+              <PowerUpCardMobile title="Thru" desc="Ball pierces bricks"
+                                 className="bg-lime-100 text-lime-900 dark:bg-lime-900/30 dark:text-lime-100"
+                                 gated="sub"/>
+              <PowerUpCardMobile title="Bomb" desc="AoE clears nearby bricks"
+                                 className="bg-red-100 text-red-900 dark:bg-red-900/30 dark:text-red-100" gated="sub"/>
+              <PowerUpCardMobile title="Fireball" desc="Bricks are one‑hit"
+                                 className="bg-orange-100 text-orange-900 dark:bg-orange-900/30 dark:text-orange-100"
+                                 gated="sub"/>
+              <PowerUpCardMobile title="Laser" desc="Paddle shoots zaps"
+                                 className="bg-cyan-100 text-cyan-900 dark:bg-cyan-900/30 dark:text-cyan-100"
+                                 gated="sub"/>
+              <PowerUpCardMobile title="Extra Life" desc="Gain +1 life (max 5)"
+                                 className="bg-emerald-100 text-emerald-900 dark:bg-emerald-900/30 dark:text-emerald-100"
+                                 gated="sub"/>
             </div>
           </details>
           {/* Desktop/tablet */}
           <div className="hidden sm:block">
           <h3 className="text-lg font-semibold mb-2">Power-Ups</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-sm">
-            <div className="rounded-md px-3 py-2 bg-blue-100 text-blue-900 dark:bg-blue-900/30 dark:text-blue-100">
-              <div className="font-semibold">Expand</div>
-              <div className="opacity-80">Wider paddle</div>
-            </div>
-            <div className="rounded-md px-3 py-2 bg-rose-100 text-rose-900 dark:bg-rose-900/30 dark:text-rose-100">
-              <div className="font-semibold">Shrink</div>
-              <div className="opacity-80">Smaller paddle</div>
-            </div>
-            <div className="rounded-md px-3 py-2 bg-amber-100 text-amber-900 dark:bg-amber-900/30 dark:text-amber-100">
-              <div className="font-semibold">Slow</div>
-              <div className="opacity-80">Slower ball (timed)</div>
-            </div>
-            <div
-                className="rounded-md px-3 py-2 bg-violet-100 text-violet-900 dark:bg-violet-900/30 dark:text-violet-100">
-              <div className="font-semibold">Multiball</div>
-              <div className="opacity-80">Extra balls</div>
-            </div>
-            <div
-                className="rounded-md px-3 py-2 bg-fuchsia-100 text-fuchsia-900 dark:bg-fuchsia-900/30 dark:text-fuchsia-100">
-              <div className="font-semibold">Sticky</div>
-              <div className="opacity-80">Ball sticks; press ↑ or click to release</div>
-            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-3 text-sm">
+              <PowerUpCard title="Fast" desc="Faster ball (timed)"
+                           className="bg-emerald-100 text-emerald-900 dark:bg-emerald-900/30 dark:text-emerald-100"/>
+              <PowerUpCard title="Slow" desc="Slower ball (timed)"
+                           className="bg-amber-100 text-amber-900 dark:bg-amber-900/30 dark:text-amber-100"/>
+              <PowerUpCard title="Sticky" desc="Ball sticks; press ↑ or click to release"
+                           className="bg-fuchsia-100 text-fuchsia-900 dark:bg-fuchsia-900/30 dark:text-fuchsia-100"
+                           gated="auth"/>
+              <PowerUpCard title="Thru" desc="Ball pierces bricks"
+                           className="bg-lime-100 text-lime-900 dark:bg-lime-900/30 dark:text-lime-100" gated="sub"/>
+              <PowerUpCard title="Bomb" desc="AoE clears nearby bricks"
+                           className="bg-red-100 text-red-900 dark:bg-red-900/30 dark:text-red-100" gated="sub"/>
+              <PowerUpCard title="Fireball" desc="Bricks are one‑hit"
+                           className="bg-orange-100 text-orange-900 dark:bg-orange-900/30 dark:text-orange-100"
+                           gated="sub"/>
+              <PowerUpCard title="Laser" desc="Paddle shoots zaps"
+                           className="bg-cyan-100 text-cyan-900 dark:bg-cyan-900/30 dark:text-cyan-100" gated="sub"/>
+              <PowerUpCard title="Extra Life" desc="Gain +1 life (max 5)"
+                           className="bg-emerald-100 text-emerald-900 dark:bg-emerald-900/30 dark:text-emerald-100"
+                           gated="sub"/>
           </div>
         </div>
         </div>
     </GameContainer>
   );
+}
+
+function PowerUpCard({title, desc, className, gated}: {
+  title: string;
+  desc: string;
+  className: string;
+  gated?: "auth" | "sub"
+}) {
+  const {isAuthenticated, isSubscriber} = useGameSettings();
+  const locked = (gated === "auth" && !isAuthenticated) || (gated === "sub" && !isSubscriber);
+  return (
+      <div className={`rounded-md px-3 py-2 relative ${className}`}>
+        <div className="font-semibold flex items-center gap-2">
+          {title}
+          {locked && <span
+              className="text-[10px] px-1.5 py-0.5 rounded bg-gray-900/70 text-white">🔒 {gated === 'auth' ? 'Sign in' : 'Subscriber'}</span>}
+        </div>
+        <div className="opacity-80">{desc}</div>
+      </div>
+  );
+}
+
+function PowerUpCardMobile(props: { title: string; desc: string; className: string; gated?: "auth" | "sub" }) {
+  return <PowerUpCard {...props} />;
 }
