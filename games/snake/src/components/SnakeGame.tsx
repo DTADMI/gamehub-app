@@ -1,7 +1,8 @@
 // games/snake/src/components/SnakeGame.tsx
 import {GameContainer, soundManager} from "@games/shared";
-import {submitScore} from "@/lib/graphql/queries";
 import React, {useCallback, useEffect, useRef, useState} from "react";
+
+import {submitScore} from "@/lib/graphql/queries";
 
 import {
   CELL_SIZE,
@@ -46,7 +47,9 @@ export const SnakeGame: React.FC = () => {
   const [portals, setPortals] = useState<Portal[]>([]);
   const [gameLoop, setGameLoop] = useState<NodeJS.Timeout | null>(null);
   const [controlScheme, setControlScheme] = useState<ControlScheme>(() => {
-    if (typeof window === "undefined") return "swipe";
+    if (typeof window === "undefined") {
+      return "swipe";
+    }
     try {
       const saved = localStorage.getItem("snakeControlScheme");
       return (saved === "joystick" || saved === "swipe") ? (saved as ControlScheme) : "swipe";
@@ -249,16 +252,24 @@ export const SnakeGame: React.FC = () => {
 
       switch (e.key) {
         case "ArrowUp":
-          if (direction !== "DOWN") setNextDirection("UP");
+          if (direction !== "DOWN") {
+            setNextDirection("UP");
+          }
           break;
         case "ArrowDown":
-          if (direction !== "UP") setNextDirection("DOWN");
+          if (direction !== "UP") {
+            setNextDirection("DOWN");
+          }
           break;
         case "ArrowLeft":
-          if (direction !== "RIGHT") setNextDirection("LEFT");
+          if (direction !== "RIGHT") {
+            setNextDirection("LEFT");
+          }
           break;
         case "ArrowRight":
-          if (direction !== "LEFT") setNextDirection("RIGHT");
+          if (direction !== "LEFT") {
+            setNextDirection("RIGHT");
+          }
           break;
       }
     },
@@ -268,8 +279,12 @@ export const SnakeGame: React.FC = () => {
   // Touch swipe controls when controlScheme === 'swipe'
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
-    if (controlScheme !== "swipe") return;
+    if (!canvas) {
+      return;
+    }
+    if (controlScheme !== "swipe") {
+      return;
+    }
 
     let startX = 0;
     let startY = 0;
@@ -281,7 +296,9 @@ export const SnakeGame: React.FC = () => {
     );
 
     const onTouchStart = (e: TouchEvent) => {
-      if (!gameStarted || isPaused || gameOver) return;
+      if (!gameStarted || isPaused || gameOver) {
+        return;
+      }
       const t = e.touches[0];
       startX = t.clientX;
       startY = t.clientY;
@@ -289,23 +306,35 @@ export const SnakeGame: React.FC = () => {
       e.preventDefault();
     };
     const onTouchMove = (e: TouchEvent) => {
-      if (!tracking) return;
+      if (!tracking) {
+        return;
+      }
       e.preventDefault();
     };
     const commitDirection = (dx: number, dy: number) => {
       const ax = Math.abs(dx);
       const ay = Math.abs(dy);
-      if (ax < threshold && ay < threshold) return;
+      if (ax < threshold && ay < threshold) {
+        return;
+      }
       if (ax > ay) {
-        if (dx < 0 && direction !== "RIGHT") setNextDirection("LEFT");
-        else if (dx > 0 && direction !== "LEFT") setNextDirection("RIGHT");
+        if (dx < 0 && direction !== "RIGHT") {
+          setNextDirection("LEFT");
+        } else if (dx > 0 && direction !== "LEFT") {
+          setNextDirection("RIGHT");
+        }
       } else {
-        if (dy < 0 && direction !== "DOWN") setNextDirection("UP");
-        else if (dy > 0 && direction !== "UP") setNextDirection("DOWN");
+        if (dy < 0 && direction !== "DOWN") {
+          setNextDirection("UP");
+        } else if (dy > 0 && direction !== "UP") {
+          setNextDirection("DOWN");
+        }
       }
     };
     const onTouchEnd = (e: TouchEvent) => {
-      if (!tracking) return;
+      if (!tracking) {
+        return;
+      }
       const t = e.changedTouches[0];
       const dx = t.clientX - startX;
       const dy = t.clientY - startY;
@@ -631,10 +660,14 @@ export const SnakeGame: React.FC = () => {
   // DPR/responsive scaling: fit canvas to container width while keeping crisp pixels
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {
+      return;
+    }
     const handleResize = () => {
       const container = canvas.parentElement as HTMLElement | null;
-      if (!container) return;
+      if (!container) {
+        return;
+      }
       const logicalW = config.gridSize * CELL_SIZE;
       const logicalH = config.gridSize * CELL_SIZE;
       const containerWidth = container.clientWidth || logicalW;
@@ -957,16 +990,24 @@ export const SnakeGame: React.FC = () => {
                     // Map to cardinal and avoid 180° reversals
                     switch (dir) {
                       case "UP":
-                        if (direction !== "DOWN") setNextDirection("UP");
+                        if (direction !== "DOWN") {
+                          setNextDirection("UP");
+                        }
                         break;
                       case "DOWN":
-                        if (direction !== "UP") setNextDirection("DOWN");
+                        if (direction !== "UP") {
+                          setNextDirection("DOWN");
+                        }
                         break;
                       case "LEFT":
-                        if (direction !== "RIGHT") setNextDirection("LEFT");
+                        if (direction !== "RIGHT") {
+                          setNextDirection("LEFT");
+                        }
                         break;
                       case "RIGHT":
-                        if (direction !== "LEFT") setNextDirection("RIGHT");
+                        if (direction !== "LEFT") {
+                          setNextDirection("RIGHT");
+                        }
                         break;
                     }
                   }}
@@ -1011,19 +1052,25 @@ const VirtualJoystick: React.FC<JoystickProps> = ({onDirection}) => {
   const knobRef = useRef<HTMLDivElement>(null);
 
   // Convert movement vector to a cardinal direction
-  const vectorToDir = (dx: number, dy: number): Direction | null => {
+  const vectorToDir = useCallback((dx: number, dy: number): Direction | null => {
     const dead = JOYSTICK_DEADZONE_PX; // px deadzone
     const ax = Math.abs(dx);
     const ay = Math.abs(dy);
-    if (ax < dead && ay < dead) return null;
-    if (ax > ay) return dx > 0 ? "RIGHT" : "LEFT";
+    if (ax < dead && ay < dead) {
+      return null;
+    }
+    if (ax > ay) {
+      return dx > 0 ? "RIGHT" : "LEFT";
+    }
     return dy > 0 ? "DOWN" : "UP";
-  };
+  }, []);
 
-  const handleMoveFromEvent = (clientX: number, clientY: number) => {
+  const handleMoveFromEvent = useCallback((clientX: number, clientY: number) => {
     const pad = padRef.current;
     const knob = knobRef.current;
-    if (!pad || !knob) return;
+    if (!pad || !knob) {
+      return;
+    }
     const rect = pad.getBoundingClientRect();
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
@@ -1035,12 +1082,16 @@ const VirtualJoystick: React.FC<JoystickProps> = ({onDirection}) => {
     const ny = (dy / len) * Math.min(maxR, len);
     knob.style.transform = `translate(${nx}px, ${ny}px)`;
     const dir = vectorToDir(dx, dy);
-    if (dir) onDirection(dir);
-  };
+    if (dir) {
+      onDirection(dir);
+    }
+  }, [onDirection, vectorToDir]);
 
   useEffect(() => {
     const pad = padRef.current;
-    if (!pad) return;
+    if (!pad) {
+      return;
+    }
     const onPointerDown = (e: PointerEvent) => {
       setActive(true);
       (e.target as HTMLElement)?.setPointerCapture?.(e.pointerId);
@@ -1048,13 +1099,17 @@ const VirtualJoystick: React.FC<JoystickProps> = ({onDirection}) => {
       e.preventDefault();
     };
     const onPointerMove = (e: PointerEvent) => {
-      if (!active) return;
+      if (!active) {
+        return;
+      }
       handleMoveFromEvent(e.clientX, e.clientY);
       e.preventDefault();
     };
     const onPointerUp = (e: PointerEvent) => {
       setActive(false);
-      if (knobRef.current) knobRef.current.style.transform = `translate(0px, 0px)`;
+      if (knobRef.current) {
+        knobRef.current.style.transform = `translate(0px, 0px)`;
+      }
       e.preventDefault();
     };
 
@@ -1066,7 +1121,7 @@ const VirtualJoystick: React.FC<JoystickProps> = ({onDirection}) => {
       window.removeEventListener("pointermove", onPointerMove as any);
       window.removeEventListener("pointerup", onPointerUp as any);
     };
-  }, [active]);
+  }, [active, handleMoveFromEvent]);
 
   return (
       <div className="select-none">

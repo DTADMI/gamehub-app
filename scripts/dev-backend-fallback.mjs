@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+/* eslint-env node */
+/* global process, console, setTimeout */
 /*
   Dev helper: Ensure a backend is available on localhost:8080.
   - Checks http://localhost:8080/api/health (then /actuator/health) for readiness
@@ -62,6 +64,7 @@ function tryRemoveExisting(name) {
     try {
         execSync(`docker rm -f ${name}`, {stdio: 'ignore'});
     } catch {
+        /* ignore */
     }
 }
 
@@ -113,12 +116,12 @@ async function main() {
     const start = Date.now();
     const timeoutMs = 30_000;
     while (Date.now() - start < timeoutMs) {
-        // eslint-disable-next-line no-await-in-loop
+
         if (await isBackendUp()) {
             log('Backend is up at http://localhost:8080');
             return;
         }
-        // eslint-disable-next-line no-await-in-loop
+
         await new Promise((r2) => setTimeout(r2, 1500));
     }
     log('Backend container did not become ready in time. It may require DB env vars.');

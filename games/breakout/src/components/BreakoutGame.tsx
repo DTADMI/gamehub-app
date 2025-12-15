@@ -1,8 +1,9 @@
 "use client";
 
 import {GameContainer, soundManager} from "@games/shared";
-import {submitScore} from "@/lib/graphql/queries";
 import React, {useCallback, useEffect, useRef, useState} from "react";
+
+import {submitScore} from "@/lib/graphql/queries";
 
 // Minimal, stable MVP implementation for Breakout
 // Constants (logical canvas size; we apply DPR scaling in a resize handler)

@@ -44,7 +44,9 @@ export const MemoryGame: React.FC = () => {
         try {
             const now = Date.now();
             const last = lastPlayRef.current[name] || 0;
-            if (now - last < minIntervalMs) return;
+            if (now - last < minIntervalMs) {
+                return;
+            }
             lastPlayRef.current[name] = now;
             soundManager.playSound(name as any);
         } catch {
@@ -127,7 +129,7 @@ export const MemoryGame: React.FC = () => {
       setFlippedIndices([]);
       setTimeout(() => setIsProcessing(false), 1000);
     }
-  }, [flippedIndices, cards]);
+  }, [flippedIndices, cards, playSound]);
 
   // Check for game over
   useEffect(() => {
@@ -136,7 +138,7 @@ export const MemoryGame: React.FC = () => {
         playSound("win", 200);
       soundManager.stopMusic();
     }
-  }, [cards]);
+  }, [cards, playSound]);
 
     // Auto-complete UX: when only two unmatched cards remain, auto-flip them and count as one move
     useEffect(() => {
@@ -173,6 +175,7 @@ export const MemoryGame: React.FC = () => {
         flippedIndices.length,
         gameOver,
         isProcessing,
+        playSound,
     ]);
 
   // Handle card click
