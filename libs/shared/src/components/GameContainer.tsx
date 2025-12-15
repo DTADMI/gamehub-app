@@ -2,6 +2,7 @@
 import React, {type ReactNode} from "react";
 
 import {ErrorBoundary} from "../lib/ErrorBoundary";
+import {GameSettingsProvider, useGameSettings} from "../contexts/GameSettingsContext";
 
 export interface GameContainerProps {
   children: ReactNode;
@@ -31,6 +32,7 @@ function GameContainer({
         }
         : {};
   return (
+      <GameSettingsProvider>
     <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${className}`}>
       <div className="container mx-auto px-4 py-8">
         <header className="mb-8 text-center">
@@ -55,18 +57,37 @@ function GameContainer({
           </div>
         </ErrorBoundary>
 
-        <div className="mt-8 text-center">
+          <div className="mt-6 flex flex-col items-center gap-4">
+              <ParticlesToggle/>
+              <div className="text-center">
           <button
             onClick={() => window.location.reload()}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             Reset Game
           </button>
-        </div>
+              </div>
+          </div>
       </div>
     </div>
+      </GameSettingsProvider>
   );
 }
 
 // Export the component as default
 export default GameContainer;
+
+function ParticlesToggle() {
+    const {enableParticles, setEnableParticles} = useGameSettings();
+    return (
+        <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+            <input
+                type="checkbox"
+                checked={enableParticles}
+                onChange={(e) => setEnableParticles(e.currentTarget.checked)}
+                className="h-4 w-4 accent-blue-600"
+            />
+            Enable particles (experimental)
+        </label>
+    );
+}

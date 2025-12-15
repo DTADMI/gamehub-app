@@ -535,6 +535,23 @@ curl -sS "$SERVICE_URL/actuator/health"
   Artifact
   Registry repo exists and you ran `gcloud auth configure-docker <region>-docker.pkg.dev` locally.
 
+### Display crispness (DPR/rotation)
+
+If canvas graphics appear blurry, especially after rotating a mobile device:
+
+- Ensure canvases are sized with the device pixel ratio on resize and the transform is reset:
+  - Physical size: `canvas.width = logicalW * dpr; canvas.height = logicalH * dpr;`
+  - Rendering scale: `ctx.setTransform(dpr, 0, 0, dpr, 0, 0)` immediately after resizing.
+- CSS should scale the canvas to fit the container without stretching:
+  - `style="max-width: 100%; height: auto"` (or equivalent class names).
+- Rotation checks:
+  - Verify the resize handler runs on orientation change and reapplies `setTransform`.
+  - No debounce is necessary; the work is light and idempotent.
+- Backend URL sanity: `NEXT_PUBLIC_API_URL` must end with `/api` so the GraphQL client can reach `${API_BASE}/graphql`.
+
+Particles note: Optional particle effects are OFF by default and can be toggled in the in‑app Settings under the game
+container. Effects are pooled and lightweight, but leave them off on very low‑end devices if you notice frame drops.
+
 ## Cloud services, variables and secrets
 
 Below is a checklist of required variables/secrets and how to obtain them.

@@ -11,6 +11,7 @@ test.describe("Breakout life loss and resume", () => {
         await page.keyboard.press("Space");
 
         // Wait for ball y to start changing
+      await page.waitForTimeout(100);
         const y1 = await canvas.getAttribute("data-bally");
         await page.waitForTimeout(250);
         const y2 = await canvas.getAttribute("data-bally");
@@ -28,6 +29,7 @@ test.describe("Breakout life loss and resume", () => {
 
         // After life loss, gameStarted becomes false; press Space to resume
         await page.keyboard.press("Space");
+      await page.waitForTimeout(100);
         const yBefore = await canvas.getAttribute("data-bally");
         await page.waitForTimeout(250);
         const yAfter = await canvas.getAttribute("data-bally");
