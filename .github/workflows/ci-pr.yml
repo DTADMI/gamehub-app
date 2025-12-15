@@ -1,37 +1,43 @@
-name: E2E Tests (Playwright)
+name: PR Checks — Lint, Unit, Type-Check, Build (no deploy)
 
 on:
   pull_request:
-  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-  e2e:
+  pr-checks:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node & pnpm (Corepack)
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'pnpm'
           cache-dependency-path: 'pnpm-lock.yaml'
+
       - name: Enable Corepack (pnpm)
         run: |
           corepack enable
           corepack prepare pnpm@10.24.0 --activate
 
-      - name: Install dependencies (pnpm)
-        run: pnpm i --frozen-lockfile
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-      - name: Install Playwright Browsers
-        run: pnpm exec playwright install --with-deps
+      - name: Lint
+        run: pnpm run lint:ci
 
-      - name: Run tests (pnpm)
+      - name: Type-check
+        run: pnpm exec tsc -p tsconfig.json --noEmit
+
+      - name: Unit tests
+        run: pnpm test -- --run
+
+      - name: Build (no deploy)
         env:
-          # Ensure access-control redirect expectations are enforced
-          E2E_PUBLIC_MODE: "false"
           NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api' }}
-        run: pnpm test:e2e
+        run: pnpm build

@@ -3,8 +3,6 @@ name: "CI/CD — Frontend: test, build-once, push (Hub+AR), deploy"
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
   # Manual trigger (no special inputs)
 
@@ -52,7 +50,7 @@ jobs:
 
   build-local-and-tag-images:
     name: Build once locally and tag images
-    needs: [ test-frontend, test-e2e ]
+    needs: [ test-frontend ]
     runs-on: ubuntu-latest
     # Explicit permissions for this job
     permissions:

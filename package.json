@@ -21,6 +21,8 @@
     "start": "next start",
     "test": "vitest",
     "test:e2e": "playwright install --with-deps && playwright test --config=playwright.config.ts",
+    "backend:up": "node ./scripts/dev-backend-fallback.mjs",
+    "backend:down": "node -e \"try{require('child_process').execSync('docker rm -f gamehub-backend-latest',{stdio:'inherit'})}catch(e){}\"",
     "format": "prettier --write .",
     "prepare": "husky install"
   },
