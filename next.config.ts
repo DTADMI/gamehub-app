@@ -75,13 +75,13 @@ const nextConfig: NextConfig = {
   // Environment variables baked at build time (local default points at backend:3000)
   env: {
     NEXT_PUBLIC_API_URL:
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api",
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api",
   },
 
   // Keep API requests going to the configured backend when running in the same origin
   async rewrites() {
     const target =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
     return [
       // IMPORTANT: Keep NextAuth routes on the frontend (do not proxy to backend)
       {
@@ -105,7 +105,7 @@ const nextConfig: NextConfig = {
   // Security headers with CSP tuned for Next.js 16, next/font, and optional Google Fonts
   async headers() {
     const backend =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
     // Allow Google Fonts when used by older pages; next/font is self-hosted and works with 'self'
     const csp = [
       "default-src 'self'",

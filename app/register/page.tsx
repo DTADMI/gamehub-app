@@ -6,7 +6,7 @@ import {useState} from "react";
 
 const API_URL =
     process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
-    "http://localhost:3000/api";
+    "http://localhost:8080/api";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");

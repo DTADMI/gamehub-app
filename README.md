@@ -43,6 +43,16 @@ NEXT_PUBLIC_API_URL=http://localhost:8080/api
 NEXT_PUBLIC_GITHUB_URL=https://github.com/DTADMI
 NEXT_PUBLIC_LINKEDIN_URL=https://www.linkedin.com/in/darryl-ulrich-t-62358476/
 NEXT_PUBLIC_CONTACT_EMAIL=dtadmi@gmail.com
+
+# NextAuth (server-only; do NOT prefix with NEXT_PUBLIC)
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=replace_with_a_strong_random_value
+
+# OAuth providers (optional; server-only)
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+GITHUB_CLIENT_ID=...
+GITHUB_CLIENT_SECRET=...
 ```
 
 Notes:
@@ -50,6 +60,26 @@ Notes:
 - `NEXT_PUBLIC_API_URL` must point to your backend base URL and include the `/api` suffix. For local development the
   backend is expected on port 8080.
 - Additional optional envs are documented in `.env.example`.
+- OAuth provider secrets must NOT be exposed as `NEXT_PUBLIC_*`. Store them as GitHub Actions secrets for CI/CD and as
+  environment variables on Cloud Run.
+
+### Auth callbacks (Google/GitHub)
+
+Set the following authorized callback URLs in your OAuth apps:
+
+- Local: `http://localhost:3000/api/auth/callback/google` and `http://localhost:3000/api/auth/callback/github`
+- Prod: `https://<your-frontend-domain>/api/auth/callback/google` and
+  `https://<your-frontend-domain>/api/auth/callback/github`
+
+Email/password uses the Java backend endpoints via the Credentials provider:
+
+- Sign in: `POST ${NEXT_PUBLIC_API_URL}/auth/signin`
+- Sign up: `POST ${NEXT_PUBLIC_API_URL}/auth/signup`
+- Refresh: `POST ${NEXT_PUBLIC_API_URL}/auth/refresh`
+- Me: `GET ${NEXT_PUBLIC_API_URL}/auth/me`
+
+Frontend route: `/signin` — a single page with tabs (Sign In/Sign Up), Google/GitHub buttons, “Forgot password” link,
+and Terms/Privacy note. The flow completes on the frontend and redirects back to the app via `callbackUrl`.
 
 3. Local development
 

@@ -1,5 +1,6 @@
-import NextAuth, {NextAuthOptions, Session, User} from "next-auth";
-import {JWT} from "next-auth/jwt";
+import type {Session, User} from "next-auth";
+import NextAuth from "next-auth";
+import type {JWT} from "next-auth/jwt";
 import Credentials from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
@@ -37,7 +38,7 @@ interface UserData {
 
 const BACKEND_URL =
     process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
-    "http://localhost:3000/api";
+    "http://localhost:8080/api";
 
 function safeJson<T = any>(input: Response | string | null): T | null {
   try {
@@ -58,7 +59,10 @@ function safeJson<T = any>(input: Response | string | null): T | null {
   }
 }
 
-const authOptions: NextAuthOptions = {
+// Derive the options type from the NextAuth handler to be compatible with v4/v5 typings
+type NAOptions = Parameters<typeof NextAuth>[0];
+
+const authOptions: NAOptions = {
     secret: process.env.NEXTAUTH_SECRET || "dev-secret",
   session: { strategy: "jwt" as const },
     // Keep cookie settings explicit in dev to avoid host/port mismatches
@@ -89,7 +93,7 @@ const authOptions: NextAuthOptions = {
         }
         let data: TokenResponse | null = null;
         try {
-          const res = await fetch(`${BACKEND_URL}/auth/login`, {
+            const res = await fetch(`${BACKEND_URL}/auth/signin`, {
             method: "POST",
               headers: {
                   "Content-Type": "application/json",
@@ -114,7 +118,7 @@ const authOptions: NextAuthOptions = {
             return null;
           }
         } catch {
-            console.error("[auth] /auth/login network error");
+            console.error("[auth] /auth/signin network error");
           return null;
         }
 
@@ -165,7 +169,7 @@ const authOptions: NextAuthOptions = {
   ],
   callbacks: {
       // Prevent redirects to external origins (e.g., backend) — always bring back to frontend base URL.
-      async redirect({url, baseUrl}) {
+      async redirect({url, baseUrl}: { url: string; baseUrl: string }) {
           // Always redirect to the frontend origin (NEXTAUTH_URL or computed baseUrl)
           const frontendBase = (process.env.NEXTAUTH_URL || baseUrl).replace(
               /\/$/,
@@ -182,7 +186,7 @@ const authOptions: NextAuthOptions = {
               return frontendBase;
           }
       },
-    async jwt({ token, user }) {
+      async jwt({token, user}: { token: JWT; user?: User | null }) {
       const authToken = token as AuthToken;
 
       if (user) {
@@ -230,7 +234,7 @@ const authOptions: NextAuthOptions = {
 
       return authToken;
     },
-    async session({ session, token }) {
+      async session({session, token}: { session: Session; token: JWT }) {
       const authSession = session as AuthSession;
       const authToken = token as AuthToken;
 

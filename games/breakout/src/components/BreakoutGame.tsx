@@ -664,7 +664,8 @@ export default function BreakoutGame() {
         for (const eb of extraBallsRef.current) {
           ctx.beginPath();
           ctx.arc(eb.x, eb.y, eb.radius, 0, Math.PI * 2);
-          ctx.fillStyle = isDark ? "#22c55e" : "#10b981"; // emerald for extra balls
+          // Same color as the main ball for consistency
+          ctx.fillStyle = isDark ? "#e11d48" : "#e74c3c";
           ctx.fill();
           ctx.closePath();
         }
@@ -903,27 +904,38 @@ export default function BreakoutGame() {
         // bottom
         if (ny + stateBall.radius > CANVAS_HEIGHT) {
           soundManager.playSound("loseLife");
-          if ((livesRef.current || 0) <= 1) {
-            setGameOver(true);
-            soundManager.playSound("gameOver");
-            soundManager.stopMusic();
+          // If we have extra balls (multiball), promote one to be the main ball instead of losing a life
+          if (extraBallsRef.current.length > 0) {
+            const promoted = extraBallsRef.current.pop()!;
+            nx = promoted.x;
+            ny = promoted.y;
+            ndx = promoted.dx;
+            ndy = promoted.dy;
+            setBall(promoted);
+            ballRef.current = promoted;
           } else {
-            setLives((l) => l - 1);
-            livesRef.current = (livesRef.current || 1) - 1;
-            setGameStarted(false);
-            const resetBall: Ball = {
-              x: CANVAS_WIDTH / 2,
-              y: CANVAS_HEIGHT - 30,
-              dx: BASE_BALL_SPEED * (Math.random() > 0.5 ? 1 : -1),
-              dy: -BASE_BALL_SPEED,
-              radius: BALL_RADIUS,
-            };
-            nx = resetBall.x;
-            ny = resetBall.y;
-            ndx = resetBall.dx;
-            ndy = resetBall.dy;
-            setBall(resetBall);
-            ballRef.current = resetBall;
+            if ((livesRef.current || 0) <= 1) {
+              setGameOver(true);
+              soundManager.playSound("gameOver");
+              soundManager.stopMusic();
+            } else {
+              setLives((l) => l - 1);
+              livesRef.current = (livesRef.current || 1) - 1;
+              setGameStarted(false);
+              const resetBall: Ball = {
+                x: CANVAS_WIDTH / 2,
+                y: CANVAS_HEIGHT - 30,
+                dx: BASE_BALL_SPEED * (Math.random() > 0.5 ? 1 : -1),
+                dy: -BASE_BALL_SPEED,
+                radius: BALL_RADIUS,
+              };
+              nx = resetBall.x;
+              ny = resetBall.y;
+              ndx = resetBall.dx;
+              ndy = resetBall.dy;
+              setBall(resetBall);
+              ballRef.current = resetBall;
+            }
           }
         }
 
