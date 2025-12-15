@@ -175,13 +175,19 @@ function pickWeightedPowerUp(current: ActiveModifier, entitled: { auth: boolean;
   // Availability by entitlement
   const available: Array<{ t: PowerUpType; w: number }> = [];
   // Public
-  if (!(current && current.type === "fast")) available.push({t: "fast", w: 0.32});
-  if (!(current && current.type === "slow")) available.push({t: "slow", w: 0.18});
+  if (!(current && current.type === "fast")) {
+    available.push({t: "fast", w: 0.32});
+  }
+  if (!(current && current.type === "slow")) {
+    available.push({t: "slow", w: 0.18});
+  }
   available.push({t: "expand", w: 0.18});
   available.push({t: "shrink", w: 0.12});
   available.push({t: "multiball", w: 0.12});
   // Auth-only
-  if (entitled.auth && !(current && current.type === "sticky")) available.push({t: "sticky", w: 0.15});
+  if (entitled.auth && !(current && current.type === "sticky")) {
+    available.push({t: "sticky", w: 0.15});
+  }
   // Subscriber-only (heavier features)
   if (entitled.sub) {
     available.push({t: "thru", w: 0.10});
@@ -193,7 +199,9 @@ function pickWeightedPowerUp(current: ActiveModifier, entitled: { auth: boolean;
   const sum = available.reduce((a, b) => a + b.w, 0) || 1;
   let r = Math.random() * sum;
   for (const item of available) {
-    if (r < item.w) return item.t;
+    if (r < item.w) {
+      return item.t;
+    }
     r -= item.w;
   }
   return available[0]?.t ?? "fast";
@@ -278,7 +286,7 @@ export default function BreakoutGame() {
   const fallingRef = useRef<FallingPowerUp[]>([]);
   const activeRef = useRef<ActiveModifier>(null);
   const lastLaserAtRef = useRef<number>(0);
-  const modifierTimerRef = useRef<number>(0);
+  const _modifierTimerRef = useRef<number>(0);
   // Extra balls for Multiball (do not cost lives when missed)
   const extraBallsRef = useRef<Ball[]>([]);
   // Sticky capture state
@@ -580,8 +588,8 @@ export default function BreakoutGame() {
       const statePaddle = paddleRef.current;
       const stateBricks = bricksRef.current;
       const stateFalling = fallingRef.current;
-      const stateActive = activeRef.current;
-      const stateLives = livesRef.current;
+      const _stateActive = activeRef.current;
+      const _stateLives = livesRef.current;
       const stateLevel = levelRef.current;
       const started = gameStartedRef.current;
       const paused = isPausedRef.current;
@@ -997,10 +1005,14 @@ export default function BreakoutGame() {
                   const R = 46;
                   for (let cc = 0; cc < nextBricks.length; cc++) {
                     const col2 = nextBricks[cc];
-                    if (!col2) continue;
+                    if (!col2) {
+                      continue;
+                    }
                     for (let rr = 0; rr < col2.length; rr++) {
                       const bb = col2[rr];
-                      if (!bb || bb.health <= 0) continue;
+                      if (!bb || bb.health <= 0) {
+                        continue;
+                      }
                       const cx = bb.x + bb.width / 2;
                       const cy = bb.y + bb.height / 2;
                       const dx2 = (b.x + b.width / 2) - cx;
@@ -1015,8 +1027,12 @@ export default function BreakoutGame() {
                 }
                 let chance = isCoarseRef.current ? 0.08 : POWERUP_DROP_CHANCE;
                 // Mode adjusts drop rate slightly
-                if (modeRef.current === "hard") chance *= 1.2;
-                if (modeRef.current === "chaos") chance *= 1.5;
+                if (modeRef.current === "hard") {
+                  chance *= 1.2;
+                }
+                if (modeRef.current === "chaos") {
+                  chance *= 1.5;
+                }
                 const shouldDrop = Math.random() < chance;
                 if (shouldDrop) {
                   setFallingPowerUps((prev) => {
@@ -1106,8 +1122,12 @@ export default function BreakoutGame() {
             let edx = eb.dx;
             let edy = eb.dy;
             // walls
-            if (ex + eb.radius > CANVAS_WIDTH || ex - eb.radius < 0) edx = -edx;
-            if (ey - eb.radius < 0) edy = -edy;
+            if (ex + eb.radius > CANVAS_WIDTH || ex - eb.radius < 0) {
+              edx = -edx;
+            }
+            if (ey - eb.radius < 0) {
+              edy = -edy;
+            }
             // paddle bounce
             if (
                 ey + eb.radius >= statePaddle.y &&
@@ -1121,22 +1141,36 @@ export default function BreakoutGame() {
               edx = speed * Math.sin(angle);
               edy = -speed * Math.cos(angle);
               // small nudge to avoid vertical traps
-              if (Math.abs(edx) < MIN_HORIZ_COMPONENT * 0.5) edx = (edx >= 0 ? 1 : -1) * MIN_HORIZ_COMPONENT * 0.5;
+              if (Math.abs(edx) < MIN_HORIZ_COMPONENT * 0.5) {
+                edx = (edx >= 0 ? 1 : -1) * MIN_HORIZ_COMPONENT * 0.5;
+              }
               ey = statePaddle.y - eb.radius - 0.01;
             }
             // bricks
             outerExtra: for (let c = 0; c < nextBricks.length; c++) {
               const col = nextBricks[c];
-              if (!col) continue;
+              if (!col) {
+                continue;
+              }
               for (let r = 0; r < col.length; r++) {
                 const b = col[r];
-                if (!b || b.health <= 0) continue;
+                if (!b || b.health <= 0) {
+                  continue;
+                }
                 if (ex + eb.radius > b.x && ex - eb.radius < b.x + b.width && ey + eb.radius > b.y && ey - eb.radius < b.y + b.height) {
                   const ox = Math.min(Math.abs(ex - (b.x + b.width)), Math.abs(ex - b.x));
                   const oy = Math.min(Math.abs(ey - (b.y + b.height)), Math.abs(ey - b.y));
-                  if (ox < oy) edx = -edx; else edy = -edy;
+                  if (ox < oy) {
+                    edx = -edx;
+                  } else {
+                    edy = -edy;
+                  }
                   b.health -= 1;
-                  if (b.health <= 0) soundManager.playSound("brickBreak"); else soundManager.playSound("brickHit");
+                  if (b.health <= 0) {
+                    soundManager.playSound("brickBreak");
+                  } else {
+                    soundManager.playSound("brickHit");
+                  }
                   break outerExtra;
                 }
               }
@@ -1192,10 +1226,14 @@ export default function BreakoutGame() {
               let minY = Infinity;
               for (let c = 0; c < nextBricks.length; c++) {
                 const col = nextBricks[c];
-                if (!col) continue;
+                if (!col) {
+                  continue;
+                }
                 for (let r = 0; r < col.length; r++) {
                   const bb = col[r];
-                  if (!bb || bb.health <= 0) continue;
+                  if (!bb || bb.health <= 0) {
+                    continue;
+                  }
                   if (ax >= bb.x && ax <= bb.x + bb.width) {
                     if (bb.y < minY) {
                       minY = bb.y;
@@ -1206,7 +1244,9 @@ export default function BreakoutGame() {
               }
               if (target) {
                 const bb = nextBricks[target.c][target.r];
-                if (bb) bb.health = 0;
+                if (bb) {
+                  bb.health = 0;
+                }
               }
             }
           }
@@ -1359,7 +1399,7 @@ export default function BreakoutGame() {
 
   // Ensure particle pool uses device pixel ratio and draws after setting transform
   // Also reset globalAlpha each frame to avoid accidental 0 alpha from other ops
-  const dprRef = useRef<number>(typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1);
+  const _dprRef = useRef<number>(typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1);
 
   // Game settings: particle toggle/effect and mode/entitlements
   const {enableParticles, particleEffect, mode, isAuthenticated, isSubscriber} = useGameSettings();
