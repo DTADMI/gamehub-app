@@ -552,6 +552,16 @@ If canvas graphics appear blurry, especially after rotating a mobile device:
 Particles note: Optional particle effects are OFF by default and can be toggled in the in‑app Settings under the game
 container. Effects are pooled and lightweight, but leave them off on very low‑end devices if you notice frame drops.
 
+### Breakout bricks layout
+
+Breakout’s brickfield is now responsive and centered. The game computes the number of columns and brick width from the
+logical canvas width so bricks evenly fill the row without awkward left alignment. No configuration is required.
+
+### Page layout and footer
+
+Game pages have tighter vertical spacing to reduce unnecessary scrolling. The global footer is compact by default and
+uses collapsible sections on mobile, helping most pages fit within a single screen or a short scroll.
+
 ## Cloud services, variables and secrets
 
 Below is a checklist of required variables/secrets and how to obtain them.

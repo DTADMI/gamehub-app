@@ -63,8 +63,8 @@ export function Footer() {
 
   return (
     <footer className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container px-4 py-12 md:py-16">
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4 lg:grid-cols-5">
+      <div className="container px-4 py-6 md:py-10">
+        <div className="grid grid-cols-2 gap-6 md:grid-cols-4 lg:grid-cols-5">
           <div className="col-span-2 space-y-4">
             <Link href="/" className="flex items-center space-x-2">
               <Gamepad2 className="h-8 w-8 text-primary" />
@@ -100,35 +100,71 @@ export function Footer() {
 
             return (
               <div key={section.title} className="space-y-4">
-                <h4 className="text-sm font-semibold">{section.title}</h4>
-                <ul className="space-y-2">
-                  {items.map((item) => {
-                    const isExternal =
-                        item.href.startsWith("http") ||
-                        item.href.startsWith("mailto:");
-                    return (
-                      <li key={item.name}>
-                        {isExternal ? (
-                          <a
-                            href={item.href}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm text-muted-foreground hover:text-foreground transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
-                          >
-                            {item.name}
-                          </a>
-                        ) : (
-                          <Link
-                            href={item.href}
-                            className="text-sm text-muted-foreground hover:text-foreground transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
-                          >
-                            {item.name}
-                          </Link>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
+                {/* Mobile: collapsible */}
+                <details className="md:hidden group">
+                  <summary
+                      className="flex items-center justify-between cursor-pointer select-none text-sm font-semibold">
+                    {section.title}
+                    <span className="ml-2 text-muted-foreground group-open:rotate-180 transition-transform">▾</span>
+                  </summary>
+                  <ul className="mt-2 space-y-2">
+                    {items.map((item) => {
+                      const isExternal = item.href.startsWith("http") || item.href.startsWith("mailto:");
+                      return (
+                          <li key={item.name}>
+                            {isExternal ? (
+                                <a
+                                    href={item.href}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="block py-1 text-sm text-muted-foreground hover:text-foreground transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+                                >
+                                  {item.name}
+                                </a>
+                            ) : (
+                                <Link
+                                    href={item.href}
+                                    className="block py-1 text-sm text-muted-foreground hover:text-foreground transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+                                >
+                                  {item.name}
+                                </Link>
+                            )}
+                          </li>
+                      );
+                    })}
+                  </ul>
+                </details>
+
+                {/* Desktop/Tablet: static list */}
+                <div className="hidden md:block">
+                  <h4 className="text-sm font-semibold">{section.title}</h4>
+                  <ul className="mt-2 space-y-2">
+                    {items.map((item) => {
+                      const isExternal = item.href.startsWith("http") || item.href.startsWith("mailto:");
+                      return (
+                          <li key={item.name}>
+                            {isExternal ? (
+                                <a
+                                    href={item.href}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-sm text-muted-foreground hover:text-foreground transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+                                >
+                                  {item.name}
+                                </a>
+                            ) : (
+                                <Link
+                                    href={item.href}
+                                    className="text-sm text-muted-foreground hover:text-foreground transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+                                >
+                                  {item.name}
+                                </Link>
+                            )}
+                          </li>
+                      );
+                    })}
+                  </ul>
+                </div>
               </div>
             );
           })}
@@ -169,7 +205,7 @@ export function Footer() {
             </form>
           </div>
         </div>
-        <div className="mt-12 border-t pt-8">
+        <div className="mt-8 md:mt-10 border-t pt-6 md:pt-8">
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
             <p className="text-sm text-muted-foreground">
               &copy; {new Date().getFullYear()} Gamehub. All rights reserved.

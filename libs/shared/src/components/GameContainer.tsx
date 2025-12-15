@@ -34,13 +34,13 @@ function GameContainer({
   return (
       <GameSettingsProvider>
     <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${className}`}>
-      <div className="container mx-auto px-4 py-8">
-        <header className="mb-8 text-center">
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+        <div className="container mx-auto px-4 py-4 md:py-6">
+            <header className="mb-4 md:mb-6 text-center">
+                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-1 md:mb-2">
                 {title}
             </h1>
           {description && (
-            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              <p className="text-base md:text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               {description}
             </p>
           )}
@@ -57,7 +57,7 @@ function GameContainer({
           </div>
         </ErrorBoundary>
 
-          <div className="mt-6 flex flex-col items-center gap-4">
+            <div className="mt-4 md:mt-6 flex flex-col items-center gap-3 md:gap-4">
               <ParticlesToggle/>
               <div className="text-center">
           <button

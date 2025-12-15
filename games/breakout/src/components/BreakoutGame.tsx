@@ -32,12 +32,10 @@ const NUDGE_AMOUNT = 0.6; // horizontal nudge amount when trapped
 const NUDGE_COOLDOWN_MS = 320; // minimal delay between nudges
 
 const BRICK_ROW_COUNT = 5;
-const BRICK_COLUMN_COUNT = 7;
-const BRICK_WIDTH = 55;
+// Responsive brick layout: compute columns/width/offset from canvas width
 const BRICK_HEIGHT = 18;
 const BRICK_PADDING = 8;
 const BRICK_OFFSET_TOP = 40;
-const BRICK_OFFSET_LEFT = 30;
 
 type Brick = {
   x: number;
@@ -69,13 +67,52 @@ const COLORS = ["#ef4444", "#f59e0b", "#10b981", "#3b82f6", "#a855f7"];
 const clamp = (v: number, min: number, max: number) =>
     Math.max(min, Math.min(max, v));
 
+type BrickLayout = {
+  cols: number;
+  brickWidth: number;
+  offsetLeft: number;
+  padding: number;
+};
+
+// Compute a centered, responsive brick layout based on logical canvas width
+function computeBrickLayout(canvasW: number): BrickLayout {
+  const minCols = 8;
+  const maxCols = 12;
+  const margin = 24; // left/right margin inside canvas
+  const padding = BRICK_PADDING;
+  // Try higher column counts first while keeping a decent min width
+  let best: BrickLayout | null = null;
+  for (let cols = maxCols; cols >= minCols; cols--) {
+    const totalPadding = (cols - 1) * padding;
+    const available = canvasW - 2 * margin - totalPadding;
+    const brickWidth = Math.floor(available / cols);
+    if (brickWidth >= 36) { // ensure decent hitbox/tap target
+      const gridW = cols * brickWidth + totalPadding;
+      const offsetLeft = Math.floor((canvasW - gridW) / 2);
+      best = {cols, brickWidth, offsetLeft, padding};
+      break;
+    }
+  }
+  if (!best) {
+    // Fallback: use minCols with whatever width fits, still centered
+    const cols = minCols;
+    const totalPadding = (cols - 1) * padding;
+    const available = canvasW - 2 * 16 - totalPadding;
+    const brickWidth = Math.max(28, Math.floor(available / cols));
+    const gridW = cols * brickWidth + totalPadding;
+    const offsetLeft = Math.floor((canvasW - gridW) / 2);
+    best = {cols, brickWidth, offsetLeft, padding};
+  }
+  return best;
+}
+
 // Top-level brick factory (pure) to avoid effect dependencies in the game loop
-function buildBricks(lvl: number): Brick[][] {
+function buildBricks(lvl: number, layout: BrickLayout = computeBrickLayout(CANVAS_WIDTH)): Brick[][] {
   const newBricks: Brick[][] = [];
-  for (let c = 0; c < BRICK_COLUMN_COUNT; c++) {
+  for (let c = 0; c < layout.cols; c++) {
     newBricks[c] = [] as Brick[];
     for (let r = 0; r < BRICK_ROW_COUNT; r++) {
-      const brickX = c * (BRICK_WIDTH + BRICK_PADDING) + BRICK_OFFSET_LEFT;
+      const brickX = c * (layout.brickWidth + layout.padding) + layout.offsetLeft;
       const brickY = r * (BRICK_HEIGHT + BRICK_PADDING) + BRICK_OFFSET_TOP;
       const colorIndex = Math.floor(Math.random() * COLORS.length);
       const basePoints = (BRICK_ROW_COUNT - r) * 10 * Math.max(1, lvl);
@@ -86,7 +123,7 @@ function buildBricks(lvl: number): Brick[][] {
       newBricks[c][r] = {
         x: brickX,
         y: brickY,
-        width: BRICK_WIDTH,
+        width: layout.brickWidth,
         height: BRICK_HEIGHT,
         color: isTough ? "#ea580c" : COLORS[colorIndex],
         points,
@@ -215,7 +252,8 @@ export default function BreakoutGame() {
 
   // Initialize or reinitialize a level
   const initLevel = useCallback(() => {
-    const newBricks = buildBricks(levelRef.current || 1);
+    const layout = computeBrickLayout(CANVAS_WIDTH);
+    const newBricks = buildBricks(levelRef.current || 1, layout);
     setBricks(newBricks);
     bricksRef.current = newBricks;
 
@@ -451,6 +489,13 @@ export default function BreakoutGame() {
       const paused = isPausedRef.current;
       const over = gameOverRef.current;
       const levelDone = showLevelCompleteRef.current;
+
+      // Defensive: if bricks are missing (edge case on rare mounts), rebuild grid
+      if (!stateBricks || !stateBricks.length || !stateBricks[0]?.length) {
+        const rebuilt = buildBricks(levelRef.current || 1, computeBrickLayout(CANVAS_WIDTH));
+        setBricks(rebuilt);
+        bricksRef.current = rebuilt;
+      }
 
       // background (theme-aware: light canvas on dark theme, dark canvas on light theme)
       ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -919,8 +964,8 @@ export default function BreakoutGame() {
             const nextLevel = (levelRef.current || 1) + 1;
             setLevel(nextLevel);
             levelRef.current = nextLevel;
-            // Rebuild bricks for the next level and reset ball/paddle
-            const newGrid = buildBricks(nextLevel);
+            // Rebuild bricks for the next level (responsive/centered) and reset ball/paddle
+            const newGrid = buildBricks(nextLevel, computeBrickLayout(CANVAS_WIDTH));
             setBricks(newGrid);
             bricksRef.current = newGrid;
             const resetBall: Ball = {
