@@ -125,8 +125,8 @@ function ModeSelector() {
                     className="h-8 rounded-md border border-input bg-background px-2 text-sm"
                 >
                     <option value="classic">Classic</option>
-                    <option value="hard">Hard</option>
-                    <option value="chaos">Chaos</option>
+                    <option value="hard" disabled={!isAuthenticated}>Hard {isAuthenticated ? "" : "(sign in)"}</option>
+                    <option value="chaos" disabled={!isSubscriber}>Chaos {isSubscriber ? "" : "(sub)"}</option>
                 </select>
             </label>
             {/* Lightweight entitlement toggles for local testing (no external providers during dev/E2E) */}
