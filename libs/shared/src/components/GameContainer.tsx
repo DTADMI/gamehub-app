@@ -33,9 +33,9 @@ function GameContainer({
         : {};
   return (
       <GameSettingsProvider>
-    <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${className}`}>
-        <div className="container mx-auto px-4 py-4 md:py-6">
-            <header className="mb-4 md:mb-6 text-center">
+          <div className={`min-h-[100svh] bg-gray-50 dark:bg-gray-900 ${className}`}>
+              <div className="container mx-auto px-4 py-3 md:py-4">
+                  <header className="mb-3 md:mb-4 text-center">
                 <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-1 md:mb-2">
                 {title}
             </h1>
@@ -57,17 +57,15 @@ function GameContainer({
           </div>
         </ErrorBoundary>
 
-            <div className="mt-4 md:mt-6 flex flex-col items-center gap-3 md:gap-4">
+                  <div className="mt-3 md:mt-4 flex items-center justify-center gap-4">
               <ParticlesToggle/>
-              <div className="text-center">
-          <button
-            onClick={() => window.location.reload()}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Reset Game
-          </button>
-              </div>
-          </div>
+                      <button
+                          onClick={() => window.location.reload()}
+                          className="px-4 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                      >
+                          Reset
+                      </button>
+                  </div>
       </div>
     </div>
       </GameSettingsProvider>

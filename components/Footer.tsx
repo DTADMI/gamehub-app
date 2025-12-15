@@ -63,7 +63,7 @@ export function Footer() {
 
   return (
     <footer className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container px-4 py-6 md:py-10">
+      <div className="container px-4 py-4 md:py-6">
         <div className="grid grid-cols-2 gap-6 md:grid-cols-4 lg:grid-cols-5">
           <div className="col-span-2 space-y-4">
             <Link href="/" className="flex items-center space-x-2">
@@ -205,7 +205,7 @@ export function Footer() {
             </form>
           </div>
         </div>
-        <div className="mt-8 md:mt-10 border-t pt-6 md:pt-8">
+        <div className="mt-6 md:mt-8 border-t pt-4 md:pt-6">
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
             <p className="text-sm text-muted-foreground">
               &copy; {new Date().getFullYear()} Gamehub. All rights reserved.

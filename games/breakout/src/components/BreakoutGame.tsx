@@ -16,9 +16,10 @@ const PADDLE_HEIGHT = 10;
 const PADDLE_SPEED = 6;
 
 const BALL_RADIUS = 8;
-const BASE_BALL_SPEED = 4;
-const MIN_BALL_SPEED = 3.2;
-const MAX_BALL_SPEED = 6.2;
+// Slightly higher baseline and ceiling to keep snappy feel on wider canvas
+const BASE_BALL_SPEED = 4.8;
+const MIN_BALL_SPEED = 3.6;
+const MAX_BALL_SPEED = 7.2;
 
 // Anti-stall and control feel
 const MIN_BOUNCE_ANGLE = (10 * Math.PI) / 180; // minimum 10° away from vertical
@@ -150,7 +151,7 @@ const POWERUP_MAX_FALLING = 2;
 const POWERUP_DURATION_MS = 7000; // 7s timed effect
 const FAST_FACTOR = 1.25;
 const SLOW_FACTOR_DESKTOP = 0.75;
-const SLOW_FACTOR_MOBILE = 0.82; // less harsh slow on mobile for better feel
+const SLOW_FACTOR_MOBILE = 0.9; // make slow less harsh on mobile to avoid sluggish feel
 
 function pickWeightedPowerUp(current: ActiveModifier): PowerUpType {
   // Slow is rarer and skipped if already active
@@ -880,7 +881,7 @@ export default function BreakoutGame() {
                       {
                         x: b.x + b.width / 2,
                         y: b.y + b.height / 2,
-                        dy: 1.6,
+                        dy: 2.2, // slightly faster fall to be noticeable
                         type,
                         size: 14,
                       },
