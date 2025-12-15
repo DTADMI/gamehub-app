@@ -49,7 +49,7 @@ function GameContainer({
         <ErrorBoundary>
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
               <div
-                  className={`relative w-full aspect-video max-w-4xl mx-auto ${lockTouch ? 'touch-none select-none' : ''}`}
+                  className={`relative w-full aspect-video max-w-[960px] mx-auto ${lockTouch ? 'touch-none select-none' : ''}`}
                   {...touchHandlers}
               >
                   {children}

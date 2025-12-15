@@ -17,7 +17,8 @@ const PADDLE_SPEED = 6;
 
 const BALL_RADIUS = 8;
 // Slightly higher baseline and ceiling to keep snappy feel on wider canvas
-const BASE_BALL_SPEED = 4.8;
+// Tuned down by ~10% for better control on desktop; still scales with level/mode
+const BASE_BALL_SPEED = 4.32;
 const MIN_BALL_SPEED = 3.6;
 const MAX_BALL_SPEED = 7.2;
 
@@ -857,9 +858,11 @@ export default function BreakoutGame() {
                   const cx = b.x + b.width / 2;
                   const cy = b.y + b.height / 2;
                   if (particleEffectRef.current === "puff") {
-                    particles.emitDustPuff(cx, cy, b.color, 6 + Math.floor(Math.random() * 4));
+                    // Slightly more puffs for visibility on desktop
+                    particles.emitDustPuff(cx, cy, b.color, 8 + Math.floor(Math.random() * 4));
                   } else {
-                    particles.emitSparkBurst(cx, cy, b.color, 10 + Math.floor(Math.random() * 6));
+                    // Boost spark count for a clearer burst
+                    particles.emitSparkBurst(cx, cy, b.color, 14 + Math.floor(Math.random() * 6));
                   }
                 }
               }
@@ -1203,24 +1206,39 @@ export default function BreakoutGame() {
         </div>
       </div>
 
-      <div className="mt-4 text-center">
-        <div className="flex justify-center gap-4 mb-4">
-          <div className="bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-lg">
-            <div className="text-sm text-gray-500">Score</div>
-            <div className="text-xl font-bold">{score}</div>
+        <div className="mt-4">
+          {/* External HUD bar */}
+          <div
+              className="mx-auto max-w-[960px] rounded-lg bg-gray-100 dark:bg-gray-800/90 px-4 py-3 shadow flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-baseline gap-2">
+              <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Score</div>
+              <div className="text-2xl md:text-3xl font-bold tabular-nums">{score}</div>
           </div>
-          <div className="bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-lg">
-            <div className="text-sm text-gray-500">High Score</div>
-            <div className="text-xl font-bold">{highScore}</div>
+            <div className="hidden sm:flex items-baseline gap-2">
+              <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">High Score</div>
+              <div className="text-xl md:text-2xl font-semibold tabular-nums">{highScore}</div>
           </div>
-          <div className="bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-lg">
-            <div className="text-sm text-gray-500">Lives</div>
-            <div className="text-xl font-bold">{"❤️".repeat(lives)}</div>
+            <div className="flex items-center gap-2">
+              <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Lives</div>
+              <div className="text-2xl md:text-3xl" aria-live="polite"
+                   aria-label={`Lives ${lives}`}>{"❤️".repeat(lives)}</div>
           </div>
-          <div className="bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-lg">
-            <div className="text-sm text-gray-500">Level</div>
-            <div className="text-xl font-bold">{level}</div>
-          </div>
+            <div className="flex items-baseline gap-2">
+              <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Level</div>
+              <div className="text-xl md:text-2xl font-semibold">{level}</div>
+            </div>
+            {activeRef.current && (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Modifier</span>
+                  <span
+                      className="inline-flex items-center rounded bg-blue-600/90 text-white px-2 py-1 text-xs md:text-sm">
+                {activeRef.current.type}
+                    <span className="ml-2 rounded bg-black/20 px-1.5 py-0.5 tabular-nums">
+                  {Math.max(0, Math.ceil((activeRef.current.endTime - Date.now()) / 1000))}s
+                </span>
+              </span>
+                </div>
+            )}
         </div>
 
         {!gameStarted && !gameOver && (

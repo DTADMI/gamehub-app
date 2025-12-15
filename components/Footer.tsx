@@ -63,7 +63,7 @@ export function Footer() {
   };
 
   return (
-    <footer className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <footer className="w-full border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container px-4 py-3 md:py-4">
         {/* Compact header row */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -226,7 +226,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-4 md:mt-6 border-t pt-3 md:pt-4">
+        <div className="mt-4 md:mt-6 pt-3 md:pt-4">
           <div className="flex flex-col items-center justify-between gap-3 md:flex-row">
             <p className="text-sm text-muted-foreground">
               &copy; {new Date().getFullYear()} Gamehub. All rights reserved.
