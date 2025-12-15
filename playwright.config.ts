@@ -17,6 +17,7 @@ export default defineConfig({
     screenshot: "only-on-failure",
     video: "on-first-retry",
   },
+  globalSetup: "./tests-e2e/global-setup.ts",
   webServer: {
     // Use pnpm directly for consistency with local and CI environments
     command: "pnpm dev",

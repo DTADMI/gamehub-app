@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  # Optional local Postgres for backend image when running via pnpm backend:up
+  db:
+    image: postgres:16
+    container_name: gamehub-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: gamehub
+      POSTGRES_USER: gamehub
+      POSTGRES_PASSWORD: gamehub
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  # Backend container using the latest image from AR or Docker Hub
+  backend:
+    image: ${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${AR_REPO:-gamehub}/${BACKEND_SERVICE:-gamehub-api}:latest
+    container_name: gamehub-backend
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      # Spring Boot / App env
+      SPRING_PROFILES_ACTIVE: dev
+      PORT: 8080
+      # Datasource (adjust as needed; aligns with README guidelines)
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/gamehub
+      SPRING_DATASOURCE_USERNAME: gamehub
+      SPRING_DATASOURCE_PASSWORD: gamehub
+      # CORS for local frontend
+      CORS_ALLOWED_ORIGINS: http://localhost:3000,http://127.0.0.1:3000
+      # Stripe placeholders (optional)
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+    ports:
+      - "8080:8080"
+
+volumes:
+  db_data:
