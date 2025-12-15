@@ -16,7 +16,9 @@ function loadInitial(): Pick<GameSettings, "enableParticles"> {
     }
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return {enableParticles: false};
+      if (!raw) {
+        return {enableParticles: false};
+      }
         const parsed = JSON.parse(raw);
         return {enableParticles: !!parsed.enableParticles};
     } catch {

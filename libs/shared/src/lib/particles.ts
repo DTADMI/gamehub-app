@@ -39,7 +39,9 @@ export class ParticlePool {
     }
 
     clear() {
-        for (const p of this.pool) p.active = false;
+        for (const p of this.pool) {
+            p.active = false;
+        }
     }
 
     emitSparkBurst(x: number, y: number, color: string, count = 10) {
@@ -47,7 +49,9 @@ export class ParticlePool {
         const n = Math.min(count, this.max);
         for (let i = 0; i < n; i++) {
             const p = this.alloc();
-            if (!p) break;
+            if (!p) {
+                break;
+            }
             const angle = Math.random() * Math.PI * 2;
             const speed = 1.6 + Math.random() * 2.4; // logical px/ms
             const life = 220 + Math.random() * 130; // ms
@@ -69,7 +73,9 @@ export class ParticlePool {
         const n = Math.min(count, this.max);
         for (let i = 0; i < n; i++) {
             const p = this.alloc();
-            if (!p) break;
+            if (!p) {
+                break;
+            }
             const angle = (-Math.PI / 2) + (Math.random() - 0.5) * (Math.PI / 2);
             const speed = 0.4 + Math.random() * 0.9;
             const life = 220 + Math.random() * 120;
@@ -88,7 +94,9 @@ export class ParticlePool {
 
     update(dtMs: number) {
         for (const p of this.pool) {
-            if (!p.active) continue;
+            if (!p.active) {
+                continue;
+            }
             p.life -= dtMs;
             if (p.life <= 0) {
                 p.active = false;
@@ -105,7 +113,9 @@ export class ParticlePool {
 
     draw(ctx: CanvasRenderingContext2D) {
         for (const p of this.pool) {
-            if (!p.active) continue;
+            if (!p.active) {
+                continue;
+            }
             const t = 1 - p.life / p.maxLife;
             const alpha = Math.max(0, 1 - t);
             if (p.type === "spark") {
@@ -143,7 +153,9 @@ export class ParticlePool {
 
     private alloc(): Particle | null {
         for (const p of this.pool) {
-            if (!p.active) return p;
+            if (!p.active) {
+                return p;
+            }
         }
         return null; // pool saturated
     }

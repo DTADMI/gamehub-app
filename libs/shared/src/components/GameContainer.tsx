@@ -1,8 +1,8 @@
 // libs/shared/src/components/GameContainer.tsx
 import React, {type ReactNode} from "react";
 
-import {ErrorBoundary} from "../lib/ErrorBoundary";
 import {GameSettingsProvider, useGameSettings} from "../contexts/GameSettingsContext";
+import {ErrorBoundary} from "../lib/ErrorBoundary";
 
 export interface GameContainerProps {
   children: ReactNode;

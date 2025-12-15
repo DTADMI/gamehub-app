@@ -804,7 +804,9 @@ export default function BreakoutGame() {
               }
               // Optional particles: dust puff on hit; spark burst on break
               if (enableParticlesRef.current) {
-                if (!particles) particles = new ParticlePool({maxParticles: 96});
+                if (!particles) {
+                  particles = new ParticlePool({maxParticles: 96});
+                }
                 const cx = b.x + b.width / 2;
                 const cy = b.y + b.height / 2;
                 if (b.health <= 0) {
@@ -1006,14 +1008,16 @@ export default function BreakoutGame() {
   // Initialize dataset attributes once on mount to avoid null reads before first RAF
   useEffect(() => {
     const el = canvasRef.current as HTMLCanvasElement | null;
-    if (!el) return;
+    if (!el) {
+      return;
+    }
     const b = ballRef.current || ball;
     const p = paddleRef.current || paddle;
     el.dataset.px = String(Math.round(p.x));
     el.dataset.ballx = String(Math.round(b.x));
     el.dataset.bally = String(Math.round(b.y));
     el.dataset.lives = String(livesRef.current || lives || 0);
-  }, []);
+  }, [ball, lives, paddle]);
 
   // Game settings: particle toggle
   const {enableParticles} = useGameSettings();
@@ -1033,9 +1037,15 @@ export default function BreakoutGame() {
   const e2eLifeNudgedRef = useRef(false);
   useEffect(() => {
     const isE2E = process.env.NEXT_PUBLIC_E2E === "true";
-    if (!isE2E) return;
-    if (!gameStarted) return;
-    if (e2eLifeNudgedRef.current) return;
+    if (!isE2E) {
+      return;
+    }
+    if (!gameStarted) {
+      return;
+    }
+    if (e2eLifeNudgedRef.current) {
+      return;
+    }
     e2eLifeNudgedRef.current = true;
     // Nudge ball near bottom with downward velocity so `lives` decrements promptly
     setBall((prev) => {
