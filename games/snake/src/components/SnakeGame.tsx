@@ -16,6 +16,10 @@ import {
 } from "../types/game";
 
 type ControlScheme = "swipe" | "joystick";
+// Tunables for mobile control feel
+const JOYSTICK_DEADZONE_PX = 14; // px radius with no direction change (slightly higher for small screens)
+const SWIPE_THRESHOLD_MIN = 24; // minimum swipe distance in px
+const SWIPE_THRESHOLD_MAX = 64; // cap threshold for larger cells
 
 export const SnakeGame: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -270,7 +274,11 @@ export const SnakeGame: React.FC = () => {
     let startX = 0;
     let startY = 0;
     let tracking = false;
-    const threshold = Math.max(20, CELL_SIZE * 0.6); // pixels
+    // Scale threshold with cell size but keep within practical bounds
+    const threshold = Math.min(
+        SWIPE_THRESHOLD_MAX,
+        Math.max(SWIPE_THRESHOLD_MIN, Math.floor(CELL_SIZE * 0.75)),
+    );
 
     const onTouchStart = (e: TouchEvent) => {
       if (!gameStarted || isPaused || gameOver) return;
@@ -360,6 +368,11 @@ export const SnakeGame: React.FC = () => {
       // Check for collision
       if (checkCollision(head)) {
         soundManager.playSound("gameOver");
+        // Gentle haptics on supported devices
+        try {
+          (navigator as any)?.vibrate?.(35);
+        } catch {
+        }
         soundManager.stopMusic();
         setGameOver(true);
         return prevSnake;
@@ -370,6 +383,11 @@ export const SnakeGame: React.FC = () => {
       // Check if food is eaten
       if (head.x === food.x && head.y === food.y) {
         soundManager.playSound("eat");
+        // Gentle haptics for positive feedback
+        try {
+          (navigator as any)?.vibrate?.(12);
+        } catch {
+        }
         setScore((prev) => {
           const newScore = prev + 10;
           if (newScore > highScore) {
@@ -994,7 +1012,7 @@ const VirtualJoystick: React.FC<JoystickProps> = ({onDirection}) => {
 
   // Convert movement vector to a cardinal direction
   const vectorToDir = (dx: number, dy: number): Direction | null => {
-    const dead = 10; // px deadzone
+    const dead = JOYSTICK_DEADZONE_PX; // px deadzone
     const ax = Math.abs(dx);
     const ay = Math.abs(dy);
     if (ax < dead && ay < dead) return null;

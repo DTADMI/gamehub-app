@@ -1,6 +1,6 @@
 // games/memory/src/components/MemoryGame.tsx
 import {GameContainer, soundManager} from "@games/shared";
-import React, {useCallback, useEffect, useMemo, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
 
 interface Card {
   id: number;
@@ -38,6 +38,19 @@ export const MemoryGame: React.FC = () => {
     const [gameStarted, setGameStarted] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+    // Throttle rapid sound effects on low-end devices
+    const lastPlayRef = useRef<Record<string, number>>({});
+    const playSound = useCallback((name: string, minIntervalMs = 60) => {
+        try {
+            const now = Date.now();
+            const last = lastPlayRef.current[name] || 0;
+            if (now - last < minIntervalMs) return;
+            lastPlayRef.current[name] = now;
+            soundManager.playSound(name as any);
+        } catch {
+            // no-op
+        }
+    }, []);
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">(
       "medium",
   );
@@ -96,7 +109,7 @@ export const MemoryGame: React.FC = () => {
                   : card,
           ),
         );
-        soundManager.playSound("match");
+          playSound("match", 80);
       } else {
         // No match, flip back after delay
         setTimeout(() => {
@@ -120,7 +133,7 @@ export const MemoryGame: React.FC = () => {
   useEffect(() => {
     if (cards.length > 0 && cards.every((card) => card.isMatched)) {
       setGameOver(true);
-      soundManager.playSound("win");
+        playSound("win", 200);
       soundManager.stopMusic();
     }
   }, [cards]);
@@ -140,7 +153,7 @@ export const MemoryGame: React.FC = () => {
         if (unmatched.length === 2 && flippedIndices.length === 0) {
             // Flip both, then let the existing match effect handle marking + move increment
             setIsProcessing(true);
-            soundManager.playSound("cardFlip");
+            playSound("cardFlip", 60);
             setCards((prev) =>
                 prev.map((c, i) =>
                     i === unmatched[0] || i === unmatched[1]
@@ -176,7 +189,7 @@ export const MemoryGame: React.FC = () => {
       return;
     }
 
-    soundManager.playSound("cardFlip");
+      playSound("cardFlip", 60);
 
     setCards((prev) =>
         prev.map((card, idx) =>
@@ -305,7 +318,7 @@ export const MemoryGame: React.FC = () => {
               key={card.id}
               onClick={() => handleCardClick(index)}
               className={`
-                aspect-square rounded-xl cursor-pointer transition-transform duration-300
+                aspect-square rounded-xl cursor-pointer transition-transform duration-200
                 [transform-style:preserve-3d] relative shadow-md hover:shadow-lg
                 ${card.isMatched ? "opacity-80" : ""}
               `}

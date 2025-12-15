@@ -67,6 +67,35 @@ Point it to a running backend (port 8080):
 export NEXT_PUBLIC_API_URL=http://localhost:8080/api
 ```
 
+Mobile‑first game UX (important):
+
+- All canvas games run inside a locked container to prevent page scroll/zoom while playing.
+- Buttons and tap targets meet a 44px minimum height for comfortable touch.
+- Canvases are high‑DPI aware and scale crisply on DPR 1/2/3; the CSS size fits the container width.
+- Breakout and Snake include a tap‑to‑start/pause overlay on mobile for smooth interaction.
+
+Local backend fallback (optional but recommended):
+
+- Start a local backend automatically (pulls latest image from Artifact Registry, falls back to Docker Hub):
+
+  ```bash
+  pnpm backend:up
+  # Frontend will use http://localhost:8080/api
+  ```
+
+- Stop the helper container:
+
+  ```bash
+  pnpm backend:down
+  ```
+
+- Full local stack with Postgres via Compose:
+
+  ```bash
+  docker compose up -d
+  # db on 5432, backend on 8080
+  ```
+
 4. Testing (Playwright e2e)
 
 We include Playwright in devDependencies and a smoke test suite that:
@@ -90,6 +119,14 @@ Notes for E2E stability:
     avoid client‑side exceptions caused by missing cloud credentials, CORS, or backend availability.
   - Public pages like `/` and `/projects` still render normally; protected routes are tested via middleware redirects.
   - This flag is only used for E2E. Production builds and normal local dev do not set it.
+
+Health‑gate for backend during E2E:
+
+- `tests-e2e/global-setup.ts` checks the backend health at `${NEXT_PUBLIC_API_URL.replace(/\/api$/, "")}`.
+- When targeting localhost and `E2E_PUBLIC_MODE=false`, it will auto‑start the local backend via `pnpm backend:up`
+  helper
+  and wait briefly for health before running tests.
+    - Set `E2E_PUBLIC_MODE=true` to skip any local backend attempts (e.g., when testing against a hosted backend).
 
 5. Build & production run
 
@@ -241,6 +278,13 @@ Operational notes and safety:
     and `DOCKERHUB_TOKEN` are provided.
   - If AR push/deploy fails, a fallback step pushes the same image to Docker Hub to ensure an artifact is published for
     debugging/local pulls. Cloud Run deployments still exclusively use AR.
+
+Workflow split for PRs vs. main:
+
+- `.github/workflows/ci-pr.yml` — runs on pull requests: lint, type‑check, unit/Vitest, and build (no deploy).
+- `.github/workflows/test-e2e.yml` — runs Playwright mobile smokes on pull requests and manual dispatch.
+- `.github/workflows/ci-cd.yml` — full pipeline on pushes to `main` (and manual dispatch): test, build‑once, push (AR
+  primary, Docker Hub fallback), and deploy to Cloud Run on port 3000.
 
 8. Design choices and trade‑offs
 
