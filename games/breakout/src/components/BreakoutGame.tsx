@@ -997,8 +997,8 @@ export default function BreakoutGame() {
                   const cx = b.x + b.width / 2;
                   const cy = b.y + b.height / 2;
                   if (particleEffectRef.current === "puff") {
-                    // Slightly more puffs for visibility on desktop
-                    particles.emitDustPuff(cx, cy, b.color, 8 + Math.floor(Math.random() * 4));
+                    // Use bright puffs to ensure visibility on light backgrounds
+                    particles.emitDustPuff(cx, cy, "rgba(255,255,255,0.95)", 10 + Math.floor(Math.random() * 6));
                   } else {
                     // Boost spark count for a clearer burst
                     particles.emitSparkBurst(cx, cy, b.color, 14 + Math.floor(Math.random() * 6));

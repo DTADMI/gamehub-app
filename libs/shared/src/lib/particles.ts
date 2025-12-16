@@ -113,18 +113,17 @@ export class ParticlePool {
 
     draw(ctx: CanvasRenderingContext2D) {
         ctx.save();
-        // Slightly additive look for sparks and round caps for visibility
+        // Round caps make thin lines more visible
         const prevComp = ctx.globalCompositeOperation;
-        ctx.globalCompositeOperation = "lighter";
         ctx.globalAlpha = 1;
         ctx.lineCap = "round";
         for (const p of this.pool) {
-            if (!p.active) {
-                continue;
-            }
+            if (!p.active) continue;
             const t = 1 - p.life / p.maxLife;
             const alpha = Math.max(0, 1 - t * 0.9);
             if (p.type === "spark") {
+                // Sparks: additive looks great on dark and light backgrounds
+                ctx.globalCompositeOperation = "lighter";
                 ctx.strokeStyle = this.withAlpha(p.color, alpha);
                 ctx.lineWidth = Math.max(2, p.size * 1.2);
                 ctx.beginPath();
@@ -132,7 +131,9 @@ export class ParticlePool {
                 ctx.lineTo(p.x - p.vx * 20, p.y - p.vy * 20);
                 ctx.stroke();
             } else {
-                ctx.fillStyle = this.withAlpha(p.color, alpha);
+                // Puffs: draw with normal composition so they remain visible on white backgrounds
+                ctx.globalCompositeOperation = "source-over";
+                ctx.fillStyle = this.withAlpha(p.color, Math.min(1, alpha * 1.1));
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, Math.max(2, p.size), 0, Math.PI * 2);
                 ctx.fill();
