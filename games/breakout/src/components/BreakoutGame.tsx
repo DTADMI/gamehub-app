@@ -581,7 +581,8 @@ export default function BreakoutGame() {
 
     let raf = 0;
     let particles: ParticlePool | null = null;
-    let lastTs = 0;
+    let lastTs = 0; // particles dt
+    let lastPhysTs = 0; // physics dt
 
     const draw = () => {
       const stateBall = ballRef.current;
@@ -618,6 +619,12 @@ export default function BreakoutGame() {
         el.dataset.lives = String(livesRef.current || 0);
       }
 
+      // Compute delta time scale for physics (normalize to 60 FPS)
+      const nowPerf = performance.now();
+      const dtMs = lastPhysTs === 0 ? 16.6667 : Math.max(8, Math.min(33, nowPerf - lastPhysTs));
+      const frameScale = dtMs / 16.6667;
+      lastPhysTs = nowPerf;
+
       // update paddle first for immediate response
       const down = keysDownRef.current;
       let dx = 0;
@@ -628,7 +635,7 @@ export default function BreakoutGame() {
         dx += PADDLE_SPEED;
       }
       let newPx = clamp(
-          (paddleXRef.current ?? statePaddle.x) + dx,
+          (paddleXRef.current ?? statePaddle.x) + dx * frameScale,
           0,
           CANVAS_WIDTH - statePaddle.width,
       );
@@ -779,9 +786,9 @@ export default function BreakoutGame() {
 
       // game updates
       if (started && !paused && !over) {
-        // move ball
-        let nx = stateBall.x + stateBall.dx;
-        let ny = stateBall.y + stateBall.dy;
+        // move ball (scaled by frame time)
+        let nx = stateBall.x + stateBall.dx * frameScale;
+        let ny = stateBall.y + stateBall.dy * frameScale;
         let ndx = stateBall.dx;
         let ndy = stateBall.dy;
 
@@ -830,6 +837,8 @@ export default function BreakoutGame() {
 
         // Track whether we changed velocity due to any collision this frame
         let needNormalize = false;
+
+        // (nx, ny, ndx, ndy already initialized above with frame scaling)
 
         // walls — reflect AND clamp position inside bounds so the ball never leaves the canvas
         if (nx + stateBall.radius > CANVAS_WIDTH) {
@@ -976,10 +985,29 @@ export default function BreakoutGame() {
               );
               const thru = activeRef.current?.type === "thru";
               if (!thru) {
+                // Keep a copy of incoming direction for separation resolution
+                const inDx = ndx;
+                const inDy = ndy;
                 if (overlapX < overlapY) {
+                  // Resolve along X and separate the ball out of the brick
                   ndx = -ndx;
+                  if (inDx > 0) {
+                    // Coming from left → place ball to the left of the brick
+                    nx = b.x - stateBall.radius - 0.01;
+                  } else {
+                    // Coming from right
+                    nx = b.x + b.width + stateBall.radius + 0.01;
+                  }
                 } else {
+                  // Resolve along Y and separate the ball out of the brick
                   ndy = -ndy;
+                  if (inDy > 0) {
+                    // Coming from above → place ball above the brick
+                    ny = b.y - stateBall.radius - 0.01;
+                  } else {
+                    // Coming from below
+                    ny = b.y + b.height + stateBall.radius + 0.01;
+                  }
                 }
                 needNormalize = true;
               }
@@ -1146,8 +1174,8 @@ export default function BreakoutGame() {
           const nextExtras: Ball[] = [];
           let extrasBrickChanged = false;
           for (const eb of extraBallsRef.current) {
-            let ex = eb.x + eb.dx;
-            let ey = eb.y + eb.dy;
+            let ex = eb.x + eb.dx * frameScale;
+            let ey = eb.y + eb.dy * frameScale;
             let edx = eb.dx;
             let edy = eb.dy;
             // walls
@@ -1291,7 +1319,7 @@ export default function BreakoutGame() {
         if (stateFalling.length) {
           const updated: FallingPowerUp[] = [];
           for (const p of stateFalling) {
-            const nyPU = p.y + p.dy;
+            const nyPU = p.y + p.dy * frameScale;
             // check catch by paddle
             const caught =
                 nyPU + p.size / 2 >= statePaddle.y &&
