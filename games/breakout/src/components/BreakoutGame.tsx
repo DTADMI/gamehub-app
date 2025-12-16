@@ -267,12 +267,15 @@ export default function BreakoutGame() {
   const [level, setLevel] = useState(1);
   const [showLevelComplete, setShowLevelComplete] = useState(false);
   const [awaitingNext, setAwaitingNext] = useState(false);
+  // Debug: particles visibility toggle (hidden control in UI)
+  const [debugParticles, setDebugParticles] = useState(false);
   const gameStartedRef = useRef<boolean>(false);
   const isPausedRef = useRef<boolean>(false);
   const gameOverRef = useRef<boolean>(false);
   const levelRef = useRef<number>(1);
   const showLevelCompleteRef = useRef<boolean>(false);
   const awaitingNextRef = useRef<boolean>(false);
+  const debugParticlesRef = useRef<boolean>(false);
 
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
@@ -280,18 +283,42 @@ export default function BreakoutGame() {
   const scoreRef = useRef<number>(0);
   const livesRef = useRef<number>(3);
 
+  // Boosters (player-controlled speed-up until next brick hit)
+  const DEFAULT_BOOSTERS = 3;
+  const [boosters, setBoosters] = useState<number>(DEFAULT_BOOSTERS);
+  const boostersRef = useRef<number>(DEFAULT_BOOSTERS);
+  const boostActiveRef = useRef<boolean>(false);
+
   // Power-ups state
   const [fallingPowerUps, setFallingPowerUps] = useState<FallingPowerUp[]>([]);
   const [activeModifier, setActiveModifier] = useState<ActiveModifier>(null);
   const fallingRef = useRef<FallingPowerUp[]>([]);
   const activeRef = useRef<ActiveModifier>(null);
   const lastLaserAtRef = useRef<number>(0);
+  const lastTapAtRef = useRef<number>(0);
   const _modifierTimerRef = useRef<number>(0);
   // Extra balls for Multiball (do not cost lives when missed)
   const extraBallsRef = useRef<Ball[]>([]);
   // Sticky capture state
   const stickyStateRef = useRef<{ captured: boolean; offset: number; capturedAt: number } | null>(null);
   const stickyReleasePendingRef = useRef<boolean>(false);
+
+  // Booster activation helper
+  const activateBoost = useCallback(() => {
+    if (boostActiveRef.current) {
+      return;
+    }
+    if ((boostersRef.current || 0) <= 0) {
+      return;
+    }
+    boostActiveRef.current = true;
+    setBoosters((n) => {
+      const v = Math.max(0, (n || 0) - 1);
+      boostersRef.current = v;
+      return v;
+    });
+    soundManager.playSound("click");
+  }, []);
 
   // Input cache
   const keysDownRef = useRef<Set<string>>(new Set());
@@ -338,6 +365,10 @@ export default function BreakoutGame() {
     setGameStarted(true);
     initLevel();
     soundManager.playMusic("background");
+    // reset boosters for a fresh game
+    setBoosters(DEFAULT_BOOSTERS);
+    boostersRef.current = DEFAULT_BOOSTERS;
+    boostActiveRef.current = false;
   }, [initLevel]);
 
   // Helper: advance to next level (used by Space and button when awaitingNext)
@@ -350,6 +381,13 @@ export default function BreakoutGame() {
     const newGrid = buildBricks(nextLevel, computeBrickLayout(CANVAS_WIDTH));
     setBricks(newGrid);
     bricksRef.current = newGrid;
+    // Clear any active modifiers and falling power-ups between levels
+    setActiveModifier(null);
+    activeRef.current = null;
+    setFallingPowerUps([]);
+    fallingRef.current = [];
+    extraBallsRef.current = [];
+    stickyStateRef.current = {captured: false, offset: 0, capturedAt: 0};
     const resetBall: Ball = {
       x: CANVAS_WIDTH / 2,
       y: CANVAS_HEIGHT - 30,
@@ -431,11 +469,21 @@ export default function BreakoutGame() {
           advanceToNextLevel();
           return;
         }
-        if (!gameStarted) {
+        if (!gameStarted && !gameOverRef.current) {
+          // Resume current level after a life loss (do not reset to level 1)
+          setGameStarted(true);
+        } else if (!gameStarted && gameOverRef.current) {
+          // From Game Over, restart
           startGame();
         } else {
           setIsPaused((p) => !p);
         }
+        return;
+      }
+      if (key === "b") {
+        // Boost on B key
+        e.preventDefault();
+        activateBoost();
         return;
       }
       if (e.key === "ArrowUp") {
@@ -474,7 +522,7 @@ export default function BreakoutGame() {
           {capture: true} as any,
       );
     };
-  }, [gameStarted, startGame, advanceToNextLevel]);
+  }, [gameStarted, startGame, advanceToNextLevel, activateBoost]);
 
   // Pointer/touch input
   useEffect(() => {
@@ -490,18 +538,29 @@ export default function BreakoutGame() {
       const clamped = clamp(x, 0, CANVAS_WIDTH - paddle.width);
       paddleXRef.current = clamped;
     };
-    const onMouseMove = (e: MouseEvent) => !isPaused && moveTo(e.clientX);
+    const onMouseMove = (e: MouseEvent) => {
+      if (isPausedRef.current) {
+        return;
+      }
+      moveTo(e.clientX);
+    };
     const onTouchStart = (e: TouchEvent) => {
-      if (isPaused) {
+      if (isPausedRef.current) {
         return;
       }
       e.preventDefault();
+      const now = Date.now();
+      if (now - (lastTapAtRef.current || 0) < 300) {
+        // double tap → boost
+        activateBoost();
+      }
+      lastTapAtRef.current = now;
       if (e.touches?.length) {
         moveTo(e.touches[0].clientX);
       }
     };
     const onTouchMove = (e: TouchEvent) => {
-      if (isPaused) {
+      if (isPausedRef.current) {
         return;
       }
       e.preventDefault();
@@ -525,7 +584,7 @@ export default function BreakoutGame() {
       canvas.removeEventListener("touchmove", onTouchMove as any);
       canvas.removeEventListener("touchstart", onTouchStart as any);
     };
-  }, [isPaused, paddle.width]);
+  }, [isPaused, paddle.width, activateBoost]);
 
   // Keep refs in sync with state (so RAF loop can read fresh values)
   useEffect(() => {
@@ -562,6 +621,9 @@ export default function BreakoutGame() {
     awaitingNextRef.current = awaitingNext;
   }, [awaitingNext]);
   useEffect(() => {
+    debugParticlesRef.current = debugParticles;
+  }, [debugParticles]);
+  useEffect(() => {
     scoreRef.current = score;
   }, [score]);
   useEffect(() => {
@@ -583,6 +645,8 @@ export default function BreakoutGame() {
     let particles: ParticlePool | null = null;
     let lastTs = 0; // particles dt
     let lastPhysTs = 0; // physics dt
+    const lastFrameScaleRef = {v: 1};
+    let lastDebugEmit = 0;
 
     const draw = () => {
       const stateBall = ballRef.current;
@@ -622,33 +686,41 @@ export default function BreakoutGame() {
       // Compute delta time scale for physics (normalize to 60 FPS)
       const nowPerf = performance.now();
       const dtMs = lastPhysTs === 0 ? 16.6667 : Math.max(8, Math.min(33, nowPerf - lastPhysTs));
-      const frameScale = dtMs / 16.6667;
+      const rawScale = dtMs / 16.6667;
+      // Smooth frameScale to reduce micro jitter from small dt fluctuations
+      const clampedRaw = Math.max(0.5, Math.min(1.5, rawScale));
+      const frameScale = 0.85 * lastFrameScaleRef.v + 0.15 * clampedRaw;
+      lastFrameScaleRef.v = frameScale;
       lastPhysTs = nowPerf;
 
-      // update paddle first for immediate response
-      const down = keysDownRef.current;
-      let dx = 0;
-      if (down.has("left")) {
-        dx -= PADDLE_SPEED;
-      }
-      if (down.has("right")) {
-        dx += PADDLE_SPEED;
-      }
-      let newPx = clamp(
+      // update paddle first for immediate response (but do not move when paused)
+      let newPx = statePaddle.x;
+      let paddleV = 0;
+      if (!paused) {
+        const down = keysDownRef.current;
+        let dx = 0;
+        if (down.has("left")) {
+          dx -= PADDLE_SPEED;
+        }
+        if (down.has("right")) {
+          dx += PADDLE_SPEED;
+        }
+        newPx = clamp(
           (paddleXRef.current ?? statePaddle.x) + dx * frameScale,
           0,
           CANVAS_WIDTH - statePaddle.width,
-      );
-      // Track paddle velocity (px per frame) for collision influence
-      const paddleV = newPx - (lastPaddleXRef.current ?? newPx);
-      lastPaddleXRef.current = newPx;
-      paddleXRef.current = newPx;
-      if (newPx !== statePaddle.x) {
-        setPaddle((p) => {
-          const np = {...p, x: newPx};
-          paddleRef.current = np;
-          return np;
-        });
+        );
+        // Track paddle velocity (px per frame) for collision influence
+        paddleV = newPx - (lastPaddleXRef.current ?? newPx);
+        lastPaddleXRef.current = newPx;
+        paddleXRef.current = newPx;
+        if (newPx !== statePaddle.x) {
+          setPaddle((p) => {
+            const np = {...p, x: newPx};
+            paddleRef.current = np;
+            return np;
+          });
+        }
       }
 
       // draw paddle
@@ -889,6 +961,13 @@ export default function BreakoutGame() {
               MAX_INFLUENCE_ANGLE,
           );
           let angle = baseAngle + influence;
+            // Clamp final angle to avoid near-horizontal skims that look like lingering on the paddle
+            if (angle > MAX_BOUNCE_ANGLE) {
+              angle = MAX_BOUNCE_ANGLE;
+            }
+            if (angle < -MAX_BOUNCE_ANGLE) {
+              angle = -MAX_BOUNCE_ANGLE;
+            }
           // Enforce a minimum horizontal angle away from vertical
           if (Math.abs(angle) < MIN_BOUNCE_ANGLE) {
             angle = angle >= 0 ? MIN_BOUNCE_ANGLE : -MIN_BOUNCE_ANGLE;
@@ -1024,23 +1103,24 @@ export default function BreakoutGame() {
               } else {
                 soundManager.playSound("brickHit");
               }
-              // Optional particles: on brick destruction, emit selected effect
+              // Particles: only when toggled; emit chosen style (puff or sparks)
               if (enableParticlesRef.current) {
                 if (!particles) {
-                  particles = new ParticlePool({maxParticles: 96});
+                  particles = new ParticlePool({maxParticles: 128});
                 }
-                if (b.health <= 0) {
-                  const cx = b.x + b.width / 2;
-                  const cy = b.y + b.height / 2;
-                  if (particleEffectRef.current === "puff") {
-                    // Use bright puffs to ensure visibility on light backgrounds
-                    particles.emitDustPuff(cx, cy, "rgba(255,255,255,0.95)", 10 + Math.floor(Math.random() * 6));
-                  } else {
-                    // Boost spark count for a clearer burst
-                    particles.emitSparkBurst(cx, cy, b.color, 14 + Math.floor(Math.random() * 6));
-                  }
+                const cx = b.x + b.width / 2;
+                const cy = b.y + b.height / 2;
+                if (particleEffectRef.current === "puff") {
+                  const base = isDark ? "rgba(255,255,255,0.9)" : "rgba(15,23,42,0.9)";
+                  const count = b.health <= 0 ? 10 : 5;
+                  particles.emitDustPuff(cx, cy, base, count);
+                } else {
+                  const count = b.health <= 0 ? 16 : 8;
+                  particles.emitSparkBurst(cx, cy, b.color, count);
                 }
               }
+              // Cancel boost after any brick contact
+              boostActiveRef.current = false;
               // Light haptics on supported devices
               try {
                 (navigator as any)?.vibrate?.(b.health <= 0 ? 15 : 8);
@@ -1127,15 +1207,38 @@ export default function BreakoutGame() {
 
         // normalize ball speed based on active modifier ONLY when a collision or nudge happened
         if (needNormalize) {
-          const target = desiredSpeedFromModifier(
+          let target = desiredSpeedFromModifier(
               activeRef.current,
               stateLevel,
               slowFactorRef.current,
           );
+          // Apply boost target if active (faster until next brick contact)
+          if (boostActiveRef.current) {
+            target = Math.min(MAX_BALL_SPEED, target * 1.6);
+          }
           const len = Math.sqrt(ndx * ndx + ndy * ndy) || 1;
           const scale = target / len;
           ndx *= scale;
           ndy *= scale;
+        }
+
+        // Gentle per-frame correction towards desired speed to avoid long-term drift
+        {
+          let desired = desiredSpeedFromModifier(
+              activeRef.current,
+              stateLevel,
+              slowFactorRef.current,
+          );
+          if (boostActiveRef.current) {
+            desired = Math.min(MAX_BALL_SPEED, desired * 1.6);
+          }
+          const len = Math.sqrt(ndx * ndx + ndy * ndy) || 1;
+          const corr = desired / len;
+          // Blend only a small fraction so bounces still feel responsive
+          const blend = 0.08; // 8% towards desired each frame
+          const scl = 1 + (corr - 1) * blend;
+          ndx *= scl;
+          ndy *= scl;
         }
 
         // After normalization, still ensure a minimum horizontal component to avoid vertical traps
@@ -1229,6 +1332,8 @@ export default function BreakoutGame() {
                   } else {
                     soundManager.playSound("brickHit");
                   }
+                  // Cancel boost after any brick contact (even from extras)
+                  boostActiveRef.current = false;
                   break outerExtra;
                 }
               }
@@ -1425,12 +1530,29 @@ export default function BreakoutGame() {
         }
       }
 
-      // Draw particles last (overlay). Update only when enabled or during fireworks.
-      // Ensure pool exists when we need to draw (also for fireworks)
-      if ((enableParticlesRef.current || fireworksUntilRef.current > Date.now()) && !particles) {
+      // Debug particle emitter at ball position (when enabled)
+      if (debugParticlesRef.current) {
+        if (!particles) {
+          particles = new ParticlePool({maxParticles: 192});
+        }
+        const nowMs = Date.now();
+        if (nowMs - lastDebugEmit > 100) {
+          lastDebugEmit = nowMs;
+          const cx = stateBall.x;
+          const cy = stateBall.y;
+          const color = isDark ? "#0f172a" : "#ffffff";
+          // Emit both styles so at least one is visible
+          particles.emitDustPuff(cx, cy, color, 10);
+          particles.emitSparkBurst(cx, cy, "#a855f7", 14);
+        }
+      }
+
+      // Draw particles last (overlay). If a pool exists (from brick breaks or fireworks), always update/draw.
+      // Auto-create during fireworks window.
+      if (!particles && fireworksUntilRef.current > Date.now()) {
         particles = new ParticlePool({maxParticles: 192});
       }
-      if ((enableParticlesRef.current || fireworksUntilRef.current > Date.now()) && particles) {
+      if (particles) {
         const now = performance.now();
         const dt = lastTs === 0 ? 16 : now - lastTs;
         lastTs = now;
@@ -1564,6 +1686,13 @@ export default function BreakoutGame() {
               <div className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Lives</div>
               <div className="text-lg md:text-xl" aria-live="polite"
                    aria-label={`Lives ${lives}`}>{"❤️".repeat(lives)}</div>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Boosts</div>
+              <div className="text-base md:text-lg font-semibold tabular-nums" aria-live="polite"
+                   aria-label={`Boosters ${boosters}`}>
+                <span role="img" aria-label="rocket">🚀</span> x{boosters}
+              </div>
             </div>
             <div className="flex items-baseline gap-1.5">
               <div className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Level</div>
@@ -1716,6 +1845,31 @@ export default function BreakoutGame() {
                 {awaitingNext ? "Next Level" : isPaused ? "Resume" : "Pause"}
           </button>
         )}
+          {/* Boost button for mobile/desktop */}
+          {gameStarted && !awaitingNext && !isPaused && (
+              <button
+                  onClick={() => activateBoost()}
+                  disabled={boosters <= 0}
+                  className={`ml-2 px-5 py-2 rounded-md transition-colors ${boosters > 0 ? 'bg-amber-600 hover:bg-amber-700 text-white' : 'bg-gray-400 text-gray-100 cursor-not-allowed'}`}
+                  aria-label={`Boost speed${boosters > 0 ? '' : ' (none left)'}`}
+                  title={boosters > 0 ? 'Boost speed (B key on desktop, double-tap on mobile)' : 'No boosts left'}
+              >
+                🚀 Boost{boosters > 0 ? ` (${boosters})` : ''}
+              </button>
+          )}
+          {/* Debug accordion for particles visibility */}
+          <details className="mt-2 mx-auto w-full max-w-[960px] text-left opacity-70">
+            <summary className="cursor-pointer text-xs text-gray-500 dark:text-gray-400">Debug</summary>
+            <div className="mt-1 flex items-center gap-3 px-2">
+              <label className="inline-flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300">
+                <input type="checkbox" checked={debugParticles}
+                       onChange={(e) => setDebugParticles(e.currentTarget.checked)}
+                       className="h-3.5 w-3.5 accent-blue-600"/>
+                Particles debug (continuous emitter)
+              </label>
+              <span className="text-[11px] text-gray-500">Use to verify visibility; will be removed later.</span>
+            </div>
+          </details>
       </div>
 
         {/* Collapsible help on mobile; expanded sections on larger screens */}

@@ -124,20 +124,20 @@ export class ParticlePool {
             const t = 1 - p.life / p.maxLife;
             const alpha = Math.max(0, 1 - t * 0.9);
             if (p.type === "spark") {
-                // Sparks: additive looks great on dark and light backgrounds
-                ctx.globalCompositeOperation = "lighter";
-                ctx.strokeStyle = this.withAlpha(p.color, alpha);
-                ctx.lineWidth = Math.max(2, p.size * 1.2);
+                // Force normal composition so sparks are visible across browsers/themes
+                ctx.globalCompositeOperation = "source-over";
+                ctx.strokeStyle = this.withAlpha(p.color, Math.min(1, alpha * 1.1));
+                ctx.lineWidth = Math.max(2.5, p.size * 1.35);
                 ctx.beginPath();
                 ctx.moveTo(p.x, p.y);
-                ctx.lineTo(p.x - p.vx * 20, p.y - p.vy * 20);
+                ctx.lineTo(p.x - p.vx * 22, p.y - p.vy * 22);
                 ctx.stroke();
             } else {
-                // Puffs: draw with normal composition so they remain visible on white backgrounds
+                // Puffs: normal composition with slightly larger radius
                 ctx.globalCompositeOperation = "source-over";
-                ctx.fillStyle = this.withAlpha(p.color, Math.min(1, alpha * 1.1));
+                ctx.fillStyle = this.withAlpha(p.color, Math.min(1, alpha * 1.2));
                 ctx.beginPath();
-                ctx.arc(p.x, p.y, Math.max(2, p.size), 0, Math.PI * 2);
+                ctx.arc(p.x, p.y, Math.max(2.5, p.size * 1.1), 0, Math.PI * 2);
                 ctx.fill();
             }
         }
