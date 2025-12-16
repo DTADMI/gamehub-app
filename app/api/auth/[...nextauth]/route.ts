@@ -246,5 +246,5 @@ const authOptions: NAOptions = {
   },
 };
 
-const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };
+// In NextAuth v5 with Next.js App Router, export GET/POST handlers directly
+export const {handlers: {GET, POST}} = NextAuth(authOptions);
