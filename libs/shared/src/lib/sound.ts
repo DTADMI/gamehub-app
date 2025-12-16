@@ -88,6 +88,11 @@ export class SoundManager {
       return false;
     }
 
+    // If already available, return true
+    if (existing?.available) {
+      return true;
+    }
+
     try {
       await this.initializeAudioContext();
 
@@ -146,18 +151,26 @@ export class SoundManager {
       return;
     }
 
-    // Lazy preload by known default path on first call
-    if (!entry) {
+    // Lazy preload by known default path on first call OR when registered but not yet loaded
+    if (!entry || (!entry.available && !entry.disabled)) {
       const known = this.defaultPaths[name];
       if (known) {
-        // Insert a placeholder entry to avoid concurrent retries
-        this.sounds.set(name, {
-          audio: null,
-          available: false,
-          disabled: false,
-          loop: false,
-          loading: true,
-        });
+        // If there is no entry yet, or we have an entry that isn't loading/available, mark loading then preload once
+        if (!entry) {
+          this.sounds.set(name, {
+            audio: null,
+            available: false,
+            disabled: false,
+            loop: false,
+            loading: true,
+          });
+        } else if (!entry.loading) {
+          entry.loading = true;
+          this.sounds.set(name, entry);
+        } else {
+          // already loading, just return
+          return;
+        }
         void this.preloadSound(name, known).then((ok) => {
           const e = this.sounds.get(name);
           if (!ok || !e || e.disabled || !e.available || !e.audio) {
@@ -208,6 +221,8 @@ export class SoundManager {
 
     this.stopMusic();
     const entry = this.sounds.get(name);
+
+    // If the sound is explicitly disabled, don't play it
     if (entry?.disabled) {
       return;
     }
@@ -215,6 +230,11 @@ export class SoundManager {
       // Try a single lazy preload if a default path exists
       const known = this.defaultPaths[name];
       if (known) {
+        // mark loading if entry exists
+        if (entry && !entry.loading) {
+          entry.loading = true;
+          this.sounds.set(name, entry);
+        }
         void this.preloadSound(name, known, true).then((ok) => {
           const e = this.sounds.get(name);
           if (!ok || !e || e.disabled || !e.available || !e.audio) {
@@ -285,12 +305,25 @@ export class SoundManager {
 
   isAvailable(name: string): boolean {
     const e = this.sounds.get(name);
-    return !!e?.available && !e?.disabled && !!e?.audio;
+    // If the sound doesn't exist in our registry, it's not available
+    if (!e) {
+      return false;
+    }
+    // If it's disabled, it's not available regardless of other states
+    if (e.disabled) {
+      return false;
+    }
+    // Otherwise, it's available if we have a valid audio element
+    return !!e.audio && e.available;
   }
 
   isDisabled(name: string): boolean {
     const e = this.sounds.get(name);
-    return !!e?.disabled;
+    // If the sound doesn't exist yet, it's not disabled
+    if (!e) {
+      return false;
+    }
+    return !!e.disabled;
   }
 
   enableSound(name: string) {

@@ -69,15 +69,20 @@ describe('SoundManager fail-safe', () => {
         soundManager.registerSound('chime', '/sounds/ok-chime.mp3');
         // First call will schedule preload and then play
         soundManager.playSound('chime');
-        // Give fake timers a tick
-        await new Promise((r) => setTimeout(r, 1));
+        // Wait for the next tick to allow the preload to complete
+        await new Promise((r) => setTimeout(r, 10));
+        // The sound should be available after preload
         expect(soundManager.isAvailable('chime')).toBe(true);
     });
 
     it('playMusic respects disabled/availability', async () => {
+        // Register a sound that will fail to load (doesn't contain 'ok' in path)
         soundManager.registerSound('bg-bad', '/sounds/fail-music.mp3', true);
+        // This should trigger a failed preload
         soundManager.playMusic('bg-bad');
-        await new Promise((r) => setTimeout(r, 1));
+        // Wait for the next tick to allow the preload to fail
+        await new Promise((r) => setTimeout(r, 10));
+        // The sound should be marked as disabled after failed preload
         expect(soundManager.isDisabled('bg-bad')).toBe(true);
     });
 });
