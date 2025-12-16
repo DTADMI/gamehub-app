@@ -25,6 +25,7 @@ Table of contents
 8. Design choices: why Next 16 + Tailwind v4 + shadcn
 9. Troubleshooting
 10. Sounds (fail‑safe manager)
+11. Breakout — Boosters & Particles
 
 — — —
 
@@ -860,3 +861,35 @@ Notes:
 - Place your custom audio files under `public/sounds/` with the expected filenames if you want built‑in keys to work.
 - When files are missing, you should see at most a single warning per missing key; subsequent calls will be no‑ops.
 - In tests, the manager can be used with a mocked `Audio` implementation (Vitest + jsdom).
+
+11. Breakout — Boosters & Particles
+
+Boosters (player‑controlled speed burst):
+
+- You get a limited number of boosters per game (default 3). The remaining count is shown in the HUD as `🚀 xN`.
+- How to trigger:
+  - Desktop: press `B` while playing, or click the "Boost" button under the canvas.
+  - Mobile: double‑tap the canvas while playing.
+- Behavior: The ball speeds up immediately and stays boosted until it contacts any brick next, then it snaps back to the
+  nominal speed (including any active `Fast/Slow` modifiers and current mode scaling). The boost is disabled while the
+  game is paused.
+
+Particles:
+
+- Toggle in the game settings strip: `Particles` checkbox.
+- Style selector: `Sparks` or `Puff`. When enabled, brick hits/breaks emit the selected effect. When disabled, no brick
+  particles are drawn. Victory fireworks are independent and always show for a short time after clearing a level.
+- Rendering has been tuned for visibility across browsers and themes (dark/light) and uses pooled particles for
+  performance.
+
+Pause & inputs:
+
+- When paused, the paddle does not respond to mouse/touch movement. Resume with Space (or tap the overlay on mobile).
+- After losing a life (not game over), pressing Space resumes the same level (no reset to level 1).
+
+Testing notes (Breakout):
+
+- Playwright E2E covers:
+  - Paddle immobility while paused (paddle `data-px` remains unchanged until resume).
+  - Boost button decrements the HUD rocket counter.
+- Unit tests cover settings persistence and UI gating for particles and modes.
