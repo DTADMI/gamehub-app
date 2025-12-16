@@ -55,6 +55,22 @@ const PROJECTS: Project[] = [
     tags: ["Charts", "Auth"],
     comingSoon: true,
   },
+  {
+    title: "Story Forge",
+    description:
+        "A web app that gamifies writing to encourage consistent progress on projects.",
+    tags: [
+      "Next.js 14+",
+      "NestJS",
+      "PostgreSQL",
+      "Prisma",
+      "Vercel",
+      "Railway",
+      "Supabase",
+    ],
+    comingSoon: true,
+    repo: "https://github.com/DTADMI/story-forge",
+  },
 ];
 
 export default function ExplorePage() {
