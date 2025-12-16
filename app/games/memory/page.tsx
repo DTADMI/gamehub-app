@@ -37,12 +37,12 @@ export default function MemoryGamePage() {
         >
             <MemoryGame key={seed}/>
             <GameHUD
-                onPauseToggle={() => {
+                onPauseToggleAction={() => {
                     window.dispatchEvent(
                         new KeyboardEvent("keydown", {key: " ", code: "Space"}),
                     );
                 }}
-                onRestart={() => setSeed((s) => s + 1)}
+                onRestartAction={() => setSeed((s) => s + 1)}
                 tips="Click cards to match pairs • Try to remember positions"
             />
         </div>

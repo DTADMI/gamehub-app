@@ -206,8 +206,8 @@ export function GameShell({
             {children}
             {mobileControls && <MobileTouchControls onKey={sendKey}/>}
             <GameHUD
-                onPauseToggle={handlePause}
-                onRestart={handleRestart}
+                onPauseToggleAction={handlePause}
+                onRestartAction={handleRestart}
                 tips={tips}
             />
         </div>

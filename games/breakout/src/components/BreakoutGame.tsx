@@ -828,20 +828,26 @@ export default function BreakoutGame() {
           }
         }
 
+        // Track whether we changed velocity due to any collision this frame
+        let needNormalize = false;
+
         // walls — reflect AND clamp position inside bounds so the ball never leaves the canvas
         if (nx + stateBall.radius > CANVAS_WIDTH) {
           nx = CANVAS_WIDTH - stateBall.radius;
           ndx = -Math.abs(ndx);
           soundManager.playSound("wall");
+          needNormalize = true;
         } else if (nx - stateBall.radius < 0) {
           nx = stateBall.radius;
           ndx = Math.abs(ndx);
           soundManager.playSound("wall");
+          needNormalize = true;
         }
         if (ny - stateBall.radius < 0) {
           ny = stateBall.radius;
           ndy = Math.abs(ndy);
           soundManager.playSound("wall");
+          needNormalize = true;
         }
 
         // paddle
@@ -898,6 +904,7 @@ export default function BreakoutGame() {
           // Pop the ball just above the paddle to ensure it never gets embedded or appears below
           ny = statePaddle.y - stateBall.radius - 0.01;
           soundManager.playSound("paddle");
+            needNormalize = true;
           }
         }
 
@@ -974,6 +981,7 @@ export default function BreakoutGame() {
                 } else {
                   ndy = -ndy;
                 }
+                needNormalize = true;
               }
               b.health -= 1;
               // Fireball: one-hit kill
@@ -1086,18 +1094,21 @@ export default function BreakoutGame() {
           const dir = nx < CANVAS_WIDTH / 2 ? 1 : -1; // push toward center-ish
           ndx = dir * NUDGE_AMOUNT;
           lastNudgeAtRef.current = nowTs;
+          needNormalize = true; // nudge changes speed components; normalize back to target
         }
 
-        // normalize ball speed based on active modifier (no-op while sticky captured)
-        const target = desiredSpeedFromModifier(
-            activeRef.current,
-            stateLevel,
-            slowFactorRef.current,
-        );
-        const len = Math.sqrt(ndx * ndx + ndy * ndy) || 1;
-        const scale = target / len;
-        ndx *= scale;
-        ndy *= scale;
+        // normalize ball speed based on active modifier ONLY when a collision or nudge happened
+        if (needNormalize) {
+          const target = desiredSpeedFromModifier(
+              activeRef.current,
+              stateLevel,
+              slowFactorRef.current,
+          );
+          const len = Math.sqrt(ndx * ndx + ndy * ndy) || 1;
+          const scale = target / len;
+          ndx *= scale;
+          ndy *= scale;
+        }
 
         // After normalization, still ensure a minimum horizontal component to avoid vertical traps
         if (Math.abs(ndx) < MIN_HORIZ_COMPONENT * 0.5) {
@@ -1128,6 +1139,7 @@ export default function BreakoutGame() {
         // Update extra balls physics (simplified) — no life loss when missed
         if (extraBallsRef.current.length) {
           const nextExtras: Ball[] = [];
+          let extrasBrickChanged = false;
           for (const eb of extraBallsRef.current) {
             let ex = eb.x + eb.dx;
             let ey = eb.y + eb.dy;
@@ -1180,6 +1192,7 @@ export default function BreakoutGame() {
                   b.health -= 1;
                   if (b.health <= 0) {
                     soundManager.playSound("brickBreak");
+                    extrasBrickChanged = true;
                   } else {
                     soundManager.playSound("brickHit");
                   }
@@ -1195,6 +1208,11 @@ export default function BreakoutGame() {
             }
           }
           extraBallsRef.current = nextExtras;
+          // If only extra balls changed bricks, commit the brick grid
+          if (!hit && extrasBrickChanged) {
+            setBricks(nextBricks);
+            bricksRef.current = nextBricks;
+          }
         }
 
         // check level complete (robust against missing rows)

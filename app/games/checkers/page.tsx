@@ -37,13 +37,13 @@ export default function CheckersPage() {
         >
             <CheckersGame key={seed}/>
             <GameHUD
-                onPauseToggle={() => {
+                onPauseToggleAction={() => {
                     // Some board UIs toggle hints with Space; we dispatch it here if the game listens to keyboard
                     window.dispatchEvent(
                         new KeyboardEvent("keydown", {key: " ", code: "Space"}),
                     );
                 }}
-                onRestart={() => setSeed((s) => s + 1)}
+                onRestartAction={() => setSeed((s) => s + 1)}
                 tips="Click a piece then a target tile • Follow legal moves to capture"
             />
         </div>

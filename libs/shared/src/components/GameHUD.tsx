@@ -4,12 +4,12 @@ import {Pause, Play, RotateCcw} from "lucide-react";
 import React from "react";
 
 export type GameHUDProps = {
-    onPauseToggle?: () => void;
-    onRestart?: () => void;
+    onPauseToggleAction?: () => void;
+    onRestartAction?: () => void;
     tips?: string;
 };
 
-export function GameHUD({onPauseToggle, onRestart, tips}: GameHUDProps) {
+export function GameHUD({onPauseToggleAction, onRestartAction, tips}: GameHUDProps) {
     return (
         <div className="pointer-events-none fixed bottom-4 right-4 z-40">
             <div
@@ -17,7 +17,7 @@ export function GameHUD({onPauseToggle, onRestart, tips}: GameHUDProps) {
                 <button
                     type="button"
                     className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-accent hover:text-accent-foreground"
-                    onClick={onPauseToggle}
+                    onClick={onPauseToggleAction}
                     aria-label="Pause or resume"
                 >
                     <Play className="h-4 w-4"/>/<Pause className="h-4 w-4"/>
@@ -25,7 +25,7 @@ export function GameHUD({onPauseToggle, onRestart, tips}: GameHUDProps) {
                 <button
                     type="button"
                     className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-accent hover:text-accent-foreground"
-                    onClick={onRestart}
+                    onClick={onRestartAction}
                     aria-label="Restart game"
                 >
                     <RotateCcw className="h-4 w-4"/> Restart

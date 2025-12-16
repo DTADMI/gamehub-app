@@ -5,6 +5,22 @@ export class SoundManager {
       string,
       HTMLAudioElement
   >();
+  private static SILENT_DATA_URI =
+      "data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCA"; // tiny silent mp3
+  // Known default paths for game sounds — used for lazy preload and to avoid 404 spam
+  private defaultPaths: Record<string, string> = {
+    background: "/sounds/background.mp3",
+    "breakout-bg": "/sounds/breakout-bg.mp3",
+    click: "/sounds/click.mp3",
+    gameOver: "/sounds/game-over.mp3",
+    brickBreak: "/sounds/brick-break.mp3",
+    brickHit: "/sounds/brick-hit.mp3",
+    paddle: "/sounds/paddle.mp3",
+    wall: "/sounds/wall.mp3",
+    powerUp: "/sounds/power-up.mp3",
+    levelComplete: "/sounds/level-complete.mp3",
+    loseLife: "/sounds/lose-life.mp3",
+  };
   private musicEnabled = true;
   private soundEffectsEnabled = true;
   private currentMusic: string | null = null;
@@ -15,9 +31,10 @@ export class SoundManager {
 
   private constructor() {
     // Initialize with default sounds
-    void this.preloadSound("background", "/sounds/background.mp3", true);
-    void this.preloadSound("click", "/sounds/click.mp3");
-    void this.preloadSound("gameOver", "/sounds/game-over.mp3");
+    // Preload a few, others will lazy‑load on first use without spamming network if missing
+    void this.preloadSound("background", this.defaultPaths.background, true);
+    void this.preloadSound("click", this.defaultPaths.click);
+    void this.preloadSound("gameOver", this.defaultPaths.gameOver);
   }
 
   static getInstance(): SoundManager {
@@ -86,7 +103,13 @@ export class SoundManager {
       this.sounds.set(name, audio);
       return true;
     } catch (error) {
-      console.warn(`Failed to preload sound ${name}:`, error);
+      // Fallback to a silent buffer to avoid repeated 404s/log spam; still cache by name
+      try {
+        const silent = new Audio(SoundManager.SILENT_DATA_URI);
+        silent.loop = loop;
+        this.sounds.set(name, silent);
+      } catch {
+      }
       return false;
     }
   }
@@ -96,7 +119,25 @@ export class SoundManager {
       return;
     } // Skip on server
 
-    const audio = this.sounds.get(name);
+    let audio = this.sounds.get(name);
+    // Lazy preload by known default path on first call
+    if (!audio) {
+      const known = this.defaultPaths[name];
+      if (known) {
+        void this.preloadSound(name, known).then(() => {
+          const a = this.sounds.get(name);
+          if (a) {
+            try {
+              a.volume = Math.min(Math.max(volume, 0), 1);
+              a.currentTime = 0;
+              void a.play();
+            } catch {
+            }
+          }
+        });
+      }
+    }
+    audio = this.sounds.get(name);
     if (audio) {
       try {
         audio.volume = Math.min(Math.max(volume, 0), 1);
@@ -110,8 +151,6 @@ export class SoundManager {
       } catch (error) {
         console.warn(`Error playing sound ${name}:`, error);
       }
-    } else {
-      console.warn(`Sound not found: ${name}`);
     }
   }
 

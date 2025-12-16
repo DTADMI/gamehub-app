@@ -219,8 +219,8 @@ export default function BlockBlastPage() {
         </div>
       </div>
         <GameHUD
-            onPauseToggle={() => void 0}
-            onRestart={reset}
+            onPauseToggleAction={() => void 0}
+            onRestartAction={reset}
             tips="Click a rack piece, then click a cell to place • Clear rows/cols for points"
         />
     </div>

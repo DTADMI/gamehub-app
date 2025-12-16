@@ -37,12 +37,12 @@ export default function TowerDefensePage() {
         >
             <TowerDefenseGame key={seed}/>
             <GameHUD
-                onPauseToggle={() => {
+                onPauseToggleAction={() => {
                     window.dispatchEvent(
                         new KeyboardEvent("keydown", {key: " ", code: "Space"}),
                     );
                 }}
-                onRestart={() => setSeed((s) => s + 1)}
+                onRestartAction={() => setSeed((s) => s + 1)}
                 tips="Click to place towers • Defend the path against waves"
             />
         </div>

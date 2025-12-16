@@ -38,13 +38,13 @@ export default function PlatformerPage() {
             {/* force remount on restart by key */}
             <PlatformerGame key={seed}/>
             <GameHUD
-                onPauseToggle={() => {
+                onPauseToggleAction={() => {
                     // Dispatch Space
                     window.dispatchEvent(
                         new KeyboardEvent("keydown", {key: " ", code: "Space"}),
                     );
                 }}
-                onRestart={() => setSeed((s) => s + 1)}
+                onRestartAction={() => setSeed((s) => s + 1)}
                 tips="Arrows/WASD to move • Space to jump"
             />
         </div>

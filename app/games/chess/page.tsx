@@ -37,12 +37,12 @@ export default function ChessPage() {
         >
             <ChessGame key={seed}/>
             <GameHUD
-                onPauseToggle={() => {
+                onPauseToggleAction={() => {
                     window.dispatchEvent(
                         new KeyboardEvent("keydown", {key: " ", code: "Space"}),
                     );
                 }}
-                onRestart={() => setSeed((s) => s + 1)}
+                onRestartAction={() => setSeed((s) => s + 1)}
                 tips="Click a piece then a square • Checkmate the opponent"
             />
         </div>
