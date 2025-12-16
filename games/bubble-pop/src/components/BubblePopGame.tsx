@@ -296,7 +296,7 @@ export const BubblePopGame: React.FC = () => {
     }
   };
 
-  const onRestart = () => {
+  const onRestartAction = () => {
     setBoard(createBoard());
     setSelected(null);
     setScore(0);
@@ -367,7 +367,7 @@ export const BubblePopGame: React.FC = () => {
       />
       <div className="mt-3 flex items-center gap-3">
         <button
-          onClick={onRestart}
+            onClick={onRestartAction}
           className="px-3 py-1 rounded bg-primary text-primary-foreground hover:bg-primary/90"
         >
           Restart

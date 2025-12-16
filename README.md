@@ -24,6 +24,7 @@ Table of contents
 7. Deploy to Google Cloud Run (GitHub Actions)
 8. Design choices: why Next 16 + Tailwind v4 + shadcn
 9. Troubleshooting
+10. Sounds (fail‑safe manager)
 
 — — —
 
@@ -829,3 +830,33 @@ Relevant e2e specs (run with `bun run test:e2e` or `pnpm test:e2e` in `frontend/
 
 With these changes, the service reliably binds to `0.0.0.0:$PORT`, passes health checks, and the UI loads its chunks and
 styles correctly.
+
+10. Sounds (fail‑safe manager)
+
+The frontend uses a small, fail‑safe SoundManager for SFX and music used by games (e.g., Breakout).
+
+- Default paths: sound keys map to `/public/sounds/*.mp3` by default (e.g., `brickHit`, `brickBreak`, `paddle`, `wall`,
+  `powerUp`, `background`).
+- Lazy preload: if a sound has never been loaded before, calling `playSound('key')` triggers a single lazy preload using
+  the default path.
+- Fail‑safe: if a sound fails to load (404 or other error), it is marked `disabled` and will not be requested or played
+  again during this session (prevents repeated network calls and console spam). Gameplay continues without audio.
+- Global controls: the manager respects global mute and separate toggles for music vs. sound effects.
+
+Public API (via `import { soundManager } from '@games/shared'`):
+
+- `soundManager.playSound(name: string, volume?: number)` — plays a short sound if available and not disabled.
+- `soundManager.playMusic(name: string, volume?: number)` — starts looping music if available and not disabled.
+- `soundManager.stopMusic()` — stops current music.
+- `soundManager.toggleMusic()` / `soundManager.toggleSoundEffects()` — enable/disable categories.
+- `soundManager.setMuted(boolean)` / `soundManager.setVolume(0..1)` — global mute/volume.
+- `soundManager.registerSound(name: string, path: string, loop?: boolean)` — register/override a sound path.
+- `soundManager.isAvailable(name: string): boolean` — whether a sound is loaded and playable.
+- `soundManager.isDisabled(name: string): boolean` — whether a sound was marked disabled (e.g., after a load error).
+- `soundManager.enableSound(name: string)` / `soundManager.disableSound(name: string)` — force status (useful in dev).
+
+Notes:
+
+- Place your custom audio files under `public/sounds/` with the expected filenames if you want built‑in keys to work.
+- When files are missing, you should see at most a single warning per missing key; subsequent calls will be no‑ops.
+- In tests, the manager can be used with a mocked `Audio` implementation (Vitest + jsdom).

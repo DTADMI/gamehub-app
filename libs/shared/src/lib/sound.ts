@@ -1,10 +1,17 @@
 // libs/shared/src/lib/sound.ts
+type SoundEntry = {
+  audio: HTMLAudioElement | null;
+  available: boolean;
+  disabled: boolean;
+  loop: boolean;
+  lastErrorAt?: number;
+  loading?: boolean;
+};
+
 export class SoundManager {
   private static instance: SoundManager;
-  private sounds: Map<string, HTMLAudioElement> = new Map<
-      string,
-      HTMLAudioElement
-  >();
+  // Track richer status per sound
+  private sounds: Map<string, SoundEntry> = new Map<string, SoundEntry>();
   private static SILENT_DATA_URI =
       "data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCA"; // tiny silent mp3
   // Known default paths for game sounds — used for lazy preload and to avoid 404 spam
@@ -57,7 +64,8 @@ export class SoundManager {
     this.volume = Math.min(1, Math.max(0, v));
     // Apply to currently playing music
     if (this.currentMusic) {
-      const music = this.sounds.get(this.currentMusic);
+      const entry = this.sounds.get(this.currentMusic);
+      const music = entry?.audio;
       if (music) {
         music.volume = this.volume * 0.5; // keep music softer by default
       }
@@ -71,6 +79,12 @@ export class SoundManager {
   ): Promise<boolean> {
     // Skip on server-side
     if (typeof window === "undefined") {
+      return false;
+    }
+
+    // If already disabled, do not attempt again
+    const existing = this.sounds.get(name);
+    if (existing?.disabled) {
       return false;
     }
 
@@ -99,17 +113,22 @@ export class SoundManager {
         audio.addEventListener("canplaythrough", onReady, { once: true });
         audio.addEventListener("error", onError, { once: true });
       });
-
-      this.sounds.set(name, audio);
+      this.sounds.set(name, {
+        audio,
+        available: true,
+        disabled: false,
+        loop,
+      });
       return true;
-    } catch (error) {
-      // Fallback to a silent buffer to avoid repeated 404s/log spam; still cache by name
-      try {
-        const silent = new Audio(SoundManager.SILENT_DATA_URI);
-        silent.loop = loop;
-        this.sounds.set(name, silent);
-      } catch {
-      }
+    } catch {
+      // Mark sound as disabled to prevent future attempts and log once
+      this.sounds.set(name, {
+        audio: null,
+        available: false,
+        disabled: true,
+        loop,
+        lastErrorAt: Date.now(),
+      });
       return false;
     }
   }
@@ -118,39 +137,67 @@ export class SoundManager {
     if (typeof window === "undefined") {
       return;
     } // Skip on server
+    if (this.isMuted || !this.soundEffectsEnabled) {
+      return;
+    }
 
-    let audio = this.sounds.get(name);
+    let entry = this.sounds.get(name);
+    if (entry?.disabled) {
+      return;
+    }
+
     // Lazy preload by known default path on first call
-    if (!audio) {
+    if (!entry) {
       const known = this.defaultPaths[name];
       if (known) {
-        void this.preloadSound(name, known).then(() => {
-          const a = this.sounds.get(name);
-          if (a) {
-            try {
-              a.volume = Math.min(Math.max(volume, 0), 1);
-              a.currentTime = 0;
-              void a.play();
-            } catch {
-            }
+        // Insert a placeholder entry to avoid concurrent retries
+        this.sounds.set(name, {
+          audio: null,
+          available: false,
+          disabled: false,
+          loop: false,
+          loading: true,
+        });
+        void this.preloadSound(name, known).then((ok) => {
+          const e = this.sounds.get(name);
+          if (!ok || !e || e.disabled || !e.available || !e.audio) {
+            return;
+          }
+          try {
+            e.audio.volume = Math.min(Math.max(volume, 0), 1) * this.volume;
+            e.audio.currentTime = 0;
+            void e.audio.play();
+          } catch {
           }
         });
+      } else {
+        // Unknown sound; cache as disabled to avoid spamming
+        this.sounds.set(name, {
+          audio: null,
+          available: false,
+          disabled: true,
+          loop: false,
+          lastErrorAt: Date.now(),
+        });
       }
+      return;
     }
-    audio = this.sounds.get(name);
-    if (audio) {
-      try {
-        audio.volume = Math.min(Math.max(volume, 0), 1);
-        audio.currentTime = 0;
-        const playPromise = audio.play();
-        if (playPromise !== undefined) {
-          playPromise.catch((error) => {
-            console.warn(`Error playing sound ${name}:`, error);
-          });
-        }
-      } catch (error) {
-        console.warn(`Error playing sound ${name}:`, error);
+
+    const audio = entry.audio;
+    if (!entry.available || entry.disabled || !audio) {
+      return;
+    }
+    try {
+      audio.volume = Math.min(Math.max(volume, 0), 1) * this.volume;
+      audio.currentTime = 0;
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((error) => {
+          console.warn(`Error playing sound ${name}:`, error);
+        });
       }
+    } catch (error) {
+      console.warn(`Error playing sound ${name}:`, error);
     }
   }
 
@@ -160,19 +207,39 @@ export class SoundManager {
     }
 
     this.stopMusic();
-    const music = this.sounds.get(name);
-    if (music) {
-      this.currentMusic = name;
-      music.volume = Math.min(1, Math.max(0, volume * this.volume));
-      void music
-          .play()
-          .catch((e) => console.warn(`Could not play music ${name}:`, e));
+    const entry = this.sounds.get(name);
+    if (entry?.disabled) {
+      return;
     }
+    if (!entry || !entry.available || !entry.audio) {
+      // Try a single lazy preload if a default path exists
+      const known = this.defaultPaths[name];
+      if (known) {
+        void this.preloadSound(name, known, true).then((ok) => {
+          const e = this.sounds.get(name);
+          if (!ok || !e || e.disabled || !e.available || !e.audio) {
+            return;
+          }
+          this.currentMusic = name;
+          e.audio.volume = Math.min(1, Math.max(0, volume * this.volume));
+          void e.audio
+              .play()
+              .catch((err) => console.warn(`Could not play music ${name}:`, err));
+        });
+      }
+      return;
+    }
+    this.currentMusic = name;
+    entry.audio.volume = Math.min(1, Math.max(0, volume * this.volume));
+    void entry.audio
+        .play()
+        .catch((e) => console.warn(`Could not play music ${name}:`, e));
   }
 
   public stopMusic() {
     if (this.currentMusic) {
-      const music = this.sounds.get(this.currentMusic);
+      const entry = this.sounds.get(this.currentMusic);
+      const music = entry?.audio;
       if (music) {
         music.pause();
         music.currentTime = 0;
@@ -200,6 +267,46 @@ export class SoundManager {
 
   areSoundEffectsEnabled(): boolean {
     return this.soundEffectsEnabled;
+  }
+
+  /**
+   * Public API helpers
+   */
+  registerSound(name: string, path: string, loop = false) {
+    this.defaultPaths[name] = path;
+    // Reset status so it can be loaded next time
+    this.sounds.set(name, {
+      audio: null,
+      available: false,
+      disabled: false,
+      loop,
+    });
+  }
+
+  isAvailable(name: string): boolean {
+    const e = this.sounds.get(name);
+    return !!e?.available && !e?.disabled && !!e?.audio;
+  }
+
+  isDisabled(name: string): boolean {
+    const e = this.sounds.get(name);
+    return !!e?.disabled;
+  }
+
+  enableSound(name: string) {
+    const e = this.sounds.get(name);
+    if (!e) {
+      return;
+    }
+    e.disabled = false;
+  }
+
+  disableSound(name: string) {
+    const e = this.sounds.get(name);
+    if (!e) {
+      return;
+    }
+    e.disabled = true;
   }
 
   private async initializeAudioContext() {

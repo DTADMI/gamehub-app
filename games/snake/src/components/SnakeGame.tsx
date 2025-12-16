@@ -813,22 +813,22 @@ export const SnakeGame: React.FC = () => {
 
   // Support external HUD controls (restart/pause) via custom events
   useEffect(() => {
-    const onRestart = () => {
+    const onRestartAction = () => {
       restartWithConfig(config);
     };
-    const onPauseToggle = () => {
+    const onPauseToggleAction = () => {
       setIsPaused((p) => !p);
     };
-    window.addEventListener("snake:restart", onRestart as EventListener);
+    window.addEventListener("snake:restart", onRestartAction as EventListener);
     window.addEventListener(
         "snake:pauseToggle",
-        onPauseToggle as EventListener,
+        onPauseToggleAction as EventListener,
     );
     return () => {
-      window.removeEventListener("snake:restart", onRestart as EventListener);
+      window.removeEventListener("snake:restart", onRestartAction as EventListener);
       window.removeEventListener(
           "snake:pauseToggle",
-          onPauseToggle as EventListener,
+          onPauseToggleAction as EventListener,
       );
     };
   }, [config, restartWithConfig]);

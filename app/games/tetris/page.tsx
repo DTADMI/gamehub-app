@@ -54,7 +54,7 @@ export default function TetrisGamePage() {
         <GameShell
             ariaLabel="Tetris game"
             tips="Arrows to move • Up to rotate • Space to drop/pause"
-            onRestart={() => setSeed((s) => s + 1)}
+            onRestartAction={() => setSeed((s) => s + 1)}
             preloadSounds={[
                 {key: "line", url: "/sounds/line.mp3"},
                 {key: "move", url: "/sounds/move.mp3"},

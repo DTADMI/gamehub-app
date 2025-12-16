@@ -118,7 +118,9 @@ export class ParticlePool {
         ctx.globalAlpha = 1;
         ctx.lineCap = "round";
         for (const p of this.pool) {
-            if (!p.active) continue;
+            if (!p.active) {
+                continue;
+            }
             const t = 1 - p.life / p.maxLife;
             const alpha = Math.max(0, 1 - t * 0.9);
             if (p.type === "spark") {

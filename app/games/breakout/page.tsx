@@ -54,7 +54,7 @@ export default function BreakoutGamePage() {
         <GameShell
             ariaLabel="Breakout game"
             tips="Move with mouse or arrows • Space to pause/resume"
-            onRestart={() => setSeed((s) => s + 1)}
+            onRestartAction={() => setSeed((s) => s + 1)}
             preloadSounds={[
                 {key: "paddle", url: "/sounds/paddle.mp3"},
                 {key: "brickHit", url: "/sounds/brick-hit.mp3"},

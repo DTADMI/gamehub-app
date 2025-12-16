@@ -26,12 +26,12 @@ export type GameShellProps = {
      * Called when user presses HUD pause/resume.
      * Default: dispatches a Space keydown or custom event 'pauseToggle' if keyboard not used by the game.
      */
-    onPauseToggle?: () => void;
+    onPauseToggleAction?: () => void;
     /**
      * Called when user presses HUD restart.
      * Default: emits a custom 'game:restart' event.
      */
-    onRestart?: () => void;
+    onRestartAction?: () => void;
 };
 
 function MobileTouchControls({onKey}: { onKey: (key: string) => void }) {
@@ -106,8 +106,8 @@ export function GameShell({
                               className,
                               preloadSounds,
                               mobileControls = true,
-                              onPauseToggle,
-                              onRestart,
+                              onPauseToggleAction,
+                              onRestartAction,
                           }: GameShellProps) {
     const rootRef = useRef<HTMLDivElement | null>(null);
     const [muted, setMuted] = useState<boolean>(false);
@@ -170,20 +170,20 @@ export function GameShell({
     }, []);
 
     const handlePause = useCallback(() => {
-        if (onPauseToggle) {
-            return onPauseToggle();
+        if (onPauseToggleAction) {
+            return onPauseToggleAction();
         }
         // Fallback: emit custom event then Space for keyboard‑driven games
         window.dispatchEvent(new Event("game:pauseToggle"));
         sendKey(" ");
-    }, [onPauseToggle, sendKey]);
+    }, [onPauseToggleAction, sendKey]);
 
     const handleRestart = useCallback(() => {
-        if (onRestart) {
-            return onRestart();
+        if (onRestartAction) {
+            return onRestartAction();
         }
         window.dispatchEvent(new Event("game:restart"));
-    }, [onRestart]);
+    }, [onRestartAction]);
 
     return (
         <div

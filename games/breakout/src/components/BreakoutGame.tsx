@@ -1114,9 +1114,14 @@ export default function BreakoutGame() {
         if (Math.abs(ndx) < MIN_HORIZ_COMPONENT * 0.5) {
           const sign = ndx >= 0 ? 1 : -1;
           const hx = MIN_HORIZ_COMPONENT * 0.5 * sign;
+          const desired = desiredSpeedFromModifier(
+              activeRef.current,
+              stateLevel,
+              slowFactorRef.current,
+          );
           const hy =
               -Math.sign(ndy || -1) *
-              Math.sqrt(Math.max(0, target * target - hx * hx));
+              Math.sqrt(Math.max(0, desired * desired - hx * hx));
           ndx = hx;
           ndy = hy;
         }
