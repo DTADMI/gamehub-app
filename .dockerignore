@@ -62,3 +62,4 @@ Thumbs.db
 **/.mvn/
 **/mvn/
 **/pom.xml.versionsBackup
+!/test-results/

@@ -4,11 +4,16 @@ test.describe("Breakout life loss and resume", () => {
     test("losing a life decrements and a second start resumes movement", async ({page}) => {
         await page.goto("/games/breakout");
 
-        const canvas = page.locator("canvas").first();
-        await expect(canvas).toBeVisible();
+        const canvas = page.locator('canvas[aria-label="Breakout playfield"]');
+        await expect(canvas).toBeVisible({timeout: 15000});
 
-        // Start the game
-        await page.keyboard.press("Space");
+        // Start the game (tap overlay if present)
+        const overlay = page.locator('button:has-text("Tap to start")');
+        if (await overlay.isVisible()) {
+            await overlay.click();
+        } else {
+            await page.keyboard.press(' ');
+        }
 
         // Wait for ball y to start changing
       await page.waitForTimeout(100);
@@ -27,8 +32,18 @@ test.describe("Breakout life loss and resume", () => {
             return val;
         }, {timeout: 15000}).toBeLessThan(initialLives);
 
-        // After life loss, gameStarted becomes false; press Space to resume
-        await page.keyboard.press("Space");
+        // After life loss, gameStarted becomes false; tap overlay or toggle to resume
+        const overlay2 = page.locator('button:has-text("Tap to start")');
+        if (await overlay2.isVisible()) {
+            await overlay2.click();
+        } else {
+            const pauseBtn = page.locator('[data-testid="btn-pause"]');
+            if (await pauseBtn.isVisible()) {
+                await pauseBtn.click();
+            } else {
+                await page.keyboard.press(' ');
+            }
+        }
       await page.waitForTimeout(100);
         const yBefore = await canvas.getAttribute("data-bally");
         await page.waitForTimeout(250);

@@ -206,3 +206,5 @@ dist/**/*.js.map
 # TypeScript v1 declaration files
 typings/
 !/.idea/
+/package.json.1858806514
+!/test-results/

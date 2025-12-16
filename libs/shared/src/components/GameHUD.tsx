@@ -19,6 +19,7 @@ export function GameHUD({onPauseToggleAction, onRestartAction, tips}: GameHUDPro
                     className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-accent hover:text-accent-foreground"
                     onClick={onPauseToggleAction}
                     aria-label="Pause or resume"
+                    data-testid="hud-pause-toggle"
                 >
                     <Play className="h-4 w-4"/>/<Pause className="h-4 w-4"/>
                 </button>

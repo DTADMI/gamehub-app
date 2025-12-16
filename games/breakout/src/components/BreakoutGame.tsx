@@ -1687,7 +1687,7 @@ export default function BreakoutGame() {
               <div className="text-lg md:text-xl" aria-live="polite"
                    aria-label={`Lives ${lives}`}>{"❤️".repeat(lives)}</div>
             </div>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5" data-testid="hud-boosts">
               <div className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Boosts</div>
               <div className="text-base md:text-lg font-semibold tabular-nums" aria-live="polite"
                    aria-label={`Boosters ${boosters}`}>
@@ -1841,10 +1841,11 @@ export default function BreakoutGame() {
                     }
                   }}
                   className={`px-5 py-2 text-white rounded-md transition-colors ${awaitingNext ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-gray-600 hover:bg-gray-700'}`}
+                  data-testid="btn-pause"
               >
                 {awaitingNext ? "Next Level" : isPaused ? "Resume" : "Pause"}
-          </button>
-        )}
+              </button>
+          )}
           {/* Boost button for mobile/desktop */}
           {gameStarted && !awaitingNext && !isPaused && (
               <button
@@ -1853,6 +1854,7 @@ export default function BreakoutGame() {
                   className={`ml-2 px-5 py-2 rounded-md transition-colors ${boosters > 0 ? 'bg-amber-600 hover:bg-amber-700 text-white' : 'bg-gray-400 text-gray-100 cursor-not-allowed'}`}
                   aria-label={`Boost speed${boosters > 0 ? '' : ' (none left)'}`}
                   title={boosters > 0 ? 'Boost speed (B key on desktop, double-tap on mobile)' : 'No boosts left'}
+                  data-testid="btn-boost"
               >
                 🚀 Boost{boosters > 0 ? ` (${boosters})` : ''}
               </button>

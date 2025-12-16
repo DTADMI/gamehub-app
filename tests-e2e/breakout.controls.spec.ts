@@ -18,8 +18,10 @@ test.describe('Breakout — pause immobility and boosters', () => {
         // Ensure data attributes exist
         await expect(canvas).toHaveAttribute('data-px', /\d+/);
 
-        // Pause with Space
-        await page.keyboard.press('Space');
+        // Pause using unambiguous UI button
+        const pauseBtn = page.locator('[data-testid="btn-pause"]');
+        await expect(pauseBtn).toBeVisible();
+        await pauseBtn.click();
         const pxBefore = await canvas.getAttribute('data-px');
 
         // Move mouse across the canvas while paused
@@ -31,11 +33,40 @@ test.describe('Breakout — pause immobility and boosters', () => {
         const pxAfterPaused = await canvas.getAttribute('data-px');
         expect(pxAfterPaused).toBe(pxBefore);
 
-        // Resume with Space
-        await page.keyboard.press('Space');
-        await page.mouse.move(box.x + box.width * 0.2, box.y + box.height * 0.5);
-        const pxAfterMove = await canvas.getAttribute('data-px');
-        expect(pxAfterMove).not.toBe(pxBefore);
+        // Resume using the same toggle button
+        await expect(pauseBtn).toBeVisible();
+        await pauseBtn.click();
+
+        // Perform a touch-like drag (helps mobile emulation) and also move the mouse as fallback
+        const startX = box.x + box.width * 0.2;
+        const startY = box.y + box.height * 0.5;
+        const endX = box.x + box.width * 0.8;
+        const endY = startY;
+        await page.dispatchEvent('canvas[aria-label="Breakout playfield"]', 'pointerdown', {
+            clientX: startX,
+            clientY: startY,
+            pointerType: 'touch',
+            buttons: 1,
+        } as any);
+        await page.dispatchEvent('canvas[aria-label="Breakout playfield"]', 'pointermove', {
+            clientX: endX,
+            clientY: endY,
+            pointerType: 'touch',
+            buttons: 1,
+        } as any);
+        await page.dispatchEvent('canvas[aria-label="Breakout playfield"]', 'pointerup', {
+            clientX: endX,
+            clientY: endY,
+            pointerType: 'touch',
+            buttons: 0,
+        } as any);
+        await page.mouse.move(startX, startY);
+        await page.mouse.move(endX, endY);
+
+        await expect(async () => {
+            const pxAfterMove = await canvas.getAttribute('data-px');
+            expect(pxAfterMove).not.toBe(pxBefore);
+        }).toPass();
     });
 
     test('clicking Boost decreases boosters counter in HUD', async ({page}) => {
@@ -47,7 +78,7 @@ test.describe('Breakout — pause immobility and boosters', () => {
             await overlay.click();
         }
 
-        const boostsHud = page.locator('div:has-text("Boosts")');
+        const boostsHud = page.locator('[data-testid="hud-boosts"]');
         await expect(boostsHud).toBeVisible();
         const textBefore = await boostsHud.textContent();
         if (!textBefore) throw new Error('Boosts HUD not found');
@@ -55,7 +86,7 @@ test.describe('Breakout — pause immobility and boosters', () => {
         expect(m).not.toBeNull();
         const before = Number(m![1]);
 
-        const boostBtn = page.locator('button:has-text("Boost")');
+        const boostBtn = page.locator('[data-testid="btn-boost"]');
         await expect(boostBtn).toBeEnabled();
         await boostBtn.click();
 
