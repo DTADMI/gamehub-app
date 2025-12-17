@@ -41,7 +41,6 @@ Thumbs.db
 # Testing
 **/coverage/
 **/cypress/
-**/__tests__/
 **/*.test.*
 **/*.spec.*
 
@@ -63,3 +62,4 @@ Thumbs.db
 **/mvn/
 **/pom.xml.versionsBackup
 !/test-results/
+!/test-results/*

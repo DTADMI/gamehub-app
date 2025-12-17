@@ -70,14 +70,23 @@ export function GameSettingsProvider({children}: { children: React.ReactNode }) 
     const [isSubscriber, setIsSubscriber] = useState<boolean>(initial.isSubscriber);
 
     useEffect(() => {
+        const payload = {
+            enableParticles,
+            particleEffect,
+            mode,
+            isAuthenticated,
+            isSubscriber,
+        };
         try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify({
-                enableParticles,
-                particleEffect,
-                mode,
-                isAuthenticated,
-                isSubscriber
-            }));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+        } catch {
+            // ignore
+        }
+        try {
+            // Notify any non-context consumers (e.g., games that can’t access the provider directly)
+            if (typeof window !== "undefined") {
+                window.dispatchEvent(new CustomEvent('gamehub:settings', {detail: payload}));
+            }
         } catch {
             // ignore
         }

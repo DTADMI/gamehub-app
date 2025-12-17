@@ -239,6 +239,9 @@ export const MemoryGame: React.FC = () => {
     <GameContainer
       title="Memory Card Game"
       description={`Match all the pairs in as few moves as possible! Matches: ${score} / ${pairsInPlay}`}
+      lockTouch={false}
+      backgroundImage="/images/bg-pastel-pattern.jpg"
+      showParticleControls={false}
     >
       <div className="p-4">
           {/* Controls */}

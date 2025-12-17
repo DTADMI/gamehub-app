@@ -11,6 +11,10 @@ export interface GameContainerProps {
   className?: string;
     // When true, prevents page scroll/zoom and enables touch-action safety inside the game area (mobile-friendly)
     lockTouch?: boolean;
+    // Optional background image url (e.g., /images/bg-neon-grid.jpg)
+    backgroundImage?: string;
+    // Show/hide particle controls selector (only relevant for games that implement particles)
+    showParticleControls?: boolean;
 }
 
 // Prefer a standard function component that explicitly returns JSX.Element
@@ -21,6 +25,8 @@ function GameContainer({
                            description,
                            className = "",
                            lockTouch = true,
+                           backgroundImage,
+                           showParticleControls = true,
                        }: GameContainerProps) {
     // Prevent scroll/zoom gestures while interacting with the game area on mobile
     // Avoid calling preventDefault in React synthetic handlers (which are passive by default
@@ -33,7 +39,14 @@ function GameContainer({
         : {};
   return (
       <GameSettingsProvider>
-          <div className={`min-h-0 bg-gray-50 dark:bg-gray-900 ${className}`}>
+          <div
+              className={`min-h-0 bg-gray-50 dark:bg-gray-900 ${className}`}
+              style={backgroundImage ? {
+                  backgroundImage: `url(${backgroundImage})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+              } : undefined}
+          >
               <div className="container mx-auto px-3 py-3 md:px-4 md:py-4">
                   <header className="mb-3 md:mb-4 text-center">
                 <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-1 md:mb-2">
@@ -59,7 +72,7 @@ function GameContainer({
 
                   <div className="mt-3 md:mt-4 flex items-center justify-center gap-4 flex-wrap">
                       <ModeSelector/>
-              <ParticlesToggle/>
+                      {showParticleControls ? <ParticlesToggle/> : null}
                       <button
                           onClick={() => window.location.reload()}
                           className="px-4 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"

@@ -209,3 +209,17 @@ typings/
 !/.idea/
 /package.json.1858806514
 !/test-results/
+/test-results/**
+/.output.txt
+/test-results/breakout-Breakout-MVP-paddle-moves-and-start-pause-works-mobile-safari/error-context.md
+/test-results/breakout-life-Breakout-lif-f1bce-cond-start-resumes-movement-mobile-safari/error-context.md
+/test-results/hydration-no-hydration-mismatch-errors-on-home-chromium/error-context.md
+/test-results/hydration-no-hydration-mismatch-errors-on-home-mobile-chrome/error-context.md
+/test-results/hydration-no-hydration-mismatch-errors-on-home-mobile-safari/error-context.md
+/test-results/hydration-error.png
+/test-results/breakout-Breakout-MVP-losi-51fdf-updates-the-lives-attribute-mobile-safari/test-failed-1.png
+/test-results/breakout-Breakout-MVP-paddle-moves-and-start-pause-works-mobile-safari/test-failed-1.png
+/test-results/breakout-life-Breakout-lif-f1bce-cond-start-resumes-movement-mobile-safari/test-failed-1.png
+/test-results/hydration-no-hydration-mismatch-errors-on-home-chromium/test-failed-1.png
+/test-results/hydration-no-hydration-mismatch-errors-on-home-mobile-chrome/test-failed-1.png
+/test-results/hydration-no-hydration-mismatch-errors-on-home-mobile-safari/test-failed-1.png

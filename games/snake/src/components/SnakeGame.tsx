@@ -929,6 +929,7 @@ export const SnakeGame: React.FC = () => {
     <GameContainer
       title="Snake Game"
       description={`Eat the food to grow. Avoid walls and yourself! Score: ${score} | High Score: ${highScore}`}
+      showParticleControls={false}
     >
       <div className="p-4">
         {/* Mobile control mode selector: Swipe vs Joystick vs Taps */}

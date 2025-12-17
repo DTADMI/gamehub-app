@@ -1586,20 +1586,46 @@ export default function BreakoutGame() {
   // Also reset globalAlpha each frame to avoid accidental 0 alpha from other ops
   const _dprRef = useRef<number>(typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1);
 
-  // Game settings: particle toggle/effect and mode/entitlements
+  // Settings bridge: consume provider if available; also listen to global updates from GameSettingsProvider
   const {enableParticles, particleEffect, mode, isAuthenticated, isSubscriber} = useGameSettings();
   // Default to true so particles are visible during normal play; user settings can disable it.
   const enableParticlesRef = useRef<boolean>(true);
   const particleEffectRef = useRef<"sparks" | "puff">("sparks");
   const modeRef = useRef<"classic" | "hard" | "chaos">("classic");
   const authRef = useRef<{ auth: boolean; sub: boolean }>({auth: false, sub: false});
+  // Apply context values if a provider is present; otherwise fallback to localStorage + window events
   useEffect(() => {
-    // If settings are undefined, keep default true; else honor the setting
-    enableParticlesRef.current = enableParticles === undefined ? true : !!enableParticles;
-    particleEffectRef.current = particleEffect || "sparks";
-    modeRef.current = mode || "classic";
+    // Apply context values if non-stub (we can’t distinguish easily; apply regardless)
+    enableParticlesRef.current = enableParticles === undefined ? enableParticlesRef.current : !!enableParticles;
+    particleEffectRef.current = (particleEffect as any) || particleEffectRef.current;
+    modeRef.current = (mode as any) || modeRef.current;
     authRef.current = {auth: !!isAuthenticated, sub: !!isSubscriber};
   }, [enableParticles, particleEffect, mode, isAuthenticated, isSubscriber]);
+
+  useEffect(() => {
+    // Initial load from localStorage for cases where provider context isn’t reachable at hook time
+    try {
+      const raw = localStorage.getItem("gamehub:settings");
+      if (raw) {
+        const s = JSON.parse(raw);
+        if (typeof s.enableParticles === "boolean") enableParticlesRef.current = s.enableParticles;
+        if (s.particleEffect === "puff" || s.particleEffect === "sparks") particleEffectRef.current = s.particleEffect;
+        if (s.mode === "hard" || s.mode === "chaos" || s.mode === "classic") modeRef.current = s.mode;
+        authRef.current = {auth: !!s.isAuthenticated, sub: !!s.isSubscriber};
+      }
+    } catch {
+    }
+    const onSettings = (e: Event) => {
+      const ce = e as CustomEvent<any>;
+      const d = ce.detail || {};
+      if (typeof d.enableParticles === "boolean") enableParticlesRef.current = d.enableParticles;
+      if (d.particleEffect === "puff" || d.particleEffect === "sparks") particleEffectRef.current = d.particleEffect;
+      if (d.mode === "hard" || d.mode === "chaos" || d.mode === "classic") modeRef.current = d.mode;
+      authRef.current = {auth: !!d.isAuthenticated, sub: !!d.isSubscriber};
+    };
+    window.addEventListener('gamehub:settings', onSettings as any);
+    return () => window.removeEventListener('gamehub:settings', onSettings as any);
+  }, []);
 
   // Fireworks management during level completion
   const fireworksUntilRef = useRef<number>(0);
@@ -1671,6 +1697,7 @@ export default function BreakoutGame() {
       <GameContainer
           title="Breakout"
           description="Break all the bricks with the ball and don't let it fall!"
+          backgroundImage="/images/bg-neon-grid.jpg"
       >
         {/* Compact HUD above the canvas for better ergonomics */}
         <div className="mb-3">

@@ -1,0 +1,116 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+    - button "Open Next.js Dev Tools" [ref=e7] [cursor=pointer]:
+        - generic [ref=e10]:
+            - text: Compiling
+            - generic [ref=e11]:
+                - generic [ref=e12]: .
+                - generic [ref=e13]: .
+                - generic [ref=e14]: .
+    - alert [ref=e15]
+    - banner [ref=e16]:
+        - generic [ref=e17]:
+            - link "GameHub Home" [ref=e19]:
+                - /url: /
+                - text: GameHub
+            - generic [ref=e20]:
+                - button "Toggle theme" [ref=e21]:
+                    - img
+                    - generic [ref=e22]: Toggle theme
+                - link "Sign In" [ref=e23]:
+                    - /url: /login
+                    - img
+                    - generic [ref=e24]: Sign In
+    - main [ref=e25]:
+        - application "Breakout game" [active] [ref=e26]:
+            - button "Mute sound" [ref=e28]: 🔈 Sound
+            - generic [ref=e30]:
+                - generic [ref=e31]:
+                    - heading "Breakout" [level=1] [ref=e32]
+                    - paragraph [ref=e33]: Break all the bricks with the ball and don't let it fall!
+                - generic [ref=e35]:
+                    - generic [ref=e37]:
+                        - generic [ref=e38]:
+                            - generic [ref=e39]: Score
+                            - generic [ref=e40]: "0"
+                        - generic [ref=e41]:
+                            - generic [ref=e42]: Lives
+                            - generic "Lives 3" [ref=e43]: ❤️❤️❤️
+                        - generic [ref=e44]:
+                            - generic [ref=e45]: Boosts
+                            - generic "Boosters 3" [ref=e46]:
+                                - img "rocket" [ref=e47]: 🚀
+                                - text: x3
+                        - generic [ref=e48]:
+                            - generic [ref=e49]: Level
+                            - generic [ref=e50]: "1"
+                    - generic [ref=e52]:
+                        - generic "Breakout playfield" [ref=e53]
+                        - button "Tap to start" [ref=e54]
+                    - generic [ref=e55]:
+                        - button "Start Game" [ref=e56]
+                        - group [ref=e57]:
+                            - generic "Debug" [ref=e58] [cursor=pointer]
+                    - group [ref=e60]:
+                        - generic "How to Play" [ref=e61] [cursor=pointer]
+                    - group [ref=e63]:
+                        - generic "Power-Ups" [ref=e64] [cursor=pointer]
+                - generic [ref=e65]:
+                    - generic [ref=e66]:
+                        - generic [ref=e67]:
+                            - generic [ref=e68]: Game mode
+                            - combobox "Game mode" [ref=e69]:
+                                - option "Classic" [selected]
+                                - option "Hard (sign in)" [disabled]
+                                - option "Chaos (sub)" [disabled]
+                        - generic [ref=e70]:
+                            - checkbox "Signed in" [ref=e71]
+                            - text: Signed in
+                        - generic [ref=e72]:
+                            - checkbox "Subscriber" [ref=e73]
+                            - text: Subscriber
+                    - generic [ref=e74]:
+                        - generic [ref=e75]:
+                            - checkbox "Particles" [ref=e76]
+                            - text: Particles
+                        - generic [ref=e77]:
+                            - generic [ref=e78]: Particle effect
+                            - combobox "Particle effect" [disabled] [ref=e79]:
+                                - option "Sparks" [selected]
+                                - option "Puff"
+                    - button "Reset" [ref=e80]
+            - generic [ref=e82]: Sign in to view leaderboards and compete with others.
+            - generic:
+                - generic [ref=e83]:
+                    - button "Up" [ref=e84]: ▲
+                    - button "Left" [ref=e85]: ◀
+                    - button "Down" [ref=e86]: ▼
+                    - button "Right" [ref=e87]: ▶
+                - button "Pause or resume" [ref=e89]: Pause / Resume
+            - generic [ref=e90]:
+                - button "Pause or resume" [ref=e91]:
+                    - img [ref=e92]
+                    - text: /
+                    - img [ref=e94]
+                - button "Restart game" [ref=e97]:
+                    - img [ref=e98]
+                    - text: Restart
+                - generic [ref=e101]: Move with mouse or arrows • Space to pause/resume
+    - contentinfo [ref=e102]:
+        - generic [ref=e103]:
+            - generic [ref=e104]:
+                - generic [ref=e105]:
+                    - link "Gamehub" [ref=e106]:
+                        - /url: /
+                        - img [ref=e107]
+                        - generic [ref=e109]: Gamehub
+                    - paragraph [ref=e110]: A collection of fun and engaging games for everyone.
+                - generic [ref=e111]:
+                    - button "Toggle theme" [ref=e112]:
+                        - img
+                        - generic [ref=e113]: Toggle theme
+                    - button "More" [ref=e114]
+            - paragraph [ref=e117]: © 2025 Gamehub. All rights reserved.
+```
