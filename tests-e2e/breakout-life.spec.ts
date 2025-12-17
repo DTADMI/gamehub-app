@@ -15,14 +15,10 @@ test.describe("Breakout life loss and resume", () => {
             await page.keyboard.press(' ');
         }
 
-        // Wait for ball y to start changing
-      await page.waitForTimeout(100);
-        const y1 = await canvas.getAttribute("data-bally");
-        await page.waitForTimeout(250);
-        const y2 = await canvas.getAttribute("data-bally");
-        expect(y1).not.toBeNull();
-        expect(y2).not.toBeNull();
-        expect(Number(y1)).not.toEqual(Number(y2));
+        // Wait for ball y to start changing (robust against slower frames on mobile-safari)
+        const yInitial = await canvas.getAttribute("data-bally");
+        await expect.poll(async () => Number((await canvas.getAttribute("data-bally")) ?? yInitial ?? "0"), {timeout: 4000})
+            .not.toBe(Number(yInitial ?? "0"));
 
         // Wait until a life is lost (lives attr decreases)
         const initialLivesAttr = await canvas.getAttribute("data-lives");

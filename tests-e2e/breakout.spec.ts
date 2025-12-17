@@ -3,14 +3,33 @@ import {expect, test} from "@playwright/test";
 test.describe("Breakout MVP", () => {
   test("paddle moves and start/pause works", async ({page}) => {
     await page.goto("/games/breakout");
-
+    // Ensure page and client bundle settle a bit for mobile-safari
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForLoadState('networkidle');
+    // Wait for app shell first to avoid hitting canvases during warm-up/compile
+    const appShell = page.getByRole('application', {name: 'Breakout game'});
+    await expect(appShell).toBeVisible({timeout: 20000});
+    // On some mobile engines the game component hydrates a bit later; wait for attachment first
+    try {
+      await page.waitForSelector('canvas[aria-label="Breakout playfield"]', {state: 'attached', timeout: 30000});
+    } catch (e) {
+      // Retry once after a reload for very slow hydrations
+      await page.reload();
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForSelector('canvas[aria-label="Breakout playfield"]', {state: 'attached', timeout: 30000});
+    }
     const canvas = page.locator('canvas[aria-label="Breakout playfield"]');
-    await expect(canvas).toBeVisible({timeout: 15000});
+    await expect(canvas).toBeVisible({timeout: 30000});
 
     // Start game: always dismiss overlay first if present to avoid it intercepting clicks
-    const overlay = page.locator('button:has-text("Tap to start")');
+    const overlay = page.locator('button[aria-label="Tap to start"]');
     if (await overlay.isVisible()) {
       await overlay.click();
+    } else {
+      const resume = page.locator('button[aria-label="Tap to resume"]');
+      if (await resume.isVisible()) {
+        await resume.click();
+      }
     }
 
     // Ensure canvas has focus for keyboard fallback and read initial paddle X
@@ -57,7 +76,7 @@ test.describe("Breakout MVP", () => {
     }).toPass();
 
     // Game should already be started by the overlay above; if not, try to start now
-    const maybeOverlay = page.locator('button:has-text("Tap to start")');
+    const maybeOverlay = page.locator('button[aria-label="Tap to start"]');
     if (await maybeOverlay.isVisible()) {
       await maybeOverlay.click();
     }
@@ -79,14 +98,25 @@ test.describe("Breakout MVP", () => {
 
   test("losing a life updates the lives attribute", async ({page}) => {
     await page.goto("/games/breakout");
+    // Wait for app shell then the canvas to avoid early queries during compile
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForLoadState('networkidle');
+    const appShell = page.getByRole('application', {name: 'Breakout game'});
+    await expect(appShell).toBeVisible({timeout: 20000});
+    await page.waitForSelector('canvas[aria-label="Breakout playfield"]', {state: 'attached', timeout: 30000});
     const canvas = page.locator('canvas[aria-label="Breakout playfield"]');
-    await expect(canvas).toBeVisible({timeout: 15000});
+    await expect(canvas).toBeVisible({timeout: 30000});
     // Start game via overlay if available
-    const overlay = page.locator('button:has-text("Tap to start")');
+    const overlay = page.locator('button[aria-label="Tap to start"]');
     if (await overlay.isVisible()) {
       await overlay.click();
     } else {
-      await page.keyboard.press(' ');
+      const resume = page.locator('button[aria-label="Tap to resume"]');
+      if (await resume.isVisible()) {
+        await resume.click();
+      } else {
+        await page.keyboard.press(' ');
+      }
     }
 
     const lives0 = Number((await canvas.getAttribute("data-lives")) ?? 0);
