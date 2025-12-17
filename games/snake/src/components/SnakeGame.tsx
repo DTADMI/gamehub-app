@@ -16,7 +16,7 @@ import {
   Position,
 } from "../types/game";
 
-type ControlScheme = "swipe" | "joystick";
+type ControlScheme = "swipe" | "joystick" | "taps";
 // Tunables for mobile control feel
 const JOYSTICK_DEADZONE_PX = 14; // px radius with no direction change (slightly higher for small screens)
 const SWIPE_THRESHOLD_MIN = 24; // minimum swipe distance in px
@@ -52,7 +52,7 @@ export const SnakeGame: React.FC = () => {
     }
     try {
       const saved = localStorage.getItem("snakeControlScheme");
-      return (saved === "joystick" || saved === "swipe") ? (saved as ControlScheme) : "swipe";
+      return (saved === "joystick" || saved === "swipe" || saved === "taps") ? (saved as ControlScheme) : "swipe";
     } catch {
       return "swipe";
     }
@@ -351,6 +351,61 @@ export const SnakeGame: React.FC = () => {
       canvas.removeEventListener("touchstart", onTouchStart as any);
       canvas.removeEventListener("touchmove", onTouchMove as any);
       canvas.removeEventListener("touchend", onTouchEnd as any);
+    };
+  }, [controlScheme, direction, gameStarted, isPaused, gameOver]);
+
+  // Taps control scheme: tapping left/right halves issues relative left/right turns
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    if (controlScheme !== "taps") return;
+
+    const turnLeft = (dir: Direction): Direction => {
+      switch (dir) {
+        case "UP":
+          return "LEFT";
+        case "DOWN":
+          return "RIGHT";
+        case "LEFT":
+          return "DOWN";
+        case "RIGHT":
+          return "UP";
+      }
+    };
+    const turnRight = (dir: Direction): Direction => {
+      switch (dir) {
+        case "UP":
+          return "RIGHT";
+        case "DOWN":
+          return "LEFT";
+        case "LEFT":
+          return "UP";
+        case "RIGHT":
+          return "DOWN";
+      }
+    };
+
+    const handleTap = (clientX: number) => {
+      if (!gameStarted || isPaused || gameOver) return;
+      const rect = canvas.getBoundingClientRect();
+      const isLeft = clientX < rect.left + rect.width / 2;
+      const target = isLeft ? turnLeft(direction) : turnRight(direction);
+      // Avoid 180° reversal guards are inherent in relative turns
+      setNextDirection(target);
+    };
+
+    const onClick = (e: MouseEvent) => handleTap(e.clientX);
+    const onTouchStart = (e: TouchEvent) => {
+      const t = e.touches[0];
+      handleTap(t.clientX);
+      // Do not preventDefault so page can still scroll when not tapping canvas
+    };
+
+    canvas.addEventListener("click", onClick as any, {passive: true} as any);
+    canvas.addEventListener("touchstart", onTouchStart as any, {passive: true} as any);
+    return () => {
+      canvas.removeEventListener("click", onClick as any);
+      canvas.removeEventListener("touchstart", onTouchStart as any);
     };
   }, [controlScheme, direction, gameStarted, isPaused, gameOver]);
 
@@ -876,7 +931,7 @@ export const SnakeGame: React.FC = () => {
       description={`Eat the food to grow. Avoid walls and yourself! Score: ${score} | High Score: ${highScore}`}
     >
       <div className="p-4">
-        {/* Mobile control mode selector: Swipe vs Joystick */}
+        {/* Mobile control mode selector: Swipe vs Joystick vs Taps */}
         <div className="mb-3 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
           <span className="text-sm text-gray-600 dark:text-gray-300">Mobile Controls:</span>
           <div className="inline-flex rounded-md overflow-hidden border border-gray-300 dark:border-gray-700">
@@ -893,6 +948,13 @@ export const SnakeGame: React.FC = () => {
                 className={`px-4 py-2 text-sm min-h-11 border-l border-gray-300 dark:border-gray-700 ${controlScheme === 'joystick' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
             >
               Joystick
+            </button>
+            <button
+                type="button"
+                onClick={() => setControlScheme("taps")}
+                className={`px-4 py-2 text-sm min-h-11 border-l border-gray-300 dark:border-gray-700 ${controlScheme === 'taps' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+            >
+              Taps
             </button>
           </div>
         </div>
@@ -982,7 +1044,7 @@ export const SnakeGame: React.FC = () => {
             </button>
         )}
 
-        {/* Virtual joystick for mobile when selected */}
+        {/* Virtual joystick for mobile when selected (optional; doesn't block page scroll) */}
         {controlScheme === "joystick" && (
             <div className="mt-4 flex justify-center">
               <VirtualJoystick

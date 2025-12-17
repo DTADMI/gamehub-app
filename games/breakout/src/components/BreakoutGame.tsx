@@ -1675,7 +1675,7 @@ export default function BreakoutGame() {
         {/* Compact HUD above the canvas for better ergonomics */}
         <div className="mb-3">
           <div
-              className="mx-auto max-w-[960px] rounded-md bg-gray-100 dark:bg-gray-800/80 px-3 py-2 shadow-sm flex flex-wrap items-center justify-between gap-2">
+              className="mx-auto max-w-[960px] rounded-md bg-gray-100 dark:bg-gray-800/80 px-3 py-2 shadow-sm flex flex-wrap items-center justify-between gap-2 min-h-[44px] whitespace-nowrap">
             <div className="flex items-baseline gap-1.5">
               <div className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Score</div>
               <div className="text-lg md:text-xl font-bold tabular-nums">{score}</div>
@@ -1720,7 +1720,8 @@ export default function BreakoutGame() {
                     } as const;
                     return (
                         <span
-                            className={`inline-flex items-center rounded ${colorClass[t]} text-white px-1.5 py-0.5 text-[11px] md:text-xs`}>
+                            className={`inline-flex items-center rounded ${colorClass[t]} text-white px-1.5 py-0.5 text-[11px] md:text-xs`}
+                            style={{maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis"}}>
                           {t}
                           <span className="ml-1 rounded bg-black/20 px-1 tabular-nums">
                           {Math.max(0, Math.ceil((activeRef.current!.endTime - Date.now()) / 1000))}s
