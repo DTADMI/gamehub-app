@@ -23,32 +23,37 @@ interface GameCardProps {
 }
 
 export function GameCard({ game, featured = false }: GameCardProps) {
-  return (
-    <div className="block">
+  // Full-card clickable for better UX; keep Play button overlay for affordance.
+  const CardInner = (
       <Card
-        className={`group overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${featured ? "ring-2 ring-primary/20" : ""}`}
+          className={`group overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${featured ? "ring-2 ring-primary/20" : ""}`}
       >
         <CardHeader className="p-0">
           <div className="relative overflow-hidden">
+            {/* 16:9 media slot to prevent stretching on desktop */}
+            <div className="w-full aspect-[16/9] bg-muted/30">
             <Image
               src={game.image || "/placeholder.svg"}
               alt={game.title}
-              width={300}
-              height={200}
-              className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+              width={1920}
+              height={1080}
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
-            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+            </div>
+            <div
+                className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
               {game.upcoming ? (
-                <span className="inline-flex items-center rounded-md bg-amber-500/90 px-3 py-1.5 text-sm font-medium text-white">
-                  Coming soon
-                </span>
+                  <span
+                      className="inline-flex items-center rounded-md bg-amber-500/90 px-3 py-1.5 text-sm font-medium text-white">
+                Coming soon
+              </span>
               ) : (
-                <Button size="lg" className="gap-2" asChild>
-                  <Link href={`/games/${game.slug}`}>
-                    <Play className="w-4 h-4" />
-                    Play
-                  </Link>
-                </Button>
+                  <Button size="lg" className="gap-2" asChild>
+                    <Link href={`/games/${game.slug}`}>
+                      <Play className="w-4 h-4"/>
+                      Play
+                    </Link>
+                  </Button>
               )}
             </div>
             {featured && (
@@ -73,13 +78,26 @@ export function GameCard({ game, featured = false }: GameCardProps) {
           </p>
           <div className="flex flex-wrap gap-2">
             {game.tags.map((tag) => (
-              <Badge key={tag} variant="secondary" className="text-xs">
-                {tag}
-              </Badge>
+                <Badge key={tag} variant="secondary" className="text-xs">
+                  {tag}
+                </Badge>
             ))}
           </div>
         </CardContent>
       </Card>
+  );
+
+  return (
+      <div className="block">
+        {game.upcoming ? (
+            CardInner
+        ) : (
+            // Wrap in Link to make the entire card clickable
+            <Link href={`/games/${game.slug}`}
+                  className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary rounded-md">
+              {CardInner}
+            </Link>
+        )}
     </div>
   );
 }

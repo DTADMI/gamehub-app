@@ -38,6 +38,8 @@ export const MemoryGame: React.FC = () => {
     const [gameStarted, setGameStarted] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+    // Track cards to hide after match animation completes
+    const [hiddenIds, setHiddenIds] = useState<Set<number>>(() => new Set());
     // Throttle rapid sound effects on low-end devices
     const lastPlayRef = useRef<Record<string, number>>({});
     const playSound = useCallback((name: string, minIntervalMs = 60) => {
@@ -85,6 +87,7 @@ export const MemoryGame: React.FC = () => {
     setFlippedIndices([]);
     setMoves(0);
     setGameOver(false);
+      setHiddenIds(new Set());
   }, [difficulty]);
 
     const startGame = useCallback(() => {
@@ -112,6 +115,15 @@ export const MemoryGame: React.FC = () => {
           ),
         );
           playSound("match", 80);
+          // After a brief spin animation, remove matched cards from layout
+          const idsToHide = [firstCard.id, secondCard.id];
+          setTimeout(() => {
+              setHiddenIds((prev) => {
+                  const next = new Set(prev);
+                  idsToHide.forEach((id) => next.add(id));
+                  return next;
+              });
+          }, 500);
       } else {
         // No match, flip back after delay
         setTimeout(() => {
@@ -317,20 +329,24 @@ export const MemoryGame: React.FC = () => {
                 </button>
             )}
           {cards.map((card, index) => (
+              !hiddenIds.has(card.id) && (
             <div
               key={card.id}
               onClick={() => handleCardClick(index)}
               className={`
                 aspect-square rounded-xl cursor-pointer transition-transform duration-200
                 [transform-style:preserve-3d] relative shadow-md hover:shadow-lg
-                ${card.isMatched ? "opacity-80" : ""}
+                ${card.isMatched ? "animate-spin opacity-0 transition-opacity duration-500 pointer-events-none" : ""}
               `}
               style={{
                   transform:
                       card.isFlipped || card.isMatched
                           ? "rotateY(180deg)"
                           : "rotateY(0)",
+                  // Shorten spin duration
+                  animationDuration: card.isMatched ? "500ms" : undefined,
               }}
+              aria-hidden={card.isMatched || undefined}
             >
                 {/* Back */}
                 <div
@@ -343,6 +359,7 @@ export const MemoryGame: React.FC = () => {
                     <span aria-hidden>{getEmojiForValue(card.value)}</span>
               </div>
             </div>
+              )
           ))}
         </div>
 

@@ -1588,12 +1588,14 @@ export default function BreakoutGame() {
 
   // Game settings: particle toggle/effect and mode/entitlements
   const {enableParticles, particleEffect, mode, isAuthenticated, isSubscriber} = useGameSettings();
-  const enableParticlesRef = useRef<boolean>(false);
+  // Default to true so particles are visible during normal play; user settings can disable it.
+  const enableParticlesRef = useRef<boolean>(true);
   const particleEffectRef = useRef<"sparks" | "puff">("sparks");
   const modeRef = useRef<"classic" | "hard" | "chaos">("classic");
   const authRef = useRef<{ auth: boolean; sub: boolean }>({auth: false, sub: false});
   useEffect(() => {
-    enableParticlesRef.current = !!enableParticles;
+    // If settings are undefined, keep default true; else honor the setting
+    enableParticlesRef.current = enableParticles === undefined ? true : !!enableParticles;
     particleEffectRef.current = particleEffect || "sparks";
     modeRef.current = mode || "classic";
     authRef.current = {auth: !!isAuthenticated, sub: !!isSubscriber};
