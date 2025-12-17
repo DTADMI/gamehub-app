@@ -223,3 +223,5 @@ typings/
 /test-results/hydration-no-hydration-mismatch-errors-on-home-chromium/test-failed-1.png
 /test-results/hydration-no-hydration-mismatch-errors-on-home-mobile-chrome/test-failed-1.png
 /test-results/hydration-no-hydration-mismatch-errors-on-home-mobile-safari/test-failed-1.png
+
+next-env.d.ts

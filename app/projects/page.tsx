@@ -34,6 +34,14 @@ const projects: Project[] = [
     comingSoon: true,
   },
   {
+    title: "Velvet Galaxy",
+    description:
+        "A lifestyle social network application focused on creativity and community.",
+    tags: ["Next.js", "Prisma", "Auth", "Social"],
+    repo: "https://github.com/DTADMI/velvet-galaxy",
+    comingSoon: true,
+  },
+  {
     title: "Story Forge",
     description:
         "A web app that gamifies writing to encourage consistent progress on projects.",
