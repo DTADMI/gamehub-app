@@ -302,6 +302,9 @@ export default function BreakoutGame() {
   // Sticky capture state
   const stickyStateRef = useRef<{ captured: boolean; offset: number; capturedAt: number } | null>(null);
   const stickyReleasePendingRef = useRef<boolean>(false);
+  // Color-match bonus state: ball color per launch and first-hit eligibility
+  const ballColorRef = useRef<string | null>(null);
+  const firstHitEligibleRef = useRef<boolean>(false);
 
   // Booster activation helper
   const activateBoost = useCallback(() => {
@@ -731,10 +734,10 @@ export default function BreakoutGame() {
         (canvasRef.current as HTMLCanvasElement).dataset.px = String(Math.round(newPx));
       }
 
-      // draw ball
+      // draw ball (tinted to current bonus color if set)
       ctx.beginPath();
       ctx.arc(stateBall.x, stateBall.y, stateBall.radius, 0, Math.PI * 2);
-      ctx.fillStyle = isDark ? "#e11d48" : "#e74c3c";
+      ctx.fillStyle = ballColorRef.current || (isDark ? "#e11d48" : "#e74c3c");
       ctx.fill();
       ctx.closePath();
 
@@ -744,7 +747,7 @@ export default function BreakoutGame() {
           ctx.beginPath();
           ctx.arc(eb.x, eb.y, eb.radius, 0, Math.PI * 2);
           // Same color as the main ball for consistency
-          ctx.fillStyle = isDark ? "#e11d48" : "#e74c3c";
+          ctx.fillStyle = ballColorRef.current || (isDark ? "#e11d48" : "#e74c3c");
           ctx.fill();
           ctx.closePath();
         }
@@ -989,6 +992,24 @@ export default function BreakoutGame() {
             ndx = tx;
             ndy = ty;
           }
+            // Set new ball color for the next launch and mark first-hit eligible for color bonus
+            try {
+              const colors = Array.from(new Set(
+                  (bricksRef.current || [])
+                      .flat()
+                      .filter((bb) => bb && bb.health > 0)
+                      .map((bb) => bb.color),
+              ));
+              if (colors.length > 0) {
+                ballColorRef.current = colors[Math.floor(Math.random() * colors.length)];
+              } else {
+                ballColorRef.current = null;
+              }
+            } catch {
+              ballColorRef.current = null;
+            }
+            firstHitEligibleRef.current = true;
+
           // Pop the ball just above the paddle to ensure it never gets embedded or appears below
           ny = statePaddle.y - stateBall.radius - 0.01;
           soundManager.playSound("paddle");
@@ -1102,6 +1123,18 @@ export default function BreakoutGame() {
                 soundManager.playSound("brickBreak");
               } else {
                 soundManager.playSound("brickHit");
+              }
+              // Color-match bonus: on the first brick contact after a paddle send
+              if (firstHitEligibleRef.current) {
+                firstHitEligibleRef.current = false; // only eligible for the very first contact
+                try {
+                  if (ballColorRef.current && b.color === ballColorRef.current) {
+                    setScore((s) => s + b.points); // add an extra b.points (total 2x)
+                    scoreRef.current = (scoreRef.current || 0) + b.points;
+                  }
+                } catch {
+                  // no-op safeguard
+                }
               }
               // Particles: only when toggled; emit chosen style (puff or sparks)
               if (enableParticlesRef.current) {
@@ -1696,7 +1729,7 @@ export default function BreakoutGame() {
   return (
       <GameContainer
           title="Breakout"
-          description="Break all the bricks with the ball and don't let it fall!"
+          description="Break all the bricks with the ball and don't let it fall! Tip: When the ball leaves the paddle, it takes on a random brick color. If the FIRST brick it hits matches that color, you get double points for that brick. The ball keeps its color until it returns to the paddle and changes again."
           backgroundImage="/images/bg-neon-grid.jpg"
       >
         {/* Compact HUD above the canvas for better ergonomics */}
