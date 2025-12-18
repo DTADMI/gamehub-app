@@ -893,3 +893,10 @@ Testing notes (Breakout):
   - Paddle immobility while paused (paddle `data-px` remains unchanged until resume).
   - Boost button decrements the HUD rocket counter.
 - Unit tests cover settings persistence and UI gating for particles and modes.
+
+## Upcoming Projects
+
+- Quest Hunt — Mobile-first social geocaching: create, participate in, and share location-based treasure hunts.
+  - Repo: https://github.com/DTADMI/quest-hunt
+  - Stack highlights: Next.js 14, TypeScript, Tailwind (shadcn/ui), MapLibre (OpenStreetMap), Supabase (Postgres +
+    PostGIS, Auth, Storage, Realtime), Drizzle ORM, REST + WebSockets, Vercel, GitHub Actions, Sentry.

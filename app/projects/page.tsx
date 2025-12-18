@@ -42,6 +42,23 @@ const projects: Project[] = [
     comingSoon: true,
   },
   {
+    title: "Quest Hunt",
+    description:
+        "Mobile-first social geocaching: create, participate in, and share location-based treasure hunts.",
+    tags: [
+      "Next.js 14",
+      "TypeScript",
+      "Tailwind",
+      "MapLibre",
+      "Supabase",
+      "Drizzle",
+      "WebSockets",
+      "Vercel",
+    ],
+    repo: "https://github.com/DTADMI/quest-hunt",
+    comingSoon: true,
+  },
+  {
     title: "Story Forge",
     description:
         "A web app that gamifies writing to encourage consistent progress on projects.",
