@@ -21,7 +21,7 @@ designed to be backend-agnostic, communicating with a separate API service.
 
 ## In Progress
 
-- [ ] Implement game launcher system for dynamic game loading
+- [ ] Implement game launcher system for dynamic game loading (manifest-driven)
 - [ ] Add user profile and game statistics tracking
 - [ ] Implement leaderboard functionality
 - [ ] Add more games to the platform
@@ -47,7 +47,9 @@ designed to be backend-agnostic, communicating with a separate API service.
 
 ### Technical Improvements
 
-- [ ] Implement runtime game loading with dynamic imports
+- [x] Implement runtime game loading with dynamic imports (via central games manifest) — Phase 1: manifest + `[slug]`
+  route + catalog wired
+- [ ] Implement admin‑controlled flags to drive manifest enable/upcoming state and UI gates
 - [ ] Add service worker for offline capabilities
 - [ ] Implement WebSocket for real-time multiplayer games
 - [ ] Add performance monitoring
@@ -72,5 +74,7 @@ designed to be backend-agnostic, communicating with a separate API service.
 - 2025-12-18: Initial action plan created
 - 2025-12-18: Added Breakout and Memory games
 - 2025-12-18: Added Quest Hunt to Coming Soon projects
+- 2025-12-18: Planned Admin Dashboard (frontend-only) with feature flags and audit; outlined manifest-driven game
+  launcher
 - 2025-12-17: Set up CI/CD pipeline
 - 2025-12-16: Implemented authentication system

@@ -821,6 +821,100 @@ Relevant e2e specs (run with `bun run test:e2e` or `pnpm test:e2e` in `frontend/
 - `tests-e2e/access-control.spec.ts` — verifies that `/` and `/projects` are public and that a private route (e.g.,
   `/dashboard`) redirects to `/login?redirect=...` via Edge Middleware.
 
+# Admin Dashboard (frontend-only) and Feature Flags
+
+Purpose
+
+- Operate the app via an Admin profile: feature flagging, per‑game enable/disable, UI defaults, and gameplay tunables —
+  without a backend dependency for the first iteration.
+
+Status: frontend‑only MVP (local persistence)
+
+- Flags are stored in `localStorage` and can be exported/imported as JSON.
+- Admin route: `/admin` (guarded by NextAuth role `ADMIN`). In dev you can enable a local role override for testing.
+- Tabs: Feature Flags, Runtime Config (numeric/range tunables), Users (stub), Audit Log (local export).
+
+Example schema (subject to evolution)
+
+```
+{
+  "version": 1,
+  "games": {
+    "breakout": { "enabled": true, "upcoming": false },
+    "memory":   { "enabled": true, "upcoming": false },
+    "snake":    { "enabled": true, "upcoming": false }
+  },
+  "ui": {
+    "showCardPlayOverlay": true,
+    "showParticlesControl": { "breakout": true, "memory": false, "snake": false }
+  },
+  "breakout": {
+    "enableParticlesDefault": true,
+    "particleEffectDefault": "sparks",
+    "powerupDropRate": 0.06
+  },
+  "snake": { "defaultControlScheme": "swipe" },
+  "features": { "experimental": { "colorMatchBonus": true } }
+}
+```
+
+How flags take effect
+
+- Catalog and routes: `games.<slug>.enabled=false` hides the card and blocks the route with a friendly message.
+- UI: `ui.showCardPlayOverlay` toggles the play overlay on game cards; `ui.showParticlesControl` hides the particle
+  selector for games that don’t use particles.
+- Gameplay tunables: Breakout reads `powerupDropRate`, default particle effect, etc.; Snake reads
+  `defaultControlScheme`.
+
+Roadmap to backend persistence
+
+- Later, the Admin UI will switch from localStorage to REST endpoints on the backend (e.g., `/api/admin/flags`) with
+  optimistic concurrency and audit persistence. The current schema is designed to be sent as‑is to a backend.
+
+# Game Launcher (manifest‑driven dynamic loading)
+
+Goal
+
+- Standardize how games are discovered, rendered, and code‑split. The launcher uses a single manifest to describe each
+  game, and pages dynamically import games at runtime.
+
+Design
+
+- A central manifest (TypeScript) describes: `slug`, `title`, `description`, `tags`, `dynamic import`,
+  `enabled flag key`, `upcoming`, and optional assets (background, preloads).
+- `/games` renders the catalog from the manifest + flags, with client‑side search/filter.
+- `/games/[slug]` looks up a game in the manifest and uses `next/dynamic` to load it on demand. It shows Coming
+  Soon/Disabled/Not Found states when appropriate.
+- Preloading: hovering a card can trigger `rel=prefetch` for the game chunk and optionally preload SFX/images declared
+  in the manifest.
+
+Current integration
+
+- Implemented: a central manifest at `games/manifest.ts` declares Breakout, Memory, and Snake (slug, title, description,
+  tags, background, preloads, and a dynamic import factory).
+- Implemented: generic route `app/games/[slug]/page.tsx` loads a game dynamically via `next/dynamic`, and shows friendly
+  states for Coming Soon and Disabled games.
+- Implemented: catalog page `app/games/page.tsx` now renders from the manifest (mapped to the existing `GamesList`
+  component) so new games only need a manifest entry.
+
+Testing
+
+- Playwright checks: navigation loads the dynamic chunk; disabled/upcoming states are respected; flags updated in Admin
+  affect the catalog immediately after reload.
+
+How to add a new game (quick steps)
+
+1. Export your game component from its package/module (e.g., `@games/mygame`).
+2. Add a new entry to `games/manifest.ts` with `slug`, `title`, `shortDescription`, `tags`, `image`, optional
+   `backgroundImage`/`preloadAssets`, and `getComponent` that returns a dynamic import of your game.
+3. The catalog will list it automatically. Visiting `/games/<slug>` will load it dynamically. To mark as Coming Soon set
+   `upcoming: true`. To temporarily turn off set `enabled: false` (future Admin flags will manage this).
+
+# Snake mobile controllers (UX)
+
+- Default control: Swipe. A controller selector is available on the Snake page to switch between Swipe, Joystick (
+  D‑pad), and Taps. The overlay appears only when selected and does not block page scrolling.
+
 # What changed and why (Frontend runtime)
 
 - The container now starts via `frontend/docker/run.sh`, which:

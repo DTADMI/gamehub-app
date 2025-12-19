@@ -1,29 +1,23 @@
 // frontend/app/games/page.tsx
 "use client";
 
-import dynamic from "next/dynamic";
+import React from "react";
 
-import {type Game as CatalogGame, GAMES} from "@/lib/games";
-
-// Dynamically import the GamesList component with SSR disabled
-const GamesList = dynamic<{ games: CatalogGame[] }>(
-    () => import("@/components/games/GamesList"),
-    {
-        ssr: false,
-        loading: () => (
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-                <div className="text-center">
-                    <div
-                        className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
-                    <p className="mt-4 text-gray-600 dark:text-gray-300">
-                        Loading games...
-                    </p>
-                </div>
-            </div>
-        ),
-    },
-);
+import GamesList from "@/components/games/GamesList";
+import {listGames} from "@/games/manifest";
 
 export default function GamesPage() {
-  return <GamesList games={GAMES} />;
+    // Map manifest entries into the legacy GamesList shape
+    const entries = listGames();
+    const games = entries.map((e) => ({
+        id: e.slug,
+        title: e.title,
+        description: e.shortDescription,
+        image: e.image,
+        tags: e.tags,
+        // GamesList currently treats `featured` as "playable now" (shows Play vs Coming Soon)
+        featured: e.enabled !== false && !e.upcoming,
+    }));
+
+    return <GamesList games={games}/>;
 }
