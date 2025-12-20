@@ -15,7 +15,7 @@ test("no hydration mismatch errors on home", async ({ page }) => {
 
   // Check for any visible content to ensure the page is loaded
   const body = page.locator("body");
-  await expect(body).toBeVisible({timeout: 30000});
+    await expect(body).toBeVisible({timeout: 30000});
 
   // Check for hydration errors
   const hydrationErrors = errors.filter((error) =>
@@ -27,7 +27,7 @@ test("no hydration mismatch errors on home", async ({ page }) => {
   if (hydrationErrors.length > 0) {
     console.error("Hydration errors found:", hydrationErrors);
     // Take a screenshot for debugging
-    await page.screenshot({path: "test-results/hydration-error.png"});
+      await page.screenshot({path: "test-results/hydration-error.png"});
   }
 
   expect(hydrationErrors).toHaveLength(0);

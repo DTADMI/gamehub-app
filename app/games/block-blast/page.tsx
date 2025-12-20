@@ -118,7 +118,7 @@ export default function BlockBlastPage() {
   useEffect(() => {
     const el = rootRef.current;
     el?.focus();
-    const cleanup = enableGameKeyCapture({rootEl: el ?? undefined});
+      const cleanup = enableGameKeyCapture({rootEl: el ?? undefined});
     return () => cleanup();
   }, []);
 
@@ -218,11 +218,11 @@ export default function BlockBlastPage() {
           ))}
         </div>
       </div>
-        <GameHUD
-            onPauseToggleAction={() => void 0}
-            onRestartAction={reset}
-            tips="Click a rack piece, then click a cell to place • Clear rows/cols for points"
-        />
+          <GameHUD
+              onPauseToggleAction={() => void 0}
+              onRestartAction={reset}
+              tips="Click a rack piece, then click a cell to place • Clear rows/cols for points"
+          />
     </div>
   );
 }

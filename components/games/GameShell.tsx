@@ -1,7 +1,7 @@
 "use client";
 
 import {enableGameKeyCapture, GameHUD, soundManager} from "@games/shared";
-import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useRef, useState,} from "react";
 
 type PreloadSound = {
     key: string;

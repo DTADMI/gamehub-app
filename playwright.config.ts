@@ -4,7 +4,7 @@ export default defineConfig({
   testDir: "./tests-e2e",
   timeout: 30_000,
   // Give cold compiles a little more time before failing visibility checks
-  expect: {timeout: 10_000},
+    expect: {timeout: 10_000},
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
@@ -39,15 +39,15 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: {...devices["Desktop Chrome"]},
+        use: {...devices["Desktop Chrome"]},
     },
     {
       name: "mobile-chrome",
-      use: {...devices["Pixel 5"]},
+        use: {...devices["Pixel 5"]},
     },
     {
       name: "mobile-safari",
-      use: {...devices["iPhone 12"]},
+        use: {...devices["iPhone 12"]},
     },
   ],
 });

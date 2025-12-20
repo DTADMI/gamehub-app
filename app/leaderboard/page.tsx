@@ -33,8 +33,8 @@ export default function LeaderboardPage() {
   const search = useSearchParams();
   const pathname = usePathname();
   const routerNav = useRouter();
-  const {status, data} = useSession();
-  const {entitlements} = useSubscription();
+    const {status, data} = useSession();
+    const {entitlements} = useSubscription();
 
   const [gameType, setGameType] = useState<GameType>(
       (search.get("game") as GameType) || "SNAKE",
@@ -112,7 +112,7 @@ export default function LeaderboardPage() {
   // Initial load and when filters change
   useEffect(() => {
     if (status === "authenticated") {
-      loadPage({reset: true});
+        loadPage({reset: true});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameType, scope, window_, status]);
@@ -135,7 +135,7 @@ export default function LeaderboardPage() {
         >
           {GAME_TYPES.map((gt) => (
               <option key={gt} value={gt}>
-                {gt.replace(/_/g, " ")}
+                  {gt.replace(/_/g, " ")}
               </option>
           ))}
         </select>
@@ -154,7 +154,7 @@ export default function LeaderboardPage() {
                     onClick={() => !disabled && setScope(s)}
                     disabled={disabled}
                 >
-                  {s.charAt(0) + s.slice(1).toLowerCase()}
+                    {s.charAt(0) + s.slice(1).toLowerCase()}
                 </button>
             );
           })}
@@ -178,7 +178,7 @@ export default function LeaderboardPage() {
                     onClick={() => !disabled && setWindow(w)}
                     disabled={disabled}
                 >
-                  {label}
+                    {label}
                 </button>
             );
           })}
@@ -192,8 +192,8 @@ export default function LeaderboardPage() {
 
       {!loading && !error && (
           <div className="bg-white dark:bg-gray-900 shadow overflow-hidden sm:rounded-lg">
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
-              <thead className="bg-gray-50 dark:bg-gray-800/50">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+                  <thead className="bg-gray-50 dark:bg-gray-800/50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                   Rank
@@ -208,8 +208,8 @@ export default function LeaderboardPage() {
                   Game
                 </th>
               </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
               {entries.map((row) => {
                 const isCurrent =
                     currentIdentifier &&
@@ -219,38 +219,38 @@ export default function LeaderboardPage() {
                     <tr
                         key={`${row.gameType}-${row.rank}-${row.user.id}`}
                         className={
-                          isCurrent ? "bg-blue-50 dark:bg-blue-900/20" : ""
+                            isCurrent ? "bg-blue-50 dark:bg-blue-900/20" : ""
                         }
                     >
-                      <td className="px-6 py-3 text-sm text-muted-foreground">
-                        {row.rank}
-                      </td>
-                      <td className="px-6 py-3 text-sm font-medium">
-                        {row.user.username}
-                      </td>
-                      <td className="px-6 py-3 text-sm">
-                        {row.score.toLocaleString()}
-                      </td>
-                      <td className="px-6 py-3 text-sm capitalize">
-                        {row.gameType.replace(/_/g, " ")}
-                      </td>
+                        <td className="px-6 py-3 text-sm text-muted-foreground">
+                            {row.rank}
+                        </td>
+                        <td className="px-6 py-3 text-sm font-medium">
+                            {row.user.username}
+                        </td>
+                        <td className="px-6 py-3 text-sm">
+                            {row.score.toLocaleString()}
+                        </td>
+                        <td className="px-6 py-3 text-sm capitalize">
+                            {row.gameType.replace(/_/g, " ")}
+                        </td>
                     </tr>
                 );
               })}
-              </tbody>
-            </table>
+                  </tbody>
+              </table>
 
-            {/* Pagination */}
-            {hasNext && (
-                <div className="p-4 flex justify-center">
-                  <button
-                      onClick={() => loadPage()}
-                      className="px-4 py-2 rounded bg-primary text-primary-foreground"
-                  >
-                    Load more
-                  </button>
-                </div>
-            )}
+              {/* Pagination */}
+              {hasNext && (
+                  <div className="p-4 flex justify-center">
+                      <button
+                          onClick={() => loadPage()}
+                          className="px-4 py-2 rounded bg-primary text-primary-foreground"
+                      >
+                          Load more
+                      </button>
+                  </div>
+              )}
           </div>
       )}
     </div>

@@ -28,12 +28,15 @@ function maybeStartFallbackBackend(): void {
     const result = spawnSync(
         process.execPath,
         ["./scripts/dev-backend-fallback.mjs", "--quiet"],
-        {stdio: "inherit", env: process.env}
+        {stdio: "inherit", env: process.env},
     );
     if (result.error) {
         // Best-effort only: do not throw; E2E can still run without backend
         // eslint-disable-next-line no-console
-        console.warn("[E2E] Backend fallback start encountered an error:", result.error);
+        console.warn(
+            "[E2E] Backend fallback start encountered an error:",
+            result.error,
+        );
     }
 }
 
@@ -43,7 +46,8 @@ export default async function globalSetup(_config: FullConfig) {
 
     // Only attempt local fallback when targeting localhost/127.0.0.1 and public mode is not forced
     const isLocal = /^(http:\/\/)?(localhost|127\.0\.0\.1)(:|\b)/i.test(base);
-    const publicMode = (process.env.E2E_PUBLIC_MODE || "false").toLowerCase() === "true";
+    const publicMode =
+        (process.env.E2E_PUBLIC_MODE || "false").toLowerCase() === "true";
 
     if (!isLocal || publicMode) {
         return;

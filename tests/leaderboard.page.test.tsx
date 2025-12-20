@@ -6,7 +6,7 @@ import LeaderboardPage from "@/app/leaderboard/page";
 vi.mock("next-auth/react", () => ({
   useSession: () => ({
     status: "authenticated",
-    data: {user: {email: "me@example.com"}},
+      data: {user: {email: "me@example.com"}},
   }),
 }));
 
@@ -14,14 +14,14 @@ vi.mock("next/navigation", async () => {
   const actual = await vi.importActual<any>("next/navigation");
   return {
     ...actual,
-    useRouter: () => ({push: vi.fn(), replace: vi.fn()}),
+      useRouter: () => ({push: vi.fn(), replace: vi.fn()}),
     useSearchParams: () => new URLSearchParams(),
     usePathname: () => "/leaderboard",
   };
 });
 
 vi.mock("@/contexts/SubscriptionContext", () => ({
-  useSubscription: () => ({entitlements: {advancedLeaderboards: false}}),
+    useSubscription: () => ({entitlements: {advancedLeaderboards: false}}),
 }));
 
 vi.mock("@/lib/graphql/queries", () => ({
@@ -34,7 +34,7 @@ vi.mock("@/lib/graphql/queries", () => ({
             rank: 1,
             score: 100,
             gameType: "SNAKE",
-            user: {id: "u1", username: "alice"},
+              user: {id: "u1", username: "alice"},
           },
         },
         {
@@ -43,11 +43,11 @@ vi.mock("@/lib/graphql/queries", () => ({
             rank: 2,
             score: 90,
             gameType: "SNAKE",
-            user: {id: "u2", username: "bob"},
+              user: {id: "u2", username: "bob"},
           },
         },
       ],
-      pageInfo: {hasNextPage: true, endCursor: "c2"},
+        pageInfo: {hasNextPage: true, endCursor: "c2"},
     },
   }),
 }));
@@ -60,7 +60,7 @@ describe("LeaderboardPage", () => {
 
   it("renders initial rows and shows Load more when hasNextPage", async () => {
     await act(async () => {
-      render(<LeaderboardPage/>);
+        render(<LeaderboardPage/>);
     });
     expect(await screen.findByText("Leaderboard")).toBeInTheDocument();
     await act(async () => {
@@ -72,11 +72,11 @@ describe("LeaderboardPage", () => {
 
   it("gates FRIENDS scope for non-premium users", async () => {
     await act(async () => {
-      render(<LeaderboardPage/>);
+        render(<LeaderboardPage/>);
     });
     // FRIENDS button exists but disabled via opacity/cursor class; clicking should not change selection or fetch
     await act(async () => {
-      const friendsBtn = await screen.findByRole("button", {name: "Friends"});
+        const friendsBtn = await screen.findByRole("button", {name: "Friends"});
       expect(friendsBtn).toBeDisabled();
     });
   });
@@ -85,12 +85,12 @@ describe("LeaderboardPage", () => {
     const queries = await import("@/lib/graphql/queries");
     const spy = vi.spyOn(queries, "fetchLeaderboardPaged");
     await act(async () => {
-      render(<LeaderboardPage/>);
+        render(<LeaderboardPage/>);
     });
     await act(async () => {
       await screen.findByText("alice");
       const select = screen.getByDisplayValue("SNAKE");
-      fireEvent.change(select, {target: {value: "TETRIS"}});
+        fireEvent.change(select, {target: {value: "TETRIS"}});
     });
     await waitFor(() => expect(spy).toHaveBeenCalled());
   });

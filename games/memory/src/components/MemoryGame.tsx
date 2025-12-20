@@ -1,6 +1,6 @@
 // games/memory/src/components/MemoryGame.tsx
 import {GameContainer, soundManager} from "@games/shared";
-import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useRef, useState,} from "react";
 
 interface Card {
   id: number;
@@ -10,22 +10,22 @@ interface Card {
 }
 
 const EMOJIS = [
-    "🍎",
-    "🍌",
-    "🍇",
-    "🍉",
-    "🍓",
-    "🍒",
-    "🍍",
-    "🥝",
-    "🍑",
-    "🥥",
-    "🍋",
-    "🫐",
-    "🍊",
-    "🥕",
-    "🌽",
-    "🍆",
+  "🍎",
+  "🍌",
+  "🍇",
+  "🍉",
+  "🍓",
+  "🍒",
+  "🍍",
+  "🥝",
+  "🍑",
+  "🥥",
+  "🍋",
+  "🫐",
+  "🍊",
+  "🥕",
+  "🌽",
+  "🍆",
 ];
 const MAX_PAIRS = 12; // supports up to hard mode
 const CARD_VALUES = Array.from({length: MAX_PAIRS}, (_, i) => i + 1);
@@ -35,32 +35,32 @@ export const MemoryGame: React.FC = () => {
   const [flippedIndices, setFlippedIndices] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
   const [gameOver, setGameOver] = useState(false);
-    const [gameStarted, setGameStarted] = useState(false);
-    const [isPaused, setIsPaused] = useState(false);
+  const [gameStarted, setGameStarted] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-    // Track cards visually hidden after match, then removed from layout after animation
-    const [hiddenIds, setHiddenIds] = useState<Set<number>>(() => new Set());
-    const [removedIds, setRemovedIds] = useState<Set<number>>(() => new Set());
-    // Throttle rapid sound effects on low-end devices
-    const lastPlayRef = useRef<Record<string, number>>({});
-    const playSound = useCallback((name: string, minIntervalMs = 60) => {
-        try {
-            const now = Date.now();
-            const last = lastPlayRef.current[name] || 0;
-            if (now - last < minIntervalMs) {
-                return;
-            }
-            lastPlayRef.current[name] = now;
-            soundManager.playSound(name as any);
-        } catch {
-            // no-op
-        }
-    }, []);
+  // Track cards visually hidden after match, then removed from layout after animation
+  const [hiddenIds, setHiddenIds] = useState<Set<number>>(() => new Set());
+  const [removedIds, setRemovedIds] = useState<Set<number>>(() => new Set());
+  // Throttle rapid sound effects on low-end devices
+  const lastPlayRef = useRef<Record<string, number>>({});
+  const playSound = useCallback((name: string, minIntervalMs = 60) => {
+    try {
+      const now = Date.now();
+      const last = lastPlayRef.current[name] || 0;
+      if (now - last < minIntervalMs) {
+        return;
+      }
+      lastPlayRef.current[name] = now;
+      soundManager.playSound(name as any);
+    } catch {
+      // no-op
+    }
+  }, []);
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">(
       "medium",
   );
-    const [autoCompleteLastPair, setAutoCompleteLastPair] =
-        useState<boolean>(true);
+  const [autoCompleteLastPair, setAutoCompleteLastPair] =
+      useState<boolean>(true);
 
   // Initialize game
   const initializeGame = useCallback(() => {
@@ -88,15 +88,15 @@ export const MemoryGame: React.FC = () => {
     setFlippedIndices([]);
     setMoves(0);
     setGameOver(false);
-      setHiddenIds(new Set());
+    setHiddenIds(new Set());
   }, [difficulty]);
 
-    const startGame = useCallback(() => {
-        setIsPaused(false);
-        setGameStarted(true);
-        initializeGame();
-        soundManager.playMusic("background");
-    }, [initializeGame]);
+  const startGame = useCallback(() => {
+    setIsPaused(false);
+    setGameStarted(true);
+    initializeGame();
+    soundManager.playMusic("background");
+  }, [initializeGame]);
 
   // Check for matches
   useEffect(() => {
@@ -115,24 +115,24 @@ export const MemoryGame: React.FC = () => {
                   : card,
           ),
         );
-          playSound("match", 80);
-          // After a brief spin animation, visually hide matched cards then remove from layout
-          const idsToHide = [firstCard.id, secondCard.id];
+        playSound("match", 80);
+        // After a brief spin animation, visually hide matched cards then remove from layout
+        const idsToHide = [firstCard.id, secondCard.id];
+        setTimeout(() => {
+          setHiddenIds((prev) => {
+            const next = new Set(prev);
+            idsToHide.forEach((id) => next.add(id));
+            return next;
+          });
+          // After fade completes, remove from layout
           setTimeout(() => {
-              setHiddenIds((prev) => {
-                  const next = new Set(prev);
-                  idsToHide.forEach((id) => next.add(id));
-                  return next;
-              });
-              // After fade completes, remove from layout
-              setTimeout(() => {
-                  setRemovedIds((prev) => {
-                      const next = new Set(prev);
-                      idsToHide.forEach((id) => next.add(id));
-                      return next;
-                  });
-              }, 250);
-          }, 500);
+            setRemovedIds((prev) => {
+              const next = new Set(prev);
+              idsToHide.forEach((id) => next.add(id));
+              return next;
+            });
+          }, 250);
+        }, 500);
       } else {
         // No match, flip back after delay
         setTimeout(() => {
@@ -156,48 +156,48 @@ export const MemoryGame: React.FC = () => {
   useEffect(() => {
     if (cards.length > 0 && cards.every((card) => card.isMatched)) {
       setGameOver(true);
-        playSound("win", 200);
+      playSound("win", 200);
       soundManager.stopMusic();
     }
   }, [cards, playSound]);
 
-    // Auto-complete UX: when only two unmatched cards remain, auto-flip them and count as one move
-    useEffect(() => {
-        if (!autoCompleteLastPair || gameOver || isProcessing) {
-            return;
-        }
-        if (cards.length === 0) {
-            return;
-        }
-        const unmatched = cards
-            .map((c, i) => (c.isMatched ? -1 : i))
-            .filter((i) => i >= 0);
+  // Auto-complete UX: when only two unmatched cards remain, auto-flip them and count as one move
+  useEffect(() => {
+    if (!autoCompleteLastPair || gameOver || isProcessing) {
+      return;
+    }
+    if (cards.length === 0) {
+      return;
+    }
+    const unmatched = cards
+        .map((c, i) => (c.isMatched ? -1 : i))
+        .filter((i) => i >= 0);
 
-        if (unmatched.length === 2 && flippedIndices.length === 0) {
-            // Flip both, then let the existing match effect handle marking + move increment
-            setIsProcessing(true);
-            playSound("cardFlip", 60);
-            setCards((prev) =>
-                prev.map((c, i) =>
-                    i === unmatched[0] || i === unmatched[1]
-                        ? {...c, isFlipped: true}
-                        : c,
-                ),
-            );
-            setTimeout(() => {
-                setFlippedIndices([unmatched[0], unmatched[1]]);
-                // The match effect will set isProcessing true and clear it; we can clear our guard shortly after
-                setTimeout(() => setIsProcessing(false), 50);
-            }, 200);
-        }
-    }, [
-        autoCompleteLastPair,
-        cards,
-        flippedIndices.length,
-        gameOver,
-        isProcessing,
-        playSound,
-    ]);
+    if (unmatched.length === 2 && flippedIndices.length === 0) {
+      // Flip both, then let the existing match effect handle marking + move increment
+      setIsProcessing(true);
+      playSound("cardFlip", 60);
+      setCards((prev) =>
+          prev.map((c, i) =>
+              i === unmatched[0] || i === unmatched[1]
+                  ? {...c, isFlipped: true}
+                  : c,
+          ),
+      );
+      setTimeout(() => {
+        setFlippedIndices([unmatched[0], unmatched[1]]);
+        // The match effect will set isProcessing true and clear it; we can clear our guard shortly after
+        setTimeout(() => setIsProcessing(false), 50);
+      }, 200);
+    }
+  }, [
+    autoCompleteLastPair,
+    cards,
+    flippedIndices.length,
+    gameOver,
+    isProcessing,
+    playSound,
+  ]);
 
   // Handle card click
   const handleCardClick = (index: number) => {
@@ -213,7 +213,7 @@ export const MemoryGame: React.FC = () => {
       return;
     }
 
-      playSound("cardFlip", 60);
+    playSound("cardFlip", 60);
 
     setCards((prev) =>
         prev.map((card, idx) =>
@@ -232,17 +232,17 @@ export const MemoryGame: React.FC = () => {
     };
   }, [initializeGame]);
 
-    // Calculate score and pairs in play
+  // Calculate score and pairs in play
   const score = cards.filter((card) => card.isMatched).length / 2;
-    const pairsInPlay = useMemo(
-        () =>
-            cards.length / 2 ||
-            (difficulty === "easy" ? 6 : difficulty === "medium" ? 8 : 12),
-        [cards.length, difficulty],
-    );
+  const pairsInPlay = useMemo(
+      () =>
+          cards.length / 2 ||
+          (difficulty === "easy" ? 6 : difficulty === "medium" ? 8 : 12),
+      [cards.length, difficulty],
+  );
 
-    const getEmojiForValue = (value: number) =>
-        EMOJIS[(value - 1) % EMOJIS.length];
+  const getEmojiForValue = (value: number) =>
+      EMOJIS[(value - 1) % EMOJIS.length];
 
   return (
     <GameContainer
@@ -253,64 +253,64 @@ export const MemoryGame: React.FC = () => {
       showParticleControls={false}
     >
       <div className="p-4">
-          {/* Controls */}
-          <div className="mb-6 flex flex-col sm:flex-row items-center justify-center gap-4 text-center">
-              <div>
-                  <label className="mr-2 text-gray-700 dark:text-gray-300">
-                      Difficulty:
-                  </label>
-                  <select
-                      value={difficulty}
-                      onChange={(e) =>
+        {/* Controls */}
+        <div className="mb-6 flex flex-col sm:flex-row items-center justify-center gap-4 text-center">
+          <div>
+            <label className="mr-2 text-gray-700 dark:text-gray-300">
+              Difficulty:
+            </label>
+            <select
+                value={difficulty}
+                onChange={(e) =>
                 setDifficulty(e.target.value as "easy" | "medium" | "hard")
-                      }
-                      className="px-3 py-1 border rounded-md"
-                      disabled={moves > 0 && gameStarted && !gameOver}
-                  >
-                      <option value="easy">Easy (6 pairs)</option>
-                      <option value="medium">Medium (8 pairs)</option>
-                      <option value="hard">Hard (12 pairs)</option>
-                  </select>
-              </div>
-              <label className="inline-flex items-center gap-2 select-none">
-                  <input
-                      type="checkbox"
-                      className="h-4 w-4"
-                      checked={autoCompleteLastPair}
-                      onChange={(e) => setAutoCompleteLastPair(e.target.checked)}
-                  />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">
+                }
+                className="px-3 py-1 border rounded-md"
+                disabled={moves > 0 && gameStarted && !gameOver}
+            >
+              <option value="easy">Easy (6 pairs)</option>
+              <option value="medium">Medium (8 pairs)</option>
+              <option value="hard">Hard (12 pairs)</option>
+            </select>
+          </div>
+          <label className="inline-flex items-center gap-2 select-none">
+            <input
+                type="checkbox"
+                className="h-4 w-4"
+                checked={autoCompleteLastPair}
+                onChange={(e) => setAutoCompleteLastPair(e.target.checked)}
+            />
+            <span className="text-sm text-gray-700 dark:text-gray-300">
               Auto-complete last pair (counts 1 move)
             </span>
-              </label>
-              {/* Start / Pause controls */}
-              <div className="flex items-center gap-2">
-                  {!gameStarted || gameOver ? (
-                      <button
-                          onClick={startGame}
-                          className="px-4 py-2 rounded-md min-h-11 bg-blue-600 text-white hover:bg-blue-700"
-                      >
-                          {gameOver ? "Play Again" : "Start"}
-                      </button>
-                  ) : (
-                      <button
-                          onClick={() => {
-                              setIsPaused((p) => {
-                                  const next = !p;
-                                  if (next) {
-                                      soundManager.stopMusic();
-                                  } else {
-                                      soundManager.playMusic("background");
-                                  }
-                                  return next;
-                              });
-                          }}
-                          className="px-4 py-2 rounded-md min-h-11 bg-gray-600 text-white hover:bg-gray-700"
-                      >
-                          {isPaused ? "Resume" : "Pause"}
-                      </button>
-                  )}
-              </div>
+          </label>
+          {/* Start / Pause controls */}
+          <div className="flex items-center gap-2">
+            {!gameStarted || gameOver ? (
+                <button
+                    onClick={startGame}
+                    className="px-4 py-2 rounded-md min-h-11 bg-blue-600 text-white hover:bg-blue-700"
+                >
+                  {gameOver ? "Play Again" : "Start"}
+                </button>
+            ) : (
+                <button
+                    onClick={() => {
+                      setIsPaused((p) => {
+                        const next = !p;
+                        if (next) {
+                          soundManager.stopMusic();
+                        } else {
+                          soundManager.playMusic("background");
+                        }
+                        return next;
+                      });
+                    }}
+                    className="px-4 py-2 rounded-md min-h-11 bg-gray-600 text-white hover:bg-gray-700"
+                >
+                  {isPaused ? "Resume" : "Pause"}
+                </button>
+            )}
+          </div>
         </div>
 
         {/* Game Board */}
@@ -323,63 +323,63 @@ export const MemoryGame: React.FC = () => {
                 : "grid-cols-6"
           }`}
         >
-            {/* Tap-to-start / pause overlay for mobile */}
-            {(!gameStarted || isPaused) && !gameOver && (
-                <button
-                    aria-label={!gameStarted ? "Tap to start" : "Tap to resume"}
-                    className="absolute inset-0 z-10 flex items-center justify-center bg-black/40 text-white text-base sm:text-lg font-semibold select-none rounded-xl"
-                    onClick={() => {
-                        if (!gameStarted) {
-                            startGame();
-                        } else {
-                            setIsPaused(false);
-                            soundManager.playMusic("background");
-                        }
-                    }}
-                >
-                    {!gameStarted ? "Tap to start" : "Paused — Tap to resume"}
-                </button>
-            )}
-          {cards.map((card, index) => (
+          {/* Tap-to-start / pause overlay for mobile */}
+          {(!gameStarted || isPaused) && !gameOver && (
+              <button
+                  aria-label={!gameStarted ? "Tap to start" : "Tap to resume"}
+                  className="absolute inset-0 z-10 flex items-center justify-center bg-black/40 text-white text-base sm:text-lg font-semibold select-none rounded-xl"
+                  onClick={() => {
+                    if (!gameStarted) {
+                      startGame();
+                    } else {
+                      setIsPaused(false);
+                      soundManager.playMusic("background");
+                    }
+                  }}
+              >
+                {!gameStarted ? "Tap to start" : "Paused — Tap to resume"}
+              </button>
+          )}
+          {cards.map((card, index) =>
               removedIds.has(card.id) ? null : (
-            <div
-              key={card.id}
-              onClick={() => handleCardClick(index)}
-              className={`
+                  <div
+                      key={card.id}
+                      onClick={() => handleCardClick(index)}
+                      className={`
                 aspect-square rounded-xl cursor-pointer transition-transform duration-200
                 [transform-style:preserve-3d] relative shadow-md hover:shadow-lg
                 ${card.isMatched ? "animate-spin transition-opacity duration-500" : ""}
                 ${hiddenIds.has(card.id) ? "opacity-0 pointer-events-none" : ""}
               `}
-              style={{
+                      style={{
                   transform:
                       card.isFlipped || card.isMatched
                           ? "rotateY(180deg)"
                           : "rotateY(0)",
                   // Shorten spin duration
                   animationDuration: card.isMatched ? "500ms" : undefined,
-              }}
-              aria-hidden={card.isMatched || undefined}
-            >
+                      }}
+                      aria-hidden={card.isMatched || undefined}
+                  >
                 {/* Back */}
-                <div
-                    className="absolute inset-0 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white text-2xl font-semibold [backface-visibility:hidden]">
-                    ✨
+                    <div
+                        className="absolute inset-0 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white text-2xl font-semibold [backface-visibility:hidden]">
+                      ✨
                 </div>
                 {/* Front */}
-                <div
-                    className="absolute inset-0 rounded-xl bg-white dark:bg-gray-800 flex items-center justify-center text-4xl [transform:rotateY(180deg)] [backface-visibility:hidden]">
-                    <span aria-hidden>{getEmojiForValue(card.value)}</span>
-              </div>
-            </div>
-              )
-          ))}
+                    <div
+                        className="absolute inset-0 rounded-xl bg-white dark:bg-gray-800 flex items-center justify-center text-4xl [transform:rotateY(180deg)] [backface-visibility:hidden]">
+                      <span aria-hidden>{getEmojiForValue(card.value)}</span>
+                    </div>
+                  </div>
+              ),
+          )}
         </div>
 
         {/* Game Info */}
         <div className="mt-6 text-center">
           <p className="text-lg text-gray-700 dark:text-gray-300">
-              Moves: {moves} | Matches: {score} / {pairsInPlay}
+            Moves: {moves} | Matches: {score} / {pairsInPlay}
           </p>
 
           {gameOver && (

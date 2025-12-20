@@ -55,7 +55,7 @@ export function findKing(board: Board, color: Color): Pos | null {
     for (let c = 0; c < SIZE; c++) {
       const p = board[r][c].piece;
       if (p === `${color}K`) {
-        return {r, c};
+          return {r, c};
       }
     }
   }
@@ -172,7 +172,7 @@ export function generatePseudoLegalMoves(state: GameState, from: Pos): Move[] {
       const target = board[r][c].piece;
       if (target) {
         if (!sameColor(piece, target)) {
-          moves.push({from, to: {r, c}, capture: true});
+            moves.push({from, to: {r, c}, capture: true});
         }
         break;
       }
@@ -199,7 +199,7 @@ export function generatePseudoLegalMoves(state: GameState, from: Pos): Move[] {
         if (inBounds(cap.r, cap.c)) {
           const target = board[cap.r][cap.c].piece;
           if (target && target[0] !== color) {
-            moves.push({from, to: cap, capture: true});
+              moves.push({from, to: cap, capture: true});
           }
         }
       }
@@ -237,7 +237,7 @@ export function generatePseudoLegalMoves(state: GameState, from: Pos): Move[] {
         }
         const target = board[r][c].piece;
         if (!target || target[0] !== color) {
-          moves.push({from, to: {r, c}, capture: !!target});
+            moves.push({from, to: {r, c}, capture: !!target});
         }
       }
       break;
@@ -283,7 +283,7 @@ export function generatePseudoLegalMoves(state: GameState, from: Pos): Move[] {
           }
           const target = board[r][c].piece;
           if (!target || target[0] !== color) {
-            moves.push({from, to: {r, c}, capture: !!target});
+              moves.push({from, to: {r, c}, capture: !!target});
           }
         }
       }

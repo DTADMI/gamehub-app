@@ -22,8 +22,8 @@ interface GameContextType {
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
 export function GameProvider({
-                               children,
-                               gameId,
+                                 children,
+                                 gameId,
                              }: {
   children: React.ReactNode;
   gameId: string;

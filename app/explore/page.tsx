@@ -114,15 +114,15 @@ export default function ExplorePage() {
                       <h3 className="text-lg font-semibold">Featured</h3>
                       {useCarousels ? (
                           <Carousel>
-                            {ALL_GAMES.filter((g) => g.featured).map((g) => (
-                                <GameCard key={g.id} game={g} featured={g.featured}/>
-                            ))}
+                              {ALL_GAMES.filter((g) => g.featured).map((g) => (
+                                  <GameCard key={g.id} game={g} featured={g.featured}/>
+                              ))}
                           </Carousel>
                       ) : (
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {ALL_GAMES.filter((g) => g.featured).map((g) => (
-                                <GameCard key={g.id} game={g} featured={g.featured}/>
-                            ))}
+                              {ALL_GAMES.filter((g) => g.featured).map((g) => (
+                                  <GameCard key={g.id} game={g} featured={g.featured}/>
+                              ))}
                           </div>
                       )}
                   </>
@@ -165,9 +165,9 @@ export default function ExplorePage() {
                                   >
                                       <div className="p-5 space-y-3">
                                           <h2 className="text-lg font-semibold">{p.title}</h2>
-                                        <p className="text-sm text-muted-foreground">
-                                          {p.description}
-                                        </p>
+                                          <p className="text-sm text-muted-foreground">
+                                              {p.description}
+                                          </p>
                                           <div className="flex flex-wrap gap-2">
                                               {p.tags.map((t) => (
                                                   <span
@@ -191,9 +191,9 @@ export default function ExplorePage() {
                                   >
                                       <div className="p-5 space-y-3">
                                           <h2 className="text-lg font-semibold">{p.title}</h2>
-                                        <p className="text-sm text-muted-foreground">
-                                          {p.description}
-                                        </p>
+                                          <p className="text-sm text-muted-foreground">
+                                              {p.description}
+                                          </p>
                                           <div className="flex flex-wrap gap-2">
                                               {p.tags.map((t) => (
                                                   <span
@@ -223,9 +223,9 @@ export default function ExplorePage() {
                                   >
                                       <div className="p-5 space-y-3">
                                           <h2 className="text-lg font-semibold">{p.title}</h2>
-                                        <p className="text-sm text-muted-foreground">
-                                          {p.description}
-                                        </p>
+                                          <p className="text-sm text-muted-foreground">
+                                              {p.description}
+                                          </p>
                                           <div className="flex flex-wrap gap-2">
                                               {p.tags.map((t) => (
                                                   <span
@@ -253,9 +253,9 @@ export default function ExplorePage() {
                                   >
                                       <div className="p-5 space-y-3">
                                           <h2 className="text-lg font-semibold">{p.title}</h2>
-                                        <p className="text-sm text-muted-foreground">
-                                          {p.description}
-                                        </p>
+                                          <p className="text-sm text-muted-foreground">
+                                              {p.description}
+                                          </p>
                                           <div className="flex flex-wrap gap-2">
                                               {p.tags.map((t) => (
                                                   <span

@@ -53,4 +53,4 @@ Notes: Cropped to 16:9; volume normalized to −14 LUFS.
   Author:
   Source URL:
   License:
-  Notes: 
+  Notes:

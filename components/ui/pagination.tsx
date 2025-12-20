@@ -41,7 +41,7 @@ type PaginationLinkProps = {
 function PaginationLink({
   className,
   isActive,
-                          size = "icon",
+                            size = "icon",
   ...props
 }: PaginationLinkProps) {
   return (

@@ -30,9 +30,7 @@ export default function RootLayout({
     <body className={`font-sans antialiased min-h-[100svh] flex flex-col`}>
         <Providers>
           <Header />
-          <main className="flex-1 min-h-0">
-            {children}
-          </main>
+          <main className="flex-1 min-h-0">{children}</main>
           <Footer />
           <Analytics />
         </Providers>

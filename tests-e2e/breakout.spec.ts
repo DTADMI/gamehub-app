@@ -1,25 +1,31 @@
 import {expect, test} from "@playwright/test";
 
 test.describe("Breakout MVP", () => {
-  test("paddle moves and start/pause works", async ({page}) => {
+    test("paddle moves and start/pause works", async ({page}) => {
     await page.goto("/games/breakout");
     // Ensure page and client bundle settle a bit for mobile-safari
-    await page.waitForLoadState('domcontentloaded');
-    await page.waitForLoadState('networkidle');
+        await page.waitForLoadState("domcontentloaded");
+        await page.waitForLoadState("networkidle");
     // Wait for app shell first to avoid hitting canvases during warm-up/compile
-    const appShell = page.getByRole('application', {name: 'Breakout game'});
-    await expect(appShell).toBeVisible({timeout: 20000});
+        const appShell = page.getByRole("application", {name: "Breakout game"});
+        await expect(appShell).toBeVisible({timeout: 20000});
     // On some mobile engines the game component hydrates a bit later; wait for attachment first
     try {
-      await page.waitForSelector('canvas[aria-label="Breakout playfield"]', {state: 'attached', timeout: 30000});
+        await page.waitForSelector('canvas[aria-label="Breakout playfield"]', {
+            state: "attached",
+            timeout: 30000,
+        });
     } catch (e) {
       // Retry once after a reload for very slow hydrations
       await page.reload();
-      await page.waitForLoadState('domcontentloaded');
-      await page.waitForSelector('canvas[aria-label="Breakout playfield"]', {state: 'attached', timeout: 30000});
+        await page.waitForLoadState("domcontentloaded");
+        await page.waitForSelector('canvas[aria-label="Breakout playfield"]', {
+            state: "attached",
+            timeout: 30000,
+        });
     }
     const canvas = page.locator('canvas[aria-label="Breakout playfield"]');
-    await expect(canvas).toBeVisible({timeout: 30000});
+        await expect(canvas).toBeVisible({timeout: 30000});
 
     // Start game: always dismiss overlay first if present to avoid it intercepting clicks
     const overlay = page.locator('button[aria-label="Tap to start"]');
@@ -38,7 +44,7 @@ test.describe("Breakout MVP", () => {
 
     // Move paddle by mouse movement to avoid focus/device flakiness
     const box = await canvas.boundingBox();
-    if (!box) throw new Error('Canvas bounding box not found');
+        if (!box) throw new Error("Canvas bounding box not found");
     // Try a touch-like drag first (mobile emulation), then fall back to mouse move
     const startX = box.x + box.width * 0.25;
     const startY = box.y + box.height * 0.5;
@@ -46,24 +52,36 @@ test.describe("Breakout MVP", () => {
     const endY = startY;
 
     // Dispatch pointer events with pointerType 'touch' to support mobile-safari emulation
-    await page.dispatchEvent('canvas[aria-label="Breakout playfield"]', 'pointerdown', {
-      clientX: startX,
-      clientY: startY,
-      pointerType: 'touch',
-      buttons: 1,
-    } as any);
-    await page.dispatchEvent('canvas[aria-label="Breakout playfield"]', 'pointermove', {
-      clientX: endX,
-      clientY: endY,
-      pointerType: 'touch',
-      buttons: 1,
-    } as any);
-    await page.dispatchEvent('canvas[aria-label="Breakout playfield"]', 'pointerup', {
-      clientX: endX,
-      clientY: endY,
-      pointerType: 'touch',
-      buttons: 0,
-    } as any);
+        await page.dispatchEvent(
+            'canvas[aria-label="Breakout playfield"]',
+            "pointerdown",
+            {
+                clientX: startX,
+                clientY: startY,
+                pointerType: "touch",
+                buttons: 1,
+            } as any,
+        );
+        await page.dispatchEvent(
+            'canvas[aria-label="Breakout playfield"]',
+            "pointermove",
+            {
+                clientX: endX,
+                clientY: endY,
+                pointerType: "touch",
+                buttons: 1,
+            } as any,
+        );
+        await page.dispatchEvent(
+            'canvas[aria-label="Breakout playfield"]',
+            "pointerup",
+            {
+                clientX: endX,
+                clientY: endY,
+                pointerType: "touch",
+                buttons: 0,
+            } as any,
+        );
 
     // Also move the mouse as a fallback for desktop contexts
     await page.mouse.move(startX, startY);
@@ -96,16 +114,19 @@ test.describe("Breakout MVP", () => {
     expect(yPause1).toBe(yPause0);
   });
 
-  test("losing a life updates the lives attribute", async ({page}) => {
+    test("losing a life updates the lives attribute", async ({page}) => {
     await page.goto("/games/breakout");
     // Wait for app shell then the canvas to avoid early queries during compile
-    await page.waitForLoadState('domcontentloaded');
-    await page.waitForLoadState('networkidle');
-    const appShell = page.getByRole('application', {name: 'Breakout game'});
-    await expect(appShell).toBeVisible({timeout: 20000});
-    await page.waitForSelector('canvas[aria-label="Breakout playfield"]', {state: 'attached', timeout: 30000});
+        await page.waitForLoadState("domcontentloaded");
+        await page.waitForLoadState("networkidle");
+        const appShell = page.getByRole("application", {name: "Breakout game"});
+        await expect(appShell).toBeVisible({timeout: 20000});
+        await page.waitForSelector('canvas[aria-label="Breakout playfield"]', {
+            state: "attached",
+            timeout: 30000,
+        });
     const canvas = page.locator('canvas[aria-label="Breakout playfield"]');
-    await expect(canvas).toBeVisible({timeout: 30000});
+        await expect(canvas).toBeVisible({timeout: 30000});
     // Start game via overlay if available
     const overlay = page.locator('button[aria-label="Tap to start"]');
     if (await overlay.isVisible()) {
@@ -115,7 +136,7 @@ test.describe("Breakout MVP", () => {
       if (await resume.isVisible()) {
         await resume.click();
       } else {
-        await page.keyboard.press(' ');
+          await page.keyboard.press(" ");
       }
     }
 

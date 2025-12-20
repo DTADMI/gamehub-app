@@ -68,7 +68,12 @@ export class ParticlePool {
         }
     }
 
-    emitDustPuff(x: number, y: number, baseColor = "rgba(255,255,255,0.9)", count = 5) {
+    emitDustPuff(
+        x: number,
+        y: number,
+        baseColor = "rgba(255,255,255,0.9)",
+        count = 5,
+    ) {
         // 4–6 round puffs; 250–300 ms lifetime; slower, upward bias
         const n = Math.min(count, this.max);
         for (let i = 0; i < n; i++) {
@@ -76,7 +81,7 @@ export class ParticlePool {
             if (!p) {
                 break;
             }
-            const angle = (-Math.PI / 2) + (Math.random() - 0.5) * (Math.PI / 2);
+            const angle = -Math.PI / 2 + (Math.random() - 0.5) * (Math.PI / 2);
             const speed = 0.4 + Math.random() * 0.9;
             const life = 220 + Math.random() * 120;
             p.x = x + (Math.random() - 0.5) * 6;
@@ -148,12 +153,23 @@ export class ParticlePool {
     private withAlpha(color: string, alpha: number): string {
         // If color already has rgba, replace alpha; else wrap
         if (color.startsWith("rgba")) {
-            return color.replace(/rgba\(([^,]+),([^,]+),([^,]+),[^)]+\)/, (_m, r, g, b) => `rgba(${r},${g},${b},${alpha})`);
+            return color.replace(
+                /rgba\(([^,]+),([^,]+),([^,]+),[^)]+\)/,
+                (_m, r, g, b) => `rgba(${r},${g},${b},${alpha})`,
+            );
         }
         if (color.startsWith("#")) {
             // naive hex -> rgba
-            const c = color.replace('#', '');
-            const bigint = parseInt(c.length === 3 ? c.split('').map(ch => ch + ch).join('') : c, 16);
+            const c = color.replace("#", "");
+            const bigint = parseInt(
+                c.length === 3
+                    ? c
+                        .split("")
+                        .map((ch) => ch + ch)
+                        .join("")
+                    : c,
+                16,
+            );
             const r = (bigint >> 16) & 255;
             const g = (bigint >> 8) & 255;
             const b = bigint & 255;

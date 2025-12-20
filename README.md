@@ -170,7 +170,7 @@ Health‑gate for backend during E2E:
 - When targeting localhost and `E2E_PUBLIC_MODE=false`, it will auto‑start the local backend via `pnpm backend:up`
   helper
   and wait briefly for health before running tests.
-    - Set `E2E_PUBLIC_MODE=true` to skip any local backend attempts (e.g., when testing against a hosted backend).
+  - Set `E2E_PUBLIC_MODE=true` to skip any local backend attempts (e.g., when testing against a hosted backend).
 
 5. Build & production run
 
@@ -281,21 +281,21 @@ Authentication options (choose ONE):
 1. Service Account key (simple)
 
 - Secrets:
-    - `GCP_PROJECT_ID`
-    - `GCP_REGION`
-    - `GCP_SA_KEY` (entire JSON key content, multi‑line supported)
+  - `GCP_PROJECT_ID`
+  - `GCP_REGION`
+  - `GCP_SA_KEY` (entire JSON key content, multi‑line supported)
 - Required SA roles (project level):
-    - Cloud Run Admin
-    - Artifact Registry Writer
-    - Service Account Token Creator
+  - Cloud Run Admin
+  - Artifact Registry Writer
+  - Service Account Token Creator
 
 2. Workload Identity Federation (recommended, keyless)
 
 - Secrets:
-    - `GCP_PROJECT_ID`
-    - `GCP_REGION`
-    - `GCP_WORKLOAD_IDENTITY_PROVIDER` (full resource name)
-    - `GCP_SERVICE_ACCOUNT` (email)
+  - `GCP_PROJECT_ID`
+  - `GCP_REGION`
+  - `GCP_WORKLOAD_IDENTITY_PROVIDER` (full resource name)
+  - `GCP_SERVICE_ACCOUNT` (email)
 - IAM: grant `roles/iam.workloadIdentityUser` for the GitHub OIDC principal to the service account, plus the roles
   above.
 

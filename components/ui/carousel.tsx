@@ -41,7 +41,7 @@ function useCarousel() {
 }
 
 function Carousel({
-                    orientation = "horizontal",
+                      orientation = "horizontal",
   opts,
   setApi,
   plugins,
@@ -137,7 +137,7 @@ function Carousel({
 }
 
 function CarouselContent({className, ...props}: React.ComponentProps<"div">) {
-  const {carouselRef, orientation} = useCarousel();
+    const {carouselRef, orientation} = useCarousel();
 
   return (
     <div
@@ -158,7 +158,7 @@ function CarouselContent({className, ...props}: React.ComponentProps<"div">) {
 }
 
 function CarouselItem({className, ...props}: React.ComponentProps<"div">) {
-  const {orientation} = useCarousel();
+    const {orientation} = useCarousel();
 
   return (
     <div
@@ -177,11 +177,11 @@ function CarouselItem({className, ...props}: React.ComponentProps<"div">) {
 
 function CarouselPrevious({
   className,
-                            variant = "outline",
-                            size = "icon",
+                              variant = "outline",
+                              size = "icon",
   ...props
 }: React.ComponentProps<typeof Button>) {
-  const {orientation, scrollPrev, canScrollPrev} = useCarousel();
+    const {orientation, scrollPrev, canScrollPrev} = useCarousel();
 
   return (
     <Button
@@ -207,11 +207,11 @@ function CarouselPrevious({
 
 function CarouselNext({
   className,
-                        variant = "outline",
-                        size = "icon",
+                          variant = "outline",
+                          size = "icon",
   ...props
 }: React.ComponentProps<typeof Button>) {
-  const {orientation, scrollNext, canScrollNext} = useCarousel();
+    const {orientation, scrollNext, canScrollNext} = useCarousel();
 
   return (
     <Button

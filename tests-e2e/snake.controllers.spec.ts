@@ -1,16 +1,19 @@
 import {expect, test} from "@playwright/test";
 
 test.describe("Snake mobile controllers", () => {
-    test("selector toggles between Swipe / Joystick / Taps and persists", async ({page, context}) => {
+    test("selector toggles between Swipe / Joystick / Taps and persists", async ({
+                                                                                     page,
+                                                                                     context,
+                                                                                 }) => {
         await page.goto("/games/snake");
 
         // Wait for canvas and controls
         const canvas = page.locator('canvas[aria-label="Snake playfield"]');
         await expect(canvas).toBeVisible({timeout: 20000});
 
-        const swipeBtn = page.getByRole('button', {name: 'Swipe'});
-        const joystickBtn = page.getByRole('button', {name: 'Joystick'});
-        const tapsBtn = page.getByRole('button', {name: 'Taps'});
+        const swipeBtn = page.getByRole("button", {name: "Swipe"});
+        const joystickBtn = page.getByRole("button", {name: "Joystick"});
+        const tapsBtn = page.getByRole("button", {name: "Taps"});
         await expect(swipeBtn).toBeVisible();
         await expect(joystickBtn).toBeVisible();
         await expect(tapsBtn).toBeVisible();
@@ -18,22 +21,28 @@ test.describe("Snake mobile controllers", () => {
         // Switch to Joystick
         await joystickBtn.click();
         await expect(async () => {
-            const scheme = await page.evaluate(() => localStorage.getItem('snakeControlScheme'));
-            expect(scheme).toBe('joystick');
+            const scheme = await page.evaluate(() =>
+                localStorage.getItem("snakeControlScheme"),
+            );
+            expect(scheme).toBe("joystick");
         }).toPass();
 
         // Switch to Taps
         await tapsBtn.click();
         await expect(async () => {
-            const scheme = await page.evaluate(() => localStorage.getItem('snakeControlScheme'));
-            expect(scheme).toBe('taps');
+            const scheme = await page.evaluate(() =>
+                localStorage.getItem("snakeControlScheme"),
+            );
+            expect(scheme).toBe("taps");
         }).toPass();
 
         // Switch back to Swipe
         await swipeBtn.click();
         await expect(async () => {
-            const scheme = await page.evaluate(() => localStorage.getItem('snakeControlScheme'));
-            expect(scheme).toBe('swipe');
+            const scheme = await page.evaluate(() =>
+                localStorage.getItem("snakeControlScheme"),
+            );
+            expect(scheme).toBe("swipe");
         }).toPass();
 
         // Start the game via overlay

@@ -17,7 +17,7 @@ interface SoundContextType {
 const SoundContext = createContext<SoundContextType | undefined>(undefined);
 
 export const SoundProvider: React.FC<{ children: React.ReactNode }> = ({
-                                                                         children,
+                                                                           children,
                                                                        }) => {
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolumeState] = useState(0.5);

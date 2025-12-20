@@ -26,7 +26,7 @@ function SelectValue({
 
 function SelectTrigger({
   className,
-                         size = "default",
+                           size = "default",
   children,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
@@ -53,7 +53,7 @@ function SelectTrigger({
 function SelectContent({
   className,
   children,
-                         position = "popper",
+                           position = "popper",
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Content>) {
   return (

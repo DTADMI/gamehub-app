@@ -41,8 +41,8 @@ describe.skip("chess advanced rules", () => {
     s = moveBy(s, { r: 0, c: 6 }, { r: 2, c: 5 }); // Ng1-f3
     s = moveBy(s, { r: 7, c: 2 }, { r: 3, c: 6 }); // Bc8-g4 (approx along our model)
     // Now attempt to castle king side for white
-    const castleK = legalMoves(s, {r: 0, c: 4}).find(
-        (m) => m.castling === "K",
+      const castleK = legalMoves(s, {r: 0, c: 4}).find(
+          (m) => m.castling === "K",
     );
     // Depending on simplified attack detection coordinates this may not exist; if it exists, ensure applyMove keeps legality check
     if (castleK) {

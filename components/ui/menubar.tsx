@@ -66,7 +66,7 @@ function MenubarTrigger({
 
 function MenubarContent({
   className,
-                          align = "start",
+                            align = "start",
   alignOffset = -4,
   sideOffset = 8,
   ...props
@@ -91,7 +91,7 @@ function MenubarContent({
 function MenubarItem({
   className,
   inset,
-                       variant = "default",
+                         variant = "default",
   ...props
 }: React.ComponentProps<typeof MenubarPrimitive.Item> & {
   inset?: boolean;

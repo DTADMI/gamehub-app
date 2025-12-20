@@ -64,7 +64,7 @@ export function Footer() {
 
   return (
       <footer className="w-full border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container max-w-[100vw] w-full px-4 py-3 md:py-4">
+          <div className="container max-w-[100vw] w-full px-4 py-3 md:py-4">
         {/* Compact header row */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="col-span-2 space-y-4">
@@ -79,7 +79,7 @@ export function Footer() {
             </p>
           </div>
           <div className="flex items-center justify-start md:justify-end gap-3">
-            <ModeToggle/>
+              <ModeToggle/>
             <Button
                 variant="outline"
                 size="sm"
@@ -95,41 +95,45 @@ export function Footer() {
         {/* Expandable content */}
         <div id="footer-more" hidden={!expanded} className="mt-4">
           <div className="grid grid-cols-2 gap-6 md:grid-cols-4 lg:grid-cols-5 w-full">
+              {footerLinks.map((section) => {
+                  const items =
+                      section.title === "Social"
+                          ? section.items.filter((item) => {
+                              if (item.name === "GitHub") {
+                                  return Boolean(GITHUB_URL);
+                              }
+                              if (item.name === "LinkedIn") {
+                                  return Boolean(LINKEDIN_URL);
+                              }
+                              if (item.name === "Email") {
+                                  return Boolean(CONTACT_EMAIL);
+                              }
+                              return true;
+                          })
+                          : section.items;
 
-          {footerLinks.map((section) => {
-            const items =
-              section.title === "Social"
-                ? section.items.filter((item) => {
-                    if (item.name === "GitHub") {
-                      return Boolean(GITHUB_URL);
-                    }
-                    if (item.name === "LinkedIn") {
-                      return Boolean(LINKEDIN_URL);
-                    }
-                    if (item.name === "Email") {
-                      return Boolean(CONTACT_EMAIL);
-                    }
-                    return true;
-                  })
-                : section.items;
+                  if (items.length === 0) {
+                      return null;
+                  }
 
-            if (items.length === 0) {
-              return null;
-            }
-
-            return (
-              <div key={section.title} className="space-y-4">
-                {/* Mobile: collapsible */}
-                <details className="md:hidden group">
-                  <summary
-                      className="flex items-center justify-between cursor-pointer select-none text-sm font-semibold">
-                    {section.title}
-                    <span className="ml-2 text-muted-foreground group-open:rotate-180 transition-transform">▾</span>
-                  </summary>
-                  <ul className="mt-2 space-y-2">
-                    {items.map((item) => {
-                      const isExternal = item.href.startsWith("http") || item.href.startsWith("mailto:");
-                      return (
+                  return (
+                      <div key={section.title} className="space-y-4">
+                          {/* Mobile: collapsible */}
+                          <details className="md:hidden group">
+                              <summary
+                                  className="flex items-center justify-between cursor-pointer select-none text-sm font-semibold">
+                                  {section.title}
+                                  <span
+                                      className="ml-2 text-muted-foreground group-open:rotate-180 transition-transform">
+                        ▾
+                      </span>
+                              </summary>
+                              <ul className="mt-2 space-y-2">
+                                  {items.map((item) => {
+                                      const isExternal =
+                                          item.href.startsWith("http") ||
+                                          item.href.startsWith("mailto:");
+                                      return (
                           <li key={item.name}>
                             {isExternal ? (
                                 <a
@@ -138,29 +142,31 @@ export function Footer() {
                                     rel="noopener noreferrer"
                                     className="block py-1 text-sm text-muted-foreground hover:text-foreground transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
                                 >
-                                  {item.name}
+                                    {item.name}
                                 </a>
                             ) : (
                                 <Link
                                     href={item.href}
                                     className="block py-1 text-sm text-muted-foreground hover:text-foreground transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
                                 >
-                                  {item.name}
+                                    {item.name}
                                 </Link>
                             )}
                           </li>
-                      );
-                    })}
-                  </ul>
-                </details>
+                                      );
+                                  })}
+                              </ul>
+                          </details>
 
-                {/* Desktop/Tablet: static list */}
-                <div className="hidden md:block">
-                  <h4 className="text-sm font-semibold">{section.title}</h4>
-                  <ul className="mt-2 space-y-2">
-                    {items.map((item) => {
-                      const isExternal = item.href.startsWith("http") || item.href.startsWith("mailto:");
-                      return (
+                          {/* Desktop/Tablet: static list */}
+                          <div className="hidden md:block">
+                              <h4 className="text-sm font-semibold">{section.title}</h4>
+                              <ul className="mt-2 space-y-2">
+                                  {items.map((item) => {
+                                      const isExternal =
+                                          item.href.startsWith("http") ||
+                                          item.href.startsWith("mailto:");
+                                      return (
                           <li key={item.name}>
                             {isExternal ? (
                                 <a
@@ -169,60 +175,60 @@ export function Footer() {
                                     rel="noopener noreferrer"
                                     className="text-sm text-muted-foreground hover:text-foreground transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
                                 >
-                                  {item.name}
+                                    {item.name}
                                 </a>
                             ) : (
                                 <Link
                                     href={item.href}
                                     className="text-sm text-muted-foreground hover:text-foreground transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
                                 >
-                                  {item.name}
+                                    {item.name}
                                 </Link>
                             )}
                           </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              </div>
-            );
-          })}
+                                      );
+                                  })}
+                              </ul>
+                          </div>
+                      </div>
+                  );
+              })}
 
-          <div className="space-y-4">
-            <h4 className="text-sm font-semibold">
-              Subscribe to our newsletter
-            </h4>
-            <p id="newsletter-help" className="text-sm text-muted-foreground">
-              Get the latest updates and news.
-            </p>
-            <form
+              <div className="space-y-4">
+                  <h4 className="text-sm font-semibold">
+                      Subscribe to our newsletter
+                  </h4>
+                  <p id="newsletter-help" className="text-sm text-muted-foreground">
+                      Get the latest updates and news.
+                  </p>
+                  <form
                 onSubmit={handleSubmit}
                 className="flex space-x-2"
                 aria-describedby="newsletter-help"
-            >
-              <label htmlFor="newsletter-email" className="sr-only">
-                Email address
-              </label>
-              <input
-                id="newsletter-email"
-                type="email"
-                placeholder="Your email"
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                aria-required="true"
-                suppressHydrationWarning
-              />
-              <Button
+                  >
+                      <label htmlFor="newsletter-email" className="sr-only">
+                          Email address
+                      </label>
+                      <input
+                          id="newsletter-email"
+                          type="email"
+                          placeholder="Your email"
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          required
+                          aria-required="true"
+                          suppressHydrationWarning
+                      />
+                      <Button
                   type="submit"
                   size="sm"
                   className="bg-primary hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-primary/60"
-              >
-                Subscribe
-              </Button>
-            </form>
-          </div>
+                      >
+                          Subscribe
+                      </Button>
+                  </form>
+              </div>
           </div>
         </div>
 

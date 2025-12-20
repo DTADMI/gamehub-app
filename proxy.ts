@@ -10,7 +10,7 @@ export default function proxy(req: NextRequest) {
     return; // continue the request normally
   }
 
-  const {pathname, search} = req.nextUrl;
+    const {pathname, search} = req.nextUrl;
 
   // Skip static assets and public routes
   if (

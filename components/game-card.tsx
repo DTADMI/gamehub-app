@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {Play} from "lucide-react";
 import Image from "next/image";
@@ -28,7 +28,7 @@ export function GameCard({ game, featured = false }: GameCardProps) {
   // Handle play button click
   const handlePlayClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent triggering the parent link
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       window.location.href = `/games/${game.slug}`;
     }
   };
@@ -55,8 +55,8 @@ export function GameCard({ game, featured = false }: GameCardProps) {
               {game.upcoming ? (
                   <span
                       className="inline-flex items-center rounded-md bg-amber-500/90 px-3 py-1.5 text-sm font-medium text-white">
-                  Coming soon
-                </span>
+                Coming soon
+              </span>
               ) : (
                   <Button
                       size="lg"

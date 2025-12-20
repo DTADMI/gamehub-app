@@ -14,8 +14,8 @@ type Move = { to: Pos; capture?: Pos };
 const SIZE = 8;
 
 function initialBoard(): Piece[][] {
-  const board: Piece[][] = Array.from({length: SIZE}, () =>
-      Array<Piece>(SIZE).fill(null),
+    const board: Piece[][] = Array.from({length: SIZE}, () =>
+        Array<Piece>(SIZE).fill(null),
   );
   for (let r = 0; r < SIZE; r++) {
     for (let c = 0; c < SIZE; c++) {

@@ -36,7 +36,7 @@ export function Header() {
             </Link>
             {showAdmin ? (
                 <Link href="/admin/flags" className="hover:text-foreground">
-                  Admin
+                    Admin
                 </Link>
             ) : null}
           </nav>

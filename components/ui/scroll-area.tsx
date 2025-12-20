@@ -30,7 +30,7 @@ function ScrollArea({
 
 function ScrollBar({
   className,
-                     orientation = "vertical",
+                       orientation = "vertical",
   ...props
 }: React.ComponentProps<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>) {
   return (

@@ -52,7 +52,9 @@ export const SnakeGame: React.FC = () => {
     }
     try {
       const saved = localStorage.getItem("snakeControlScheme");
-      return (saved === "joystick" || saved === "swipe" || saved === "taps") ? (saved as ControlScheme) : "swipe";
+      return saved === "joystick" || saved === "swipe" || saved === "taps"
+          ? (saved as ControlScheme)
+          : "swipe";
     } catch {
       return "swipe";
     }
@@ -357,12 +359,12 @@ export const SnakeGame: React.FC = () => {
   // Taps control scheme: tapping left/right halves issues relative left/right turns
   useEffect(() => {
     const canvas = canvasRef.current;
-      if (!canvas) {
-          return;
-      }
-      if (controlScheme !== "taps") {
-          return;
-      }
+    if (!canvas) {
+      return;
+    }
+    if (controlScheme !== "taps") {
+      return;
+    }
 
     const turnLeft = (dir: Direction): Direction => {
       switch (dir) {
@@ -390,9 +392,9 @@ export const SnakeGame: React.FC = () => {
     };
 
     const handleTap = (clientX: number) => {
-        if (!gameStarted || isPaused || gameOver) {
-            return;
-        }
+      if (!gameStarted || isPaused || gameOver) {
+        return;
+      }
       const rect = canvas.getBoundingClientRect();
       const isLeft = clientX < rect.left + rect.width / 2;
       const target = isLeft ? turnLeft(direction) : turnRight(direction);
@@ -408,7 +410,11 @@ export const SnakeGame: React.FC = () => {
     };
 
     canvas.addEventListener("click", onClick as any, {passive: true} as any);
-    canvas.addEventListener("touchstart", onTouchStart as any, {passive: true} as any);
+    canvas.addEventListener(
+        "touchstart",
+        onTouchStart as any,
+        {passive: true} as any,
+    );
     return () => {
       canvas.removeEventListener("click", onClick as any);
       canvas.removeEventListener("touchstart", onTouchStart as any);
@@ -886,7 +892,10 @@ export const SnakeGame: React.FC = () => {
         onPauseToggleAction as EventListener,
     );
     return () => {
-      window.removeEventListener("snake:restart", onRestartAction as EventListener);
+      window.removeEventListener(
+          "snake:restart",
+          onRestartAction as EventListener,
+      );
       window.removeEventListener(
           "snake:pauseToggle",
           onPauseToggleAction as EventListener,
@@ -940,26 +949,28 @@ export const SnakeGame: React.FC = () => {
       <div className="p-4">
         {/* Mobile control mode selector: Swipe vs Joystick vs Taps */}
         <div className="mb-3 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
-          <span className="text-sm text-gray-600 dark:text-gray-300">Mobile Controls:</span>
+          <span className="text-sm text-gray-600 dark:text-gray-300">
+            Mobile Controls:
+          </span>
           <div className="inline-flex rounded-md overflow-hidden border border-gray-300 dark:border-gray-700">
             <button
                 type="button"
                 onClick={() => setControlScheme("swipe")}
-                className={`px-4 py-2 text-sm min-h-11 ${controlScheme === 'swipe' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                className={`px-4 py-2 text-sm min-h-11 ${controlScheme === "swipe" ? "bg-blue-600 text-white" : "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"}`}
             >
               Swipe
             </button>
             <button
                 type="button"
                 onClick={() => setControlScheme("joystick")}
-                className={`px-4 py-2 text-sm min-h-11 border-l border-gray-300 dark:border-gray-700 ${controlScheme === 'joystick' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                className={`px-4 py-2 text-sm min-h-11 border-l border-gray-300 dark:border-gray-700 ${controlScheme === "joystick" ? "bg-blue-600 text-white" : "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"}`}
             >
               Joystick
             </button>
             <button
                 type="button"
                 onClick={() => setControlScheme("taps")}
-                className={`px-4 py-2 text-sm min-h-11 border-l border-gray-300 dark:border-gray-700 ${controlScheme === 'taps' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                className={`px-4 py-2 text-sm min-h-11 border-l border-gray-300 dark:border-gray-700 ${controlScheme === "taps" ? "bg-blue-600 text-white" : "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"}`}
             >
               Taps
             </button>
@@ -1121,40 +1132,46 @@ const VirtualJoystick: React.FC<JoystickProps> = ({onDirection}) => {
   const knobRef = useRef<HTMLDivElement>(null);
 
   // Convert movement vector to a cardinal direction
-  const vectorToDir = useCallback((dx: number, dy: number): Direction | null => {
-    const dead = JOYSTICK_DEADZONE_PX; // px deadzone
-    const ax = Math.abs(dx);
-    const ay = Math.abs(dy);
-    if (ax < dead && ay < dead) {
-      return null;
-    }
-    if (ax > ay) {
-      return dx > 0 ? "RIGHT" : "LEFT";
-    }
-    return dy > 0 ? "DOWN" : "UP";
-  }, []);
+  const vectorToDir = useCallback(
+      (dx: number, dy: number): Direction | null => {
+        const dead = JOYSTICK_DEADZONE_PX; // px deadzone
+        const ax = Math.abs(dx);
+        const ay = Math.abs(dy);
+        if (ax < dead && ay < dead) {
+          return null;
+        }
+        if (ax > ay) {
+          return dx > 0 ? "RIGHT" : "LEFT";
+        }
+        return dy > 0 ? "DOWN" : "UP";
+      },
+      [],
+  );
 
-  const handleMoveFromEvent = useCallback((clientX: number, clientY: number) => {
-    const pad = padRef.current;
-    const knob = knobRef.current;
-    if (!pad || !knob) {
-      return;
-    }
-    const rect = pad.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    const dx = clientX - cx;
-    const dy = clientY - cy;
-    const maxR = rect.width * 0.32; // knob travel radius
-    const len = Math.hypot(dx, dy) || 1;
-    const nx = (dx / len) * Math.min(maxR, len);
-    const ny = (dy / len) * Math.min(maxR, len);
-    knob.style.transform = `translate(${nx}px, ${ny}px)`;
-    const dir = vectorToDir(dx, dy);
-    if (dir) {
-      onDirection(dir);
-    }
-  }, [onDirection, vectorToDir]);
+  const handleMoveFromEvent = useCallback(
+      (clientX: number, clientY: number) => {
+        const pad = padRef.current;
+        const knob = knobRef.current;
+        if (!pad || !knob) {
+          return;
+        }
+        const rect = pad.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dx = clientX - cx;
+        const dy = clientY - cy;
+        const maxR = rect.width * 0.32; // knob travel radius
+        const len = Math.hypot(dx, dy) || 1;
+        const nx = (dx / len) * Math.min(maxR, len);
+        const ny = (dy / len) * Math.min(maxR, len);
+        knob.style.transform = `translate(${nx}px, ${ny}px)`;
+        const dir = vectorToDir(dx, dy);
+        if (dir) {
+          onDirection(dir);
+        }
+      },
+      [onDirection, vectorToDir],
+  );
 
   useEffect(() => {
     const pad = padRef.current;
@@ -1182,9 +1199,21 @@ const VirtualJoystick: React.FC<JoystickProps> = ({onDirection}) => {
       e.preventDefault();
     };
 
-    pad.addEventListener("pointerdown", onPointerDown as any, {passive: false} as any);
-    window.addEventListener("pointermove", onPointerMove as any, {passive: false} as any);
-    window.addEventListener("pointerup", onPointerUp as any, {passive: false} as any);
+    pad.addEventListener(
+        "pointerdown",
+        onPointerDown as any,
+        {passive: false} as any,
+    );
+    window.addEventListener(
+        "pointermove",
+        onPointerMove as any,
+        {passive: false} as any,
+    );
+    window.addEventListener(
+        "pointerup",
+        onPointerUp as any,
+        {passive: false} as any,
+    );
     return () => {
       pad.removeEventListener("pointerdown", onPointerDown as any);
       window.removeEventListener("pointermove", onPointerMove as any);

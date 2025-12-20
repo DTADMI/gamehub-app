@@ -1,5 +1,5 @@
 // libs/shared/src/contexts/GameSettingsContext.tsx
-import React, {createContext, useContext, useEffect, useMemo, useState} from "react";
+import React, {createContext, useContext, useEffect, useMemo, useState,} from "react";
 
 export type GameSettings = {
     enableParticles: boolean;
@@ -18,9 +18,12 @@ const GameSettingsContext = createContext<GameSettings | null>(null);
 
 const STORAGE_KEY = "gamehub:settings";
 
-function loadInitial(): Pick<GameSettings, "enableParticles" | "particleEffect" | "mode"> & {
+function loadInitial(): Pick<
+    GameSettings,
+    "enableParticles" | "particleEffect" | "mode"
+> & {
     isAuthenticated: boolean;
-    isSubscriber: boolean
+    isSubscriber: boolean;
 } {
     if (typeof window === "undefined") {
         return {
@@ -28,42 +31,52 @@ function loadInitial(): Pick<GameSettings, "enableParticles" | "particleEffect" 
             particleEffect: "sparks",
             mode: "classic",
             isAuthenticated: false,
-            isSubscriber: false
+            isSubscriber: false,
         };
     }
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) {
-          return {
-              enableParticles: false,
-              particleEffect: "sparks",
-              mode: "classic",
-              isAuthenticated: false,
-              isSubscriber: false
-          };
-      }
+        if (!raw) {
+            return {
+                enableParticles: false,
+                particleEffect: "sparks",
+                mode: "classic",
+                isAuthenticated: false,
+                isSubscriber: false,
+            };
+        }
         const parsed = JSON.parse(raw);
-      return {
-        enableParticles: !!parsed.enableParticles,
-        particleEffect: parsed.particleEffect === "puff" ? "puff" : "sparks",
-          mode: parsed.mode === "hard" || parsed.mode === "chaos" ? parsed.mode : "classic",
-          isAuthenticated: !!parsed.isAuthenticated,
-          isSubscriber: !!parsed.isSubscriber,
-      };
+        return {
+            enableParticles: !!parsed.enableParticles,
+            particleEffect: parsed.particleEffect === "puff" ? "puff" : "sparks",
+            mode:
+                parsed.mode === "hard" || parsed.mode === "chaos"
+                    ? parsed.mode
+                    : "classic",
+            isAuthenticated: !!parsed.isAuthenticated,
+            isSubscriber: !!parsed.isSubscriber,
+        };
     } catch {
         return {
             enableParticles: false,
             particleEffect: "sparks",
             mode: "classic",
             isAuthenticated: false,
-            isSubscriber: false
+            isSubscriber: false,
         };
     }
 }
 
-export function GameSettingsProvider({children}: { children: React.ReactNode }) {
+export function GameSettingsProvider({
+                                         children,
+                                     }: {
+    children: React.ReactNode;
+}) {
     // Ensure localStorage exists in test environments
-    if (typeof window !== "undefined" && typeof window.localStorage === "undefined") {
+    if (
+        typeof window !== "undefined" &&
+        typeof window.localStorage === "undefined"
+    ) {
         try {
             const store: Record<string, string> = {};
             (window as any).localStorage = {
@@ -75,7 +88,9 @@ export function GameSettingsProvider({children}: { children: React.ReactNode }) 
                     delete store[k];
                 },
                 clear: () => {
-                    for (const key of Object.keys(store)) delete store[key];
+                    for (const key of Object.keys(store)) {
+                        delete store[key];
+                    }
                 },
                 key: (i: number) => Object.keys(store)[i] ?? null,
                 get length() {
@@ -87,11 +102,19 @@ export function GameSettingsProvider({children}: { children: React.ReactNode }) 
         }
     }
   const initial = loadInitial();
-  const [enableParticles, setEnableParticles] = useState(initial.enableParticles);
-  const [particleEffect, setParticleEffect] = useState<"sparks" | "puff">(initial.particleEffect);
+    const [enableParticles, setEnableParticles] = useState(
+        initial.enableParticles,
+    );
+    const [particleEffect, setParticleEffect] = useState<"sparks" | "puff">(
+        initial.particleEffect,
+    );
     const [mode, setMode] = useState<"classic" | "hard" | "chaos">(initial.mode);
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(initial.isAuthenticated);
-    const [isSubscriber, setIsSubscriber] = useState<boolean>(initial.isSubscriber);
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
+        initial.isAuthenticated,
+    );
+    const [isSubscriber, setIsSubscriber] = useState<boolean>(
+        initial.isSubscriber,
+    );
 
     useEffect(() => {
         const payload = {
@@ -109,7 +132,9 @@ export function GameSettingsProvider({children}: { children: React.ReactNode }) 
         try {
             // Notify any non-context consumers (e.g., games that can’t access the provider directly)
             if (typeof window !== "undefined") {
-                window.dispatchEvent(new CustomEvent('gamehub:settings', {detail: payload}));
+                window.dispatchEvent(
+                    new CustomEvent("gamehub:settings", {detail: payload}),
+                );
             }
         } catch {
             // ignore
@@ -123,12 +148,23 @@ export function GameSettingsProvider({children}: { children: React.ReactNode }) 
 
   const value = useMemo<GameSettings>(
       () => ({
-          enableParticles, setEnableParticles, particleEffect, setParticleEffect,
-          mode, setMode, isAuthenticated, isSubscriber, setAuthState,
+          enableParticles,
+          setEnableParticles,
+          particleEffect,
+          setParticleEffect,
+          mode,
+          setMode,
+          isAuthenticated,
+          isSubscriber,
+          setAuthState,
       }),
       [enableParticles, particleEffect, mode, isAuthenticated, isSubscriber],
   );
-    return <GameSettingsContext.Provider value={value}>{children}</GameSettingsContext.Provider>;
+    return (
+        <GameSettingsContext.Provider value={value}>
+            {children}
+        </GameSettingsContext.Provider>
+    );
 }
 
 export function useGameSettings(): GameSettings {
@@ -138,9 +174,9 @@ export function useGameSettings(): GameSettings {
             enableParticles: false,
             setEnableParticles: () => {
             },
-          particleEffect: "sparks",
-          setParticleEffect: () => {
-          },
+            particleEffect: "sparks",
+            setParticleEffect: () => {
+            },
             mode: "classic",
             setMode: () => {
             },

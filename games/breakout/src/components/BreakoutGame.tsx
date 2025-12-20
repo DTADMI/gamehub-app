@@ -1,6 +1,6 @@
 "use client";
 
-import {GameContainer, ParticlePool, soundManager, useGameSettings} from "@games/shared";
+import {GameContainer, ParticlePool, soundManager, useGameSettings,} from "@games/shared";
 import React, {useCallback, useEffect, useRef, useState} from "react";
 
 import {submitScore} from "@/lib/graphql/queries";
@@ -88,7 +88,8 @@ function computeBrickLayout(canvasW: number): BrickLayout {
     const totalPadding = (cols - 1) * padding;
     const available = canvasW - 2 * margin - totalPadding;
     const brickWidth = Math.floor(available / cols);
-    if (brickWidth >= 36) { // ensure decent hitbox/tap target
+    if (brickWidth >= 36) {
+      // ensure decent hitbox/tap target
       const gridW = cols * brickWidth + totalPadding;
       const offsetLeft = Math.floor((canvasW - gridW) / 2);
       best = {cols, brickWidth, offsetLeft, padding};
@@ -109,12 +110,16 @@ function computeBrickLayout(canvasW: number): BrickLayout {
 }
 
 // Top-level brick factory (pure) to avoid effect dependencies in the game loop
-function buildBricks(lvl: number, layout: BrickLayout = computeBrickLayout(CANVAS_WIDTH)): Brick[][] {
+function buildBricks(
+    lvl: number,
+    layout: BrickLayout = computeBrickLayout(CANVAS_WIDTH),
+): Brick[][] {
   const newBricks: Brick[][] = [];
   for (let c = 0; c < layout.cols; c++) {
     newBricks[c] = [] as Brick[];
     for (let r = 0; r < BRICK_ROW_COUNT; r++) {
-      const brickX = c * (layout.brickWidth + layout.padding) + layout.offsetLeft;
+      const brickX =
+          c * (layout.brickWidth + layout.padding) + layout.offsetLeft;
       const brickY = r * (BRICK_HEIGHT + BRICK_PADDING) + BRICK_OFFSET_TOP;
       const colorIndex = Math.floor(Math.random() * COLORS.length);
       const basePoints = (BRICK_ROW_COUNT - r) * 10 * Math.max(1, lvl);
@@ -171,7 +176,10 @@ const SLOW_FACTOR_MOBILE = 0.9; // make slow less harsh on mobile to avoid slugg
 const PADDLE_EXPAND_FACTOR = 1.5;
 const PADDLE_SHRINK_FACTOR = 0.7;
 
-function pickWeightedPowerUp(current: ActiveModifier, entitled: { auth: boolean; sub: boolean }): PowerUpType {
+function pickWeightedPowerUp(
+    current: ActiveModifier,
+    entitled: { auth: boolean; sub: boolean },
+): PowerUpType {
   // Availability by entitlement
   const available: Array<{ t: PowerUpType; w: number }> = [];
   // Public
@@ -190,7 +198,7 @@ function pickWeightedPowerUp(current: ActiveModifier, entitled: { auth: boolean;
   }
   // Subscriber-only (heavier features)
   if (entitled.sub) {
-    available.push({t: "thru", w: 0.10});
+    available.push({t: "thru", w: 0.1});
     available.push({t: "bomb", w: 0.06});
     available.push({t: "fireball", w: 0.06});
     available.push({t: "laser", w: 0.05});
@@ -300,7 +308,11 @@ export default function BreakoutGame() {
   // Extra balls for Multiball (do not cost lives when missed)
   const extraBallsRef = useRef<Ball[]>([]);
   // Sticky capture state
-  const stickyStateRef = useRef<{ captured: boolean; offset: number; capturedAt: number } | null>(null);
+  const stickyStateRef = useRef<{
+    captured: boolean;
+    offset: number;
+    capturedAt: number;
+  } | null>(null);
   const stickyReleasePendingRef = useRef<boolean>(false);
   // Color-match bonus state: ball color per launch and first-hit eligibility
   const ballColorRef = useRef<string | null>(null);
@@ -446,12 +458,17 @@ export default function BreakoutGame() {
       }
       // Update pointer type derived tuning (mobile vs desktop)
       try {
-        const coarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+        const coarse =
+            window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
         isCoarseRef.current = !!coarse;
         // On coarse pointers (most touch devices), slightly increase paddle influence
         // so quick flicks meaningfully affect the ball's outgoing angle.
-        paddleInfluenceRef.current = coarse ? PADDLE_INFLUENCE_MOBILE : PADDLE_INFLUENCE_BASE;
-        slowFactorRef.current = coarse ? SLOW_FACTOR_MOBILE : SLOW_FACTOR_DESKTOP;
+        paddleInfluenceRef.current = coarse
+            ? PADDLE_INFLUENCE_MOBILE
+            : PADDLE_INFLUENCE_BASE;
+        slowFactorRef.current = coarse
+            ? SLOW_FACTOR_MOBILE
+            : SLOW_FACTOR_DESKTOP;
       } catch {
         // no-op
       }
@@ -666,14 +683,19 @@ export default function BreakoutGame() {
 
       // Defensive: if bricks are missing (edge case on rare mounts), rebuild grid
       if (!stateBricks || !stateBricks.length || !stateBricks[0]?.length) {
-        const rebuilt = buildBricks(levelRef.current || 1, computeBrickLayout(CANVAS_WIDTH));
+        const rebuilt = buildBricks(
+            levelRef.current || 1,
+            computeBrickLayout(CANVAS_WIDTH),
+        );
         setBricks(rebuilt);
         bricksRef.current = rebuilt;
       }
 
       // background (theme-aware: light canvas on dark theme, dark canvas on light theme)
       ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-      const isDark = typeof document !== "undefined" && document.documentElement.classList.contains("dark");
+      const isDark =
+          typeof document !== "undefined" &&
+          document.documentElement.classList.contains("dark");
       ctx.fillStyle = isDark ? "#ffffff" : "#0f172a";
       ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
@@ -688,7 +710,10 @@ export default function BreakoutGame() {
 
       // Compute delta time scale for physics (normalize to 60 FPS)
       const nowPerf = performance.now();
-      const dtMs = lastPhysTs === 0 ? 16.6667 : Math.max(8, Math.min(33, nowPerf - lastPhysTs));
+      const dtMs =
+          lastPhysTs === 0
+              ? 16.6667
+              : Math.max(8, Math.min(33, nowPerf - lastPhysTs));
       const rawScale = dtMs / 16.6667;
       // Smooth frameScale to reduce micro jitter from small dt fluctuations
       const clampedRaw = Math.max(0.5, Math.min(1.5, rawScale));
@@ -731,7 +756,9 @@ export default function BreakoutGame() {
       ctx.fillRect(newPx, statePaddle.y, statePaddle.width, statePaddle.height);
       // Expose paddleX for E2E via data attribute (every frame)
       if (canvasRef.current) {
-        (canvasRef.current as HTMLCanvasElement).dataset.px = String(Math.round(newPx));
+        (canvasRef.current as HTMLCanvasElement).dataset.px = String(
+            Math.round(newPx),
+        );
       }
 
       // draw ball (tinted to current bonus color if set)
@@ -747,7 +774,8 @@ export default function BreakoutGame() {
           ctx.beginPath();
           ctx.arc(eb.x, eb.y, eb.radius, 0, Math.PI * 2);
           // Same color as the main ball for consistency
-          ctx.fillStyle = ballColorRef.current || (isDark ? "#e11d48" : "#e74c3c");
+          ctx.fillStyle =
+              ballColorRef.current || (isDark ? "#e11d48" : "#e74c3c");
           ctx.fill();
           ctx.closePath();
         }
@@ -776,17 +804,17 @@ export default function BreakoutGame() {
           ctx.beginPath();
           // Palette mapping
           const colorMap: Record<PowerUpType, string> = {
-            fast: "#22c55e",       // green
-            slow: "#f59e0b",       // amber
-            sticky: "#f0abfc",     // fuchsia-300
-            thru: "#84cc16",       // lime
-            bomb: "#ef4444",       // red
-            fireball: "#fb923c",   // orange
-            laser: "#67e8f9",      // cyan
-            extraLife: "#10b981",  // emerald
-            expand: "#60a5fa",     // sky
-            shrink: "#94a3b8",     // slate
-            multiball: "#a78bfa",  // violet
+            fast: "#22c55e", // green
+            slow: "#f59e0b", // amber
+            sticky: "#f0abfc", // fuchsia-300
+            thru: "#84cc16", // lime
+            bomb: "#ef4444", // red
+            fireball: "#fb923c", // orange
+            laser: "#67e8f9", // cyan
+            extraLife: "#10b981", // emerald
+            expand: "#60a5fa", // sky
+            shrink: "#94a3b8", // slate
+            multiball: "#a78bfa", // violet
           } as const;
           ctx.fillStyle = colorMap[p.type] || "#94a3b8";
           ctx.arc(p.x, p.y, p.size / 2, 0, Math.PI * 2);
@@ -877,12 +905,18 @@ export default function BreakoutGame() {
           ndy = 0;
           // Check release input or timeout
           const now = Date.now();
-          if (!awaitingNextRef.current && (stickyReleasePendingRef.current || now - sticky.capturedAt > 1500)) {
+          if (
+              !awaitingNextRef.current &&
+              (stickyReleasePendingRef.current || now - sticky.capturedAt > 1500)
+          ) {
             // release upwards with slight angle from offset and paddle velocity
             stickyReleasePendingRef.current = false;
-            const angleBase = clamp(sticky.offset / (statePaddle.width / 2), -1, 1) * MAX_BOUNCE_ANGLE;
+            const angleBase =
+                clamp(sticky.offset / (statePaddle.width / 2), -1, 1) *
+                MAX_BOUNCE_ANGLE;
             const influence = clamp(
-                (newPx - (lastPaddleXRef.current ?? newPx)) * paddleInfluenceRef.current,
+                (newPx - (lastPaddleXRef.current ?? newPx)) *
+                paddleInfluenceRef.current,
                 -MAX_INFLUENCE_ANGLE,
                 MAX_INFLUENCE_ANGLE,
             );
@@ -890,13 +924,27 @@ export default function BreakoutGame() {
             if (Math.abs(angle) < MIN_BOUNCE_ANGLE) {
               angle = angle >= 0 ? MIN_BOUNCE_ANGLE : -MIN_BOUNCE_ANGLE;
             }
-            const target = desiredSpeedFromModifier(activeRef.current, stateLevel, slowFactorRef.current);
+            const target = desiredSpeedFromModifier(
+                activeRef.current,
+                stateLevel,
+                slowFactorRef.current,
+            );
             ndx = target * Math.sin(angle);
             ndy = -target * Math.cos(angle);
-            stickyStateRef.current = {captured: false, offset: 0, capturedAt: 0};
+            stickyStateRef.current = {
+              captured: false,
+              offset: 0,
+              capturedAt: 0,
+            };
           } else {
             // while held, update ball and skip rest of physics except power-ups fall
-            const updatedBallWhileHeld: Ball = {x: nx, y: ny, dx: ndx, dy: ndy, radius: stateBall.radius};
+            const updatedBallWhileHeld: Ball = {
+              x: nx,
+              y: ny,
+              dx: ndx,
+              dy: ndy,
+              radius: stateBall.radius,
+            };
             setBall(updatedBallWhileHeld);
             ballRef.current = updatedBallWhileHeld;
             // Expose data attrs
@@ -944,26 +992,35 @@ export default function BreakoutGame() {
             nx - stateBall.radius < newPx + statePaddle.width
         ) {
           // If sticky modifier is active, capture the ball instead of bouncing
-          if (activeRef.current && activeRef.current.type === "sticky" && !(stickyStateRef.current?.captured)) {
+          if (
+              activeRef.current &&
+              activeRef.current.type === "sticky" &&
+              !stickyStateRef.current?.captured
+          ) {
             const center = newPx + statePaddle.width / 2;
             const offset = nx - center;
-            stickyStateRef.current = {captured: true, offset, capturedAt: Date.now()};
+            stickyStateRef.current = {
+              captured: true,
+              offset,
+              capturedAt: Date.now(),
+            };
             nx = center + offset;
             ny = statePaddle.y - stateBall.radius - 0.01;
             ndx = 0;
             ndy = 0;
             soundManager.playSound("paddle");
           } else {
-          // Compute bounce angle relative to paddle center (0 is straight up)
-          const rel = (nx - (newPx + statePaddle.width / 2)) / (statePaddle.width / 2); // -1 .. 1
-          const baseAngle = clamp(rel, -1, 1) * MAX_BOUNCE_ANGLE; // -MAX..+MAX
-          // Add a small influence based on paddle movement direction/speed this frame
-          const influence = clamp(
+            // Compute bounce angle relative to paddle center (0 is straight up)
+            const rel =
+                (nx - (newPx + statePaddle.width / 2)) / (statePaddle.width / 2); // -1 .. 1
+            const baseAngle = clamp(rel, -1, 1) * MAX_BOUNCE_ANGLE; // -MAX..+MAX
+            // Add a small influence based on paddle movement direction/speed this frame
+            const influence = clamp(
               paddleV * paddleInfluenceRef.current,
               -MAX_INFLUENCE_ANGLE,
               MAX_INFLUENCE_ANGLE,
-          );
-          let angle = baseAngle + influence;
+            );
+            let angle = baseAngle + influence;
             // Clamp final angle to avoid near-horizontal skims that look like lingering on the paddle
             if (angle > MAX_BOUNCE_ANGLE) {
               angle = MAX_BOUNCE_ANGLE;
@@ -971,37 +1028,40 @@ export default function BreakoutGame() {
             if (angle < -MAX_BOUNCE_ANGLE) {
               angle = -MAX_BOUNCE_ANGLE;
             }
-          // Enforce a minimum horizontal angle away from vertical
-          if (Math.abs(angle) < MIN_BOUNCE_ANGLE) {
-            angle = angle >= 0 ? MIN_BOUNCE_ANGLE : -MIN_BOUNCE_ANGLE;
-          }
-          // Compute components from angle, preserving current speed magnitude
-          const speed = Math.sqrt(ndx * ndx + ndy * ndy) || BASE_BALL_SPEED;
-          let tx = speed * Math.sin(angle);
-          let ty = -speed * Math.cos(angle);
-          // Ensure horizontal component doesn't vanish
-          if (Math.abs(tx) < MIN_HORIZ_COMPONENT) {
-            const sign = tx >= 0 ? 1 : -1;
-            const hx = MIN_HORIZ_COMPONENT * sign;
-            const hy =
+            // Enforce a minimum horizontal angle away from vertical
+            if (Math.abs(angle) < MIN_BOUNCE_ANGLE) {
+              angle = angle >= 0 ? MIN_BOUNCE_ANGLE : -MIN_BOUNCE_ANGLE;
+            }
+            // Compute components from angle, preserving current speed magnitude
+            const speed = Math.sqrt(ndx * ndx + ndy * ndy) || BASE_BALL_SPEED;
+            let tx = speed * Math.sin(angle);
+            let ty = -speed * Math.cos(angle);
+            // Ensure horizontal component doesn't vanish
+            if (Math.abs(tx) < MIN_HORIZ_COMPONENT) {
+              const sign = tx >= 0 ? 1 : -1;
+              const hx = MIN_HORIZ_COMPONENT * sign;
+              const hy =
                 -Math.sign(ty || -1) *
                 Math.sqrt(Math.max(0, speed * speed - hx * hx));
-            ndx = hx;
-            ndy = hy;
-          } else {
-            ndx = tx;
-            ndy = ty;
-          }
+              ndx = hx;
+              ndy = hy;
+            } else {
+              ndx = tx;
+              ndy = ty;
+            }
             // Set new ball color for the next launch and mark first-hit eligible for color bonus
             try {
-              const colors = Array.from(new Set(
+              const colors = Array.from(
+                  new Set(
                   (bricksRef.current || [])
                       .flat()
                       .filter((bb) => bb && bb.health > 0)
                       .map((bb) => bb.color),
-              ));
+                  ),
+              );
               if (colors.length > 0) {
-                ballColorRef.current = colors[Math.floor(Math.random() * colors.length)];
+                ballColorRef.current =
+                    colors[Math.floor(Math.random() * colors.length)];
               } else {
                 ballColorRef.current = null;
               }
@@ -1010,9 +1070,9 @@ export default function BreakoutGame() {
             }
             firstHitEligibleRef.current = true;
 
-          // Pop the ball just above the paddle to ensure it never gets embedded or appears below
-          ny = statePaddle.y - stateBall.radius - 0.01;
-          soundManager.playSound("paddle");
+            // Pop the ball just above the paddle to ensure it never gets embedded or appears below
+            ny = statePaddle.y - stateBall.radius - 0.01;
+            soundManager.playSound("paddle");
             needNormalize = true;
           }
         }
@@ -1128,7 +1188,10 @@ export default function BreakoutGame() {
               if (firstHitEligibleRef.current) {
                 firstHitEligibleRef.current = false; // only eligible for the very first contact
                 try {
-                  if (ballColorRef.current && b.color === ballColorRef.current) {
+                  if (
+                      ballColorRef.current &&
+                      b.color === ballColorRef.current
+                  ) {
                     setScore((s) => s + b.points); // add an extra b.points (total 2x)
                     scoreRef.current = (scoreRef.current || 0) + b.points;
                   }
@@ -1144,7 +1207,9 @@ export default function BreakoutGame() {
                 const cx = b.x + b.width / 2;
                 const cy = b.y + b.height / 2;
                 if (particleEffectRef.current === "puff") {
-                  const base = isDark ? "rgba(255,255,255,0.9)" : "rgba(15,23,42,0.9)";
+                  const base = isDark
+                      ? "rgba(255,255,255,0.9)"
+                      : "rgba(15,23,42,0.9)";
                   const count = b.health <= 0 ? 10 : 5;
                   particles.emitDustPuff(cx, cy, base, count);
                 } else {
@@ -1176,8 +1241,8 @@ export default function BreakoutGame() {
                       }
                       const cx = bb.x + bb.width / 2;
                       const cy = bb.y + bb.height / 2;
-                      const dx2 = (b.x + b.width / 2) - cx;
-                      const dy2 = (b.y + b.height / 2) - cy;
+                      const dx2 = b.x + b.width / 2 - cx;
+                      const dy2 = b.y + b.height / 2 - cy;
                       if (dx2 * dx2 + dy2 * dy2 <= R * R) {
                         bb.health = 0;
                       }
@@ -1200,7 +1265,10 @@ export default function BreakoutGame() {
                     if (prev.length >= POWERUP_MAX_FALLING) {
                       return prev;
                     }
-                    const type = pickWeightedPowerUp(activeRef.current, authRef.current);
+                    const type = pickWeightedPowerUp(
+                        activeRef.current,
+                        authRef.current,
+                    );
                     const next = [
                       ...prev,
                       {
@@ -1294,7 +1362,13 @@ export default function BreakoutGame() {
         nx = clamp(nx, stateBall.radius, CANVAS_WIDTH - stateBall.radius);
         ny = clamp(ny, stateBall.radius, CANVAS_HEIGHT - stateBall.radius);
 
-        const updatedBall: Ball = {x: nx, y: ny, dx: ndx, dy: ndy, radius: stateBall.radius};
+        const updatedBall: Ball = {
+          x: nx,
+          y: ny,
+          dx: ndx,
+          dy: ndy,
+          radius: stateBall.radius,
+        };
         setBall(updatedBall);
         ballRef.current = updatedBall;
         // Expose ball position for E2E
@@ -1325,10 +1399,13 @@ export default function BreakoutGame() {
             if (
                 ey + eb.radius >= statePaddle.y &&
                 ey - eb.radius <= statePaddle.y + statePaddle.height &&
-                ex >= newPx && ex <= newPx + statePaddle.width &&
+                ex >= newPx &&
+                ex <= newPx + statePaddle.width &&
                 edy > 0
             ) {
-              const rel = (ex - (newPx + statePaddle.width / 2)) / (statePaddle.width / 2);
+              const rel =
+                  (ex - (newPx + statePaddle.width / 2)) /
+                  (statePaddle.width / 2);
               const angle = clamp(rel, -1, 1) * MAX_BOUNCE_ANGLE;
               const speed = Math.sqrt(edx * edx + edy * edy) || BASE_BALL_SPEED;
               edx = speed * Math.sin(angle);
@@ -1350,9 +1427,20 @@ export default function BreakoutGame() {
                 if (!b || b.health <= 0) {
                   continue;
                 }
-                if (ex + eb.radius > b.x && ex - eb.radius < b.x + b.width && ey + eb.radius > b.y && ey - eb.radius < b.y + b.height) {
-                  const ox = Math.min(Math.abs(ex - (b.x + b.width)), Math.abs(ex - b.x));
-                  const oy = Math.min(Math.abs(ey - (b.y + b.height)), Math.abs(ey - b.y));
+                if (
+                    ex + eb.radius > b.x &&
+                    ex - eb.radius < b.x + b.width &&
+                    ey + eb.radius > b.y &&
+                    ey - eb.radius < b.y + b.height
+                ) {
+                  const ox = Math.min(
+                      Math.abs(ex - (b.x + b.width)),
+                      Math.abs(ex - b.x),
+                  );
+                  const oy = Math.min(
+                      Math.abs(ey - (b.y + b.height)),
+                      Math.abs(ey - b.y),
+                  );
                   if (ox < oy) {
                     edx = -edx;
                   } else {
@@ -1375,7 +1463,13 @@ export default function BreakoutGame() {
             ex = clamp(ex, eb.radius, CANVAS_WIDTH - eb.radius);
             ey = clamp(ey, eb.radius, CANVAS_HEIGHT + eb.radius);
             if (ey - eb.radius <= CANVAS_HEIGHT) {
-              nextExtras.push({x: ex, y: ey, dx: edx, dy: edy, radius: eb.radius});
+              nextExtras.push({
+                x: ex,
+                y: ey,
+                dx: edx,
+                dy: edy,
+                radius: eb.radius,
+              });
             }
           }
           extraBallsRef.current = nextExtras;
@@ -1411,7 +1505,11 @@ export default function BreakoutGame() {
           };
           setBall(parkedBall);
           ballRef.current = parkedBall;
-          stickyStateRef.current = {captured: true, offset: 0, capturedAt: Date.now()};
+          stickyStateRef.current = {
+            captured: true,
+            offset: 0,
+            capturedAt: Date.now(),
+          };
         }
 
         // Laser: periodically zap bricks above paddle while active
@@ -1420,7 +1518,10 @@ export default function BreakoutGame() {
           const interval = modeRef.current === "chaos" ? 280 : 380;
           if (nowMs - (lastLaserAtRef.current || 0) > interval) {
             lastLaserAtRef.current = nowMs;
-            const aimXs = [statePaddle.x + statePaddle.width * 0.25, statePaddle.x + statePaddle.width * 0.75];
+            const aimXs = [
+              statePaddle.x + statePaddle.width * 0.25,
+              statePaddle.x + statePaddle.width * 0.75,
+            ];
             for (const ax of aimXs) {
               // Find the nearest brick intersecting ax (lowest y)
               let target: { c: number; r: number } | null = null;
@@ -1472,7 +1573,10 @@ export default function BreakoutGame() {
                 livesRef.current = Math.min(5, (livesRef.current || 0) + 1);
               } else if (p.type === "expand" || p.type === "shrink") {
                 const base = PADDLE_WIDTH;
-                const factor = p.type === "expand" ? PADDLE_EXPAND_FACTOR : PADDLE_SHRINK_FACTOR;
+                const factor =
+                    p.type === "expand"
+                        ? PADDLE_EXPAND_FACTOR
+                        : PADDLE_SHRINK_FACTOR;
                 const newW = clamp(base * factor, base * 0.6, base * 1.8);
                 // Keep paddle within bounds when width changes
                 setPaddle((prev) => {
@@ -1482,13 +1586,17 @@ export default function BreakoutGame() {
                   return np;
                 });
                 const dur = POWERUP_DURATION_MS;
-                const next: ActiveModifier = {type: p.type, endTime: now + dur};
+                const next: ActiveModifier = {
+                  type: p.type,
+                  endTime: now + dur,
+                };
                 setActiveModifier(next);
                 activeRef.current = next;
               } else if (p.type === "multiball") {
                 // Spawn two additional balls from current main ball with slight angles
                 const mb = ballRef.current;
-                const speed = Math.sqrt(mb.dx * mb.dx + mb.dy * mb.dy) || BASE_BALL_SPEED;
+                const speed =
+                    Math.sqrt(mb.dx * mb.dx + mb.dy * mb.dy) || BASE_BALL_SPEED;
                 const angles = [-0.25, 0.25];
                 for (const a of angles) {
                   const ca = Math.atan2(mb.dy, mb.dx) + a;
@@ -1500,18 +1608,33 @@ export default function BreakoutGame() {
                     radius: BALL_RADIUS * 0.9,
                   });
                 }
-                const next: ActiveModifier = {type: p.type, endTime: now + POWERUP_DURATION_MS};
+                const next: ActiveModifier = {
+                  type: p.type,
+                  endTime: now + POWERUP_DURATION_MS,
+                };
                 setActiveModifier(next);
                 activeRef.current = next;
               } else {
-                const dur = (p.type === "laser" || p.type === "thru" || p.type === "fireball") ? POWERUP_DURATION_LONG_MS : POWERUP_DURATION_MS;
-                const next: ActiveModifier = {type: p.type, endTime: now + dur};
+                const dur =
+                    p.type === "laser" ||
+                    p.type === "thru" ||
+                    p.type === "fireball"
+                        ? POWERUP_DURATION_LONG_MS
+                        : POWERUP_DURATION_MS;
+                const next: ActiveModifier = {
+                  type: p.type,
+                  endTime: now + dur,
+                };
                 setActiveModifier(next);
                 activeRef.current = next;
               }
               // clear sticky state on mode change
               if (p.type !== "sticky") {
-                stickyStateRef.current = {captured: false, offset: 0, capturedAt: 0};
+                stickyStateRef.current = {
+                  captured: false,
+                  offset: 0,
+                  capturedAt: 0,
+                };
               }
               soundManager.playSound("powerUp");
               continue; // consumed
@@ -1527,7 +1650,10 @@ export default function BreakoutGame() {
         // expire active modifier
         if (activeRef.current && Date.now() > activeRef.current.endTime) {
           // Reset paddle size when expand/shrink ends
-          if (activeRef.current.type === "expand" || activeRef.current.type === "shrink") {
+          if (
+              activeRef.current.type === "expand" ||
+              activeRef.current.type === "shrink"
+          ) {
             setPaddle((prev) => {
               const w = PADDLE_WIDTH;
               const nx = clamp(prev.x, 0, CANVAS_WIDTH - w);
@@ -1538,7 +1664,11 @@ export default function BreakoutGame() {
           }
           setActiveModifier(null);
           activeRef.current = null;
-          stickyStateRef.current = {captured: false, offset: 0, capturedAt: 0};
+          stickyStateRef.current = {
+            captured: false,
+            offset: 0,
+            capturedAt: 0,
+          };
         }
       }
 
@@ -1553,12 +1683,29 @@ export default function BreakoutGame() {
           // random position near top half
           const fx = 40 + Math.random() * (CANVAS_WIDTH - 80);
           const fy = 40 + Math.random() * (CANVAS_HEIGHT * 0.5);
-          const colors = ["#f97316", "#22c55e", "#3b82f6", "#e11d48", "#a855f7", "#f59e0b"];
+          const colors = [
+            "#f97316",
+            "#22c55e",
+            "#3b82f6",
+            "#e11d48",
+            "#a855f7",
+            "#f59e0b",
+          ];
           const color = colors[(Math.random() * colors.length) | 0];
           if (particleEffectRef.current === "puff") {
-            particles.emitDustPuff(fx, fy, color, 10 + Math.floor(Math.random() * 6));
+            particles.emitDustPuff(
+                fx,
+                fy,
+                color,
+                10 + Math.floor(Math.random() * 6),
+            );
           } else {
-            particles.emitSparkBurst(fx, fy, color, 18 + Math.floor(Math.random() * 10));
+            particles.emitSparkBurst(
+                fx,
+                fy,
+                color,
+                18 + Math.floor(Math.random() * 10),
+            );
           }
         }
       }
@@ -1617,20 +1764,35 @@ export default function BreakoutGame() {
 
   // Ensure particle pool uses device pixel ratio and draws after setting transform
   // Also reset globalAlpha each frame to avoid accidental 0 alpha from other ops
-  const _dprRef = useRef<number>(typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1);
+  const _dprRef = useRef<number>(
+      typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1,
+  );
 
   // Settings bridge: consume provider if available; also listen to global updates from GameSettingsProvider
-  const {enableParticles, particleEffect, mode, isAuthenticated, isSubscriber} = useGameSettings();
+  const {
+    enableParticles,
+    particleEffect,
+    mode,
+    isAuthenticated,
+    isSubscriber,
+  } = useGameSettings();
   // Default to true so particles are visible during normal play; user settings can disable it.
   const enableParticlesRef = useRef<boolean>(true);
   const particleEffectRef = useRef<"sparks" | "puff">("sparks");
   const modeRef = useRef<"classic" | "hard" | "chaos">("classic");
-  const authRef = useRef<{ auth: boolean; sub: boolean }>({auth: false, sub: false});
+  const authRef = useRef<{ auth: boolean; sub: boolean }>({
+    auth: false,
+    sub: false,
+  });
   // Apply context values if a provider is present; otherwise fallback to localStorage + window events
   useEffect(() => {
     // Apply context values if non-stub (we can’t distinguish easily; apply regardless)
-    enableParticlesRef.current = enableParticles === undefined ? enableParticlesRef.current : !!enableParticles;
-    particleEffectRef.current = (particleEffect as any) || particleEffectRef.current;
+    enableParticlesRef.current =
+        enableParticles === undefined
+            ? enableParticlesRef.current
+            : !!enableParticles;
+    particleEffectRef.current =
+        (particleEffect as any) || particleEffectRef.current;
     modeRef.current = (mode as any) || modeRef.current;
     authRef.current = {auth: !!isAuthenticated, sub: !!isSubscriber};
   }, [enableParticles, particleEffect, mode, isAuthenticated, isSubscriber]);
@@ -1668,8 +1830,9 @@ export default function BreakoutGame() {
       }
       authRef.current = {auth: !!d.isAuthenticated, sub: !!d.isSubscriber};
     };
-    window.addEventListener('gamehub:settings', onSettings as any);
-    return () => window.removeEventListener('gamehub:settings', onSettings as any);
+    window.addEventListener("gamehub:settings", onSettings as any);
+    return () =>
+        window.removeEventListener("gamehub:settings", onSettings as any);
   }, []);
 
   // Fireworks management during level completion
@@ -1749,32 +1912,59 @@ export default function BreakoutGame() {
           <div
               className="mx-auto max-w-[960px] rounded-md bg-gray-100 dark:bg-gray-800/80 px-3 py-2 shadow-sm flex flex-wrap items-center justify-between gap-2 min-h-[44px] whitespace-nowrap">
             <div className="flex items-baseline gap-1.5">
-              <div className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Score</div>
-              <div className="text-lg md:text-xl font-bold tabular-nums">{score}</div>
+              <div className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                Score
+              </div>
+              <div className="text-lg md:text-xl font-bold tabular-nums">
+                {score}
+              </div>
             </div>
             <div className="hidden sm:flex items-baseline gap-1.5">
-              <div className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">High</div>
-              <div className="text-base md:text-lg font-semibold tabular-nums">{highScore}</div>
+              <div className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                High
+              </div>
+              <div className="text-base md:text-lg font-semibold tabular-nums">
+                {highScore}
+              </div>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Lives</div>
-              <div className="text-lg md:text-xl" aria-live="polite"
-                   aria-label={`Lives ${lives}`}>{"❤️".repeat(lives)}</div>
+              <div className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                Lives
+              </div>
+              <div
+                  className="text-lg md:text-xl"
+                  aria-live="polite"
+                  aria-label={`Lives ${lives}`}
+              >
+                {"❤️".repeat(lives)}
+              </div>
             </div>
             <div className="flex items-center gap-1.5" data-testid="hud-boosts">
-              <div className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Boosts</div>
-              <div className="text-base md:text-lg font-semibold tabular-nums" aria-live="polite"
-                   aria-label={`Boosters ${boosters}`}>
-                <span role="img" aria-label="rocket">🚀</span> x{boosters}
+              <div className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                Boosts
+              </div>
+              <div
+                  className="text-base md:text-lg font-semibold tabular-nums"
+                  aria-live="polite"
+                  aria-label={`Boosters ${boosters}`}
+              >
+              <span role="img" aria-label="rocket">
+                🚀
+              </span>{" "}
+                x{boosters}
               </div>
             </div>
             <div className="flex items-baseline gap-1.5">
-              <div className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Level</div>
+              <div className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                Level
+              </div>
               <div className="text-base md:text-lg font-semibold">{level}</div>
             </div>
             {activeRef.current && (
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Mod</span>
+              <span className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                Mod
+              </span>
                   {(() => {
                     const t = activeRef.current!.type as PowerUpType;
                     const colorClass: Record<PowerUpType, string> = {
@@ -1793,12 +1983,23 @@ export default function BreakoutGame() {
                     return (
                         <span
                             className={`inline-flex items-center rounded ${colorClass[t]} text-white px-1.5 py-0.5 text-[11px] md:text-xs`}
-                            style={{maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis"}}>
-                          {t}
+                            style={{
+                              maxWidth: 180,
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }}
+                        >
+                    {t}
                           <span className="ml-1 rounded bg-black/20 px-1 tabular-nums">
-                          {Math.max(0, Math.ceil((activeRef.current!.endTime - Date.now()) / 1000))}s
-                        </span>
-                      </span>
+                      {Math.max(
+                          0,
+                          Math.ceil(
+                              (activeRef.current!.endTime - Date.now()) / 1000,
+                          ),
+                      )}
+                            s
+                    </span>
+                  </span>
                     );
                   })()}
                 </div>
@@ -1883,7 +2084,10 @@ export default function BreakoutGame() {
                       const nextLevel = (levelRef.current || 1) + 1;
                       setLevel(nextLevel);
                       levelRef.current = nextLevel;
-                      const newGrid = buildBricks(nextLevel, computeBrickLayout(CANVAS_WIDTH));
+                      const newGrid = buildBricks(
+                          nextLevel,
+                          computeBrickLayout(CANVAS_WIDTH),
+                      );
                       setBricks(newGrid);
                       bricksRef.current = newGrid;
                       const resetBall: Ball = {
@@ -1915,7 +2119,7 @@ export default function BreakoutGame() {
                       setIsPaused((p) => !p);
                     }
                   }}
-                  className={`px-5 py-2 text-white rounded-md transition-colors ${awaitingNext ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-gray-600 hover:bg-gray-700'}`}
+                  className={`px-5 py-2 text-white rounded-md transition-colors ${awaitingNext ? "bg-emerald-600 hover:bg-emerald-700" : "bg-gray-600 hover:bg-gray-700"}`}
                   data-testid="btn-pause"
               >
                 {awaitingNext ? "Next Level" : isPaused ? "Resume" : "Pause"}
@@ -1926,25 +2130,36 @@ export default function BreakoutGame() {
               <button
                   onClick={() => activateBoost()}
                   disabled={boosters <= 0}
-                  className={`ml-2 px-5 py-2 rounded-md transition-colors ${boosters > 0 ? 'bg-amber-600 hover:bg-amber-700 text-white' : 'bg-gray-400 text-gray-100 cursor-not-allowed'}`}
-                  aria-label={`Boost speed${boosters > 0 ? '' : ' (none left)'}`}
-                  title={boosters > 0 ? 'Boost speed (B key on desktop, double-tap on mobile)' : 'No boosts left'}
+                  className={`ml-2 px-5 py-2 rounded-md transition-colors ${boosters > 0 ? "bg-amber-600 hover:bg-amber-700 text-white" : "bg-gray-400 text-gray-100 cursor-not-allowed"}`}
+                  aria-label={`Boost speed${boosters > 0 ? "" : " (none left)"}`}
+                  title={
+                    boosters > 0
+                        ? "Boost speed (B key on desktop, double-tap on mobile)"
+                        : "No boosts left"
+                  }
                   data-testid="btn-boost"
               >
-                🚀 Boost{boosters > 0 ? ` (${boosters})` : ''}
+                🚀 Boost{boosters > 0 ? ` (${boosters})` : ""}
               </button>
           )}
           {/* Debug accordion for particles visibility */}
           <details className="mt-2 mx-auto w-full max-w-[960px] text-left opacity-70">
-            <summary className="cursor-pointer text-xs text-gray-500 dark:text-gray-400">Debug</summary>
+            <summary className="cursor-pointer text-xs text-gray-500 dark:text-gray-400">
+              Debug
+            </summary>
             <div className="mt-1 flex items-center gap-3 px-2">
               <label className="inline-flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300">
-                <input type="checkbox" checked={debugParticles}
-                       onChange={(e) => setDebugParticles(e.currentTarget.checked)}
-                       className="h-3.5 w-3.5 accent-blue-600"/>
+                <input
+                    type="checkbox"
+                    checked={debugParticles}
+                    onChange={(e) => setDebugParticles(e.currentTarget.checked)}
+                    className="h-3.5 w-3.5 accent-blue-600"
+                />
                 Particles debug (continuous emitter)
               </label>
-              <span className="text-[11px] text-gray-500">Use to verify visibility; will be removed later.</span>
+              <span className="text-[11px] text-gray-500">
+              Use to verify visibility; will be removed later.
+            </span>
             </div>
           </details>
       </div>
@@ -1953,7 +2168,9 @@ export default function BreakoutGame() {
       <div className="mt-6">
         {/* Mobile */}
         <details className="sm:hidden rounded-lg border border-gray-200 dark:border-gray-700">
-          <summary className="cursor-pointer select-none px-4 py-2 text-base font-semibold">How to Play</summary>
+          <summary className="cursor-pointer select-none px-4 py-2 text-base font-semibold">
+            How to Play
+          </summary>
           <ul className="px-4 pb-3 pt-1 text-sm text-gray-600 dark:text-gray-300 space-y-1">
             <li>• Use ← → or A/D to move the paddle</li>
             <li>• Press Space to start/pause</li>
@@ -1974,54 +2191,108 @@ export default function BreakoutGame() {
         <div className="mt-4">
           {/* Mobile */}
           <details className="sm:hidden rounded-lg border border-gray-200 dark:border-gray-700">
-            <summary className="cursor-pointer select-none px-4 py-2 text-base font-semibold">Power-Ups</summary>
+            <summary className="cursor-pointer select-none px-4 py-2 text-base font-semibold">
+              Power-Ups
+            </summary>
             <div className="px-4 pb-3 pt-1 grid grid-cols-1 gap-3 text-sm">
-              <PowerUpCardMobile title="Fast" desc="Faster ball (timed)"
-                                 className="bg-emerald-100 text-emerald-900 dark:bg-emerald-900/30 dark:text-emerald-100"/>
-              <PowerUpCardMobile title="Slow" desc="Slower ball (timed)"
-                                 className="bg-amber-100 text-amber-900 dark:bg-amber-900/30 dark:text-amber-100"/>
-              <PowerUpCardMobile title="Sticky" desc="Ball sticks; press ↑ or click to release"
-                                 className="bg-fuchsia-100 text-fuchsia-900 dark:bg-fuchsia-900/30 dark:text-fuchsia-100"
-                                 gated="auth"/>
-              <PowerUpCardMobile title="Thru" desc="Ball pierces bricks"
-                                 className="bg-lime-100 text-lime-900 dark:bg-lime-900/30 dark:text-lime-100"
-                                 gated="sub"/>
-              <PowerUpCardMobile title="Bomb" desc="AoE clears nearby bricks"
-                                 className="bg-red-100 text-red-900 dark:bg-red-900/30 dark:text-red-100" gated="sub"/>
-              <PowerUpCardMobile title="Fireball" desc="Bricks are one‑hit"
-                                 className="bg-orange-100 text-orange-900 dark:bg-orange-900/30 dark:text-orange-100"
-                                 gated="sub"/>
-              <PowerUpCardMobile title="Laser" desc="Paddle shoots zaps"
-                                 className="bg-cyan-100 text-cyan-900 dark:bg-cyan-900/30 dark:text-cyan-100"
-                                 gated="sub"/>
-              <PowerUpCardMobile title="Extra Life" desc="Gain +1 life (max 5)"
-                                 className="bg-emerald-100 text-emerald-900 dark:bg-emerald-900/30 dark:text-emerald-100"
-                                 gated="sub"/>
+              <PowerUpCardMobile
+                  title="Fast"
+                  desc="Faster ball (timed)"
+                  className="bg-emerald-100 text-emerald-900 dark:bg-emerald-900/30 dark:text-emerald-100"
+              />
+              <PowerUpCardMobile
+                  title="Slow"
+                  desc="Slower ball (timed)"
+                  className="bg-amber-100 text-amber-900 dark:bg-amber-900/30 dark:text-amber-100"
+              />
+              <PowerUpCardMobile
+                  title="Sticky"
+                  desc="Ball sticks; press ↑ or click to release"
+                  className="bg-fuchsia-100 text-fuchsia-900 dark:bg-fuchsia-900/30 dark:text-fuchsia-100"
+                  gated="auth"
+              />
+              <PowerUpCardMobile
+                  title="Thru"
+                  desc="Ball pierces bricks"
+                  className="bg-lime-100 text-lime-900 dark:bg-lime-900/30 dark:text-lime-100"
+                  gated="sub"
+              />
+              <PowerUpCardMobile
+                  title="Bomb"
+                  desc="AoE clears nearby bricks"
+                  className="bg-red-100 text-red-900 dark:bg-red-900/30 dark:text-red-100"
+                  gated="sub"
+              />
+              <PowerUpCardMobile
+                  title="Fireball"
+                  desc="Bricks are one‑hit"
+                  className="bg-orange-100 text-orange-900 dark:bg-orange-900/30 dark:text-orange-100"
+                  gated="sub"
+              />
+              <PowerUpCardMobile
+                  title="Laser"
+                  desc="Paddle shoots zaps"
+                  className="bg-cyan-100 text-cyan-900 dark:bg-cyan-900/30 dark:text-cyan-100"
+                  gated="sub"
+              />
+              <PowerUpCardMobile
+                  title="Extra Life"
+                  desc="Gain +1 life (max 5)"
+                  className="bg-emerald-100 text-emerald-900 dark:bg-emerald-900/30 dark:text-emerald-100"
+                  gated="sub"
+              />
             </div>
           </details>
           {/* Desktop/tablet */}
           <div className="hidden sm:block">
           <h3 className="text-lg font-semibold mb-2">Power-Ups</h3>
             <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-3 text-sm">
-              <PowerUpCard title="Fast" desc="Faster ball (timed)"
-                           className="bg-emerald-100 text-emerald-900 dark:bg-emerald-900/30 dark:text-emerald-100"/>
-              <PowerUpCard title="Slow" desc="Slower ball (timed)"
-                           className="bg-amber-100 text-amber-900 dark:bg-amber-900/30 dark:text-amber-100"/>
-              <PowerUpCard title="Sticky" desc="Ball sticks; press ↑ or click to release"
-                           className="bg-fuchsia-100 text-fuchsia-900 dark:bg-fuchsia-900/30 dark:text-fuchsia-100"
-                           gated="auth"/>
-              <PowerUpCard title="Thru" desc="Ball pierces bricks"
-                           className="bg-lime-100 text-lime-900 dark:bg-lime-900/30 dark:text-lime-100" gated="sub"/>
-              <PowerUpCard title="Bomb" desc="AoE clears nearby bricks"
-                           className="bg-red-100 text-red-900 dark:bg-red-900/30 dark:text-red-100" gated="sub"/>
-              <PowerUpCard title="Fireball" desc="Bricks are one‑hit"
-                           className="bg-orange-100 text-orange-900 dark:bg-orange-900/30 dark:text-orange-100"
-                           gated="sub"/>
-              <PowerUpCard title="Laser" desc="Paddle shoots zaps"
-                           className="bg-cyan-100 text-cyan-900 dark:bg-cyan-900/30 dark:text-cyan-100" gated="sub"/>
-              <PowerUpCard title="Extra Life" desc="Gain +1 life (max 5)"
-                           className="bg-emerald-100 text-emerald-900 dark:bg-emerald-900/30 dark:text-emerald-100"
-                           gated="sub"/>
+              <PowerUpCard
+                  title="Fast"
+                  desc="Faster ball (timed)"
+                  className="bg-emerald-100 text-emerald-900 dark:bg-emerald-900/30 dark:text-emerald-100"
+              />
+              <PowerUpCard
+                  title="Slow"
+                  desc="Slower ball (timed)"
+                  className="bg-amber-100 text-amber-900 dark:bg-amber-900/30 dark:text-amber-100"
+              />
+              <PowerUpCard
+                  title="Sticky"
+                  desc="Ball sticks; press ↑ or click to release"
+                  className="bg-fuchsia-100 text-fuchsia-900 dark:bg-fuchsia-900/30 dark:text-fuchsia-100"
+                  gated="auth"
+              />
+              <PowerUpCard
+                  title="Thru"
+                  desc="Ball pierces bricks"
+                  className="bg-lime-100 text-lime-900 dark:bg-lime-900/30 dark:text-lime-100"
+                  gated="sub"
+              />
+              <PowerUpCard
+                  title="Bomb"
+                  desc="AoE clears nearby bricks"
+                  className="bg-red-100 text-red-900 dark:bg-red-900/30 dark:text-red-100"
+                  gated="sub"
+              />
+              <PowerUpCard
+                  title="Fireball"
+                  desc="Bricks are one‑hit"
+                  className="bg-orange-100 text-orange-900 dark:bg-orange-900/30 dark:text-orange-100"
+                  gated="sub"
+              />
+              <PowerUpCard
+                  title="Laser"
+                  desc="Paddle shoots zaps"
+                  className="bg-cyan-100 text-cyan-900 dark:bg-cyan-900/30 dark:text-cyan-100"
+                  gated="sub"
+              />
+              <PowerUpCard
+                  title="Extra Life"
+                  desc="Gain +1 life (max 5)"
+                  className="bg-emerald-100 text-emerald-900 dark:bg-emerald-900/30 dark:text-emerald-100"
+                  gated="sub"
+              />
           </div>
         </div>
         </div>
@@ -2029,26 +2300,41 @@ export default function BreakoutGame() {
   );
 }
 
-function PowerUpCard({title, desc, className, gated}: {
+function PowerUpCard({
+                       title,
+                       desc,
+                       className,
+                       gated,
+                     }: {
   title: string;
   desc: string;
   className: string;
-  gated?: "auth" | "sub"
+  gated?: "auth" | "sub";
 }) {
   const {isAuthenticated, isSubscriber} = useGameSettings();
-  const locked = (gated === "auth" && !isAuthenticated) || (gated === "sub" && !isSubscriber);
+  const locked =
+      (gated === "auth" && !isAuthenticated) ||
+      (gated === "sub" && !isSubscriber);
   return (
       <div className={`rounded-md px-3 py-2 relative ${className}`}>
         <div className="font-semibold flex items-center gap-2">
           {title}
-          {locked && <span
-              className="text-[10px] px-1.5 py-0.5 rounded bg-gray-900/70 text-white">🔒 {gated === 'auth' ? 'Sign in' : 'Subscriber'}</span>}
+          {locked && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-900/70 text-white">
+            🔒 {gated === "auth" ? "Sign in" : "Subscriber"}
+          </span>
+          )}
         </div>
         <div className="opacity-80">{desc}</div>
       </div>
   );
 }
 
-function PowerUpCardMobile(props: { title: string; desc: string; className: string; gated?: "auth" | "sub" }) {
+function PowerUpCardMobile(props: {
+  title: string;
+  desc: string;
+  className: string;
+  gated?: "auth" | "sub";
+}) {
   return <PowerUpCard {...props} />;
 }

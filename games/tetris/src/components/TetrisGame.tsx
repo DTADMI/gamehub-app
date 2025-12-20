@@ -39,24 +39,24 @@ const TetrisGame = () => {
 
   const checkCollision = useCallback(
       (tetromino: any, board: string[][], position: Position) => {
-        for (let y = 0; y < tetromino.shape.length; y++) {
-          for (let x = 0; x < tetromino.shape[y].length; x++) {
-            if (tetromino.shape[y][x] !== 0) {
-              const newX = position.x + x;
-              const newY = position.y + y;
+          for (let y = 0; y < tetromino.shape.length; y++) {
+              for (let x = 0; x < tetromino.shape[y].length; x++) {
+                  if (tetromino.shape[y][x] !== 0) {
+                      const newX = position.x + x;
+                      const newY = position.y + y;
 
-              if (
-                  newX < 0 ||
-                  newX >= BOARD_WIDTH ||
-                  newY >= BOARD_HEIGHT ||
-                  (newY >= 0 && board[newY][newX] !== "")
-              ) {
-                return true;
+                      if (
+                          newX < 0 ||
+                          newX >= BOARD_WIDTH ||
+                          newY >= BOARD_HEIGHT ||
+                          (newY >= 0 && board[newY][newX] !== "")
+                      ) {
+                          return true;
+                      }
+                  }
               }
-            }
           }
-        }
-        return false;
+          return false;
       },
       [],
   );
@@ -173,7 +173,7 @@ const TetrisGame = () => {
         ) {
           return {
             ...prev,
-            tetromino: {...tetromino, position: newPosition},
+              tetromino: {...tetromino, position: newPosition},
           };
         } else if (
             direction === "down" &&

@@ -2,7 +2,14 @@
 import dynamic from "next/dynamic";
 import React from "react";
 
-export type GameSlug = "breakout" | "memory" | "snake" | "knitzy" | "bubble-pop" | "checkers" | "chess";
+export type GameSlug =
+    | "breakout"
+    | "memory"
+    | "snake"
+    | "knitzy"
+    | "bubble-pop"
+    | "checkers"
+    | "chess";
 
 export type GameEntry = {
     slug: GameSlug;
@@ -44,7 +51,8 @@ export const games: GameManifest = {
     memory: {
         slug: "memory",
         title: "Memory",
-        shortDescription: "Flip cards and match all pairs in as few moves as possible.",
+        shortDescription:
+            "Flip cards and match all pairs in as few moves as possible.",
         tags: ["Casual", "Memory", "Puzzle"],
         image: "/images/bg-pastel-pattern.jpg",
         enabled: true,
@@ -68,10 +76,11 @@ export const games: GameManifest = {
         preloadAssets: [],
         getComponent: () => import("@games/snake").then((m) => m.SnakeGame),
     },
-    "knitzy": {
+    knitzy: {
         slug: "knitzy",
         title: "Knitzy",
-        shortDescription: "Relaxing stitch puzzler — knit patterns and score combos.",
+        shortDescription:
+            "Relaxing stitch puzzler — knit patterns and score combos.",
         tags: ["Puzzle", "Casual", "Mobile"],
         image: "/images/bg-pastel-pattern.jpg",
         enabled: true,
@@ -94,9 +103,10 @@ export const games: GameManifest = {
             {key: "pop", url: "/sounds/brick-hit.mp3"},
             {key: "background", url: "/sounds/breakout-bg.mp3", loop: true},
         ],
-        getComponent: () => import("@games/bubble-pop").then((m) => m.BubblePopGame),
+        getComponent: () =>
+            import("@games/bubble-pop").then((m) => m.BubblePopGame),
     },
-    "checkers": {
+    checkers: {
         slug: "checkers",
         title: "Checkers",
         shortDescription: "Classic draughts on an 8×8 board — local two player.",
@@ -107,7 +117,7 @@ export const games: GameManifest = {
         preloadAssets: [],
         getComponent: () => import("@games/checkers").then((m) => m.CheckersGame),
     },
-    "chess": {
+    chess: {
         slug: "chess",
         title: "Chess",
         shortDescription: "Open‑source chessboard — local two player (MVP).",
@@ -129,13 +139,13 @@ export function listGames(): GameEntry[] {
 }
 
 export function dynamicComponent(entry: GameEntry) {
-    return dynamic(() => entry.getComponent().then((m) => (m.default ?? m)), {
+    return dynamic(() => entry.getComponent().then((m) => m.default ?? m), {
         ssr: false,
         loading: () =>
             React.createElement(
                 "div",
                 {className: "min-h-[50vh] flex items-center justify-center"},
-                React.createElement("div", {className: "text-xl"}, "Loading game...")
+                React.createElement("div", {className: "text-xl"}, "Loading game..."),
             ),
     });
 }
