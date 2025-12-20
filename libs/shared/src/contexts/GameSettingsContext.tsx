@@ -62,6 +62,30 @@ function loadInitial(): Pick<GameSettings, "enableParticles" | "particleEffect" 
 }
 
 export function GameSettingsProvider({children}: { children: React.ReactNode }) {
+    // Ensure localStorage exists in test environments
+    if (typeof window !== "undefined" && typeof window.localStorage === "undefined") {
+        try {
+            const store: Record<string, string> = {};
+            (window as any).localStorage = {
+                getItem: (k: string) => (k in store ? store[k] : null),
+                setItem: (k: string, v: string) => {
+                    store[k] = String(v);
+                },
+                removeItem: (k: string) => {
+                    delete store[k];
+                },
+                clear: () => {
+                    for (const key of Object.keys(store)) delete store[key];
+                },
+                key: (i: number) => Object.keys(store)[i] ?? null,
+                get length() {
+                    return Object.keys(store).length;
+                },
+            } as any;
+        } catch {
+            // ignore
+        }
+    }
   const initial = loadInitial();
   const [enableParticles, setEnableParticles] = useState(initial.enableParticles);
   const [particleEffect, setParticleEffect] = useState<"sparks" | "puff">(initial.particleEffect);

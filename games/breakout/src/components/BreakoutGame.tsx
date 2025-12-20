@@ -1641,9 +1641,15 @@ export default function BreakoutGame() {
       const raw = localStorage.getItem("gamehub:settings");
       if (raw) {
         const s = JSON.parse(raw);
-        if (typeof s.enableParticles === "boolean") enableParticlesRef.current = s.enableParticles;
-        if (s.particleEffect === "puff" || s.particleEffect === "sparks") particleEffectRef.current = s.particleEffect;
-        if (s.mode === "hard" || s.mode === "chaos" || s.mode === "classic") modeRef.current = s.mode;
+        if (typeof s.enableParticles === "boolean") {
+          enableParticlesRef.current = s.enableParticles;
+        }
+        if (s.particleEffect === "puff" || s.particleEffect === "sparks") {
+          particleEffectRef.current = s.particleEffect;
+        }
+        if (s.mode === "hard" || s.mode === "chaos" || s.mode === "classic") {
+          modeRef.current = s.mode;
+        }
         authRef.current = {auth: !!s.isAuthenticated, sub: !!s.isSubscriber};
       }
     } catch {
@@ -1651,9 +1657,15 @@ export default function BreakoutGame() {
     const onSettings = (e: Event) => {
       const ce = e as CustomEvent<any>;
       const d = ce.detail || {};
-      if (typeof d.enableParticles === "boolean") enableParticlesRef.current = d.enableParticles;
-      if (d.particleEffect === "puff" || d.particleEffect === "sparks") particleEffectRef.current = d.particleEffect;
-      if (d.mode === "hard" || d.mode === "chaos" || d.mode === "classic") modeRef.current = d.mode;
+      if (typeof d.enableParticles === "boolean") {
+        enableParticlesRef.current = d.enableParticles;
+      }
+      if (d.particleEffect === "puff" || d.particleEffect === "sparks") {
+        particleEffectRef.current = d.particleEffect;
+      }
+      if (d.mode === "hard" || d.mode === "chaos" || d.mode === "classic") {
+        modeRef.current = d.mode;
+      }
       authRef.current = {auth: !!d.isAuthenticated, sub: !!d.isSubscriber};
     };
     window.addEventListener('gamehub:settings', onSettings as any);

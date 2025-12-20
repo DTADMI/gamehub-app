@@ -357,8 +357,12 @@ export const SnakeGame: React.FC = () => {
   // Taps control scheme: tapping left/right halves issues relative left/right turns
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
-    if (controlScheme !== "taps") return;
+      if (!canvas) {
+          return;
+      }
+      if (controlScheme !== "taps") {
+          return;
+      }
 
     const turnLeft = (dir: Direction): Direction => {
       switch (dir) {
@@ -386,7 +390,9 @@ export const SnakeGame: React.FC = () => {
     };
 
     const handleTap = (clientX: number) => {
-      if (!gameStarted || isPaused || gameOver) return;
+        if (!gameStarted || isPaused || gameOver) {
+            return;
+        }
       const rect = canvas.getBoundingClientRect();
       const isLeft = clientX < rect.left + rect.width / 2;
       const target = isLeft ? turnLeft(direction) : turnRight(direction);
