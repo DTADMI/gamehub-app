@@ -13,7 +13,7 @@ test.describe("Checkers MVP", () => {
             await start.click();
         }
 
-        const canvas = page.locator('canvas[aria-label="Checkers board"]');
-        await expect(canvas).toBeVisible();
+        const board = page.locator('[data-testid="checkers-board"]');
+        await expect(board).toBeVisible();
     });
 });

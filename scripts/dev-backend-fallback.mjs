@@ -65,7 +65,10 @@ function docker(args, opts = {}) {
 
 function dockerCapture(args, opts = {}) {
   // Returns stdout as string, exit status in .status
-  return spawnSync("docker", args, {stdio: ["ignore", "pipe", "inherit"], ...opts});
+  return spawnSync("docker", args, {
+    stdio: ["ignore", "pipe", "inherit"],
+    ...opts,
+  });
 }
 
 function tryRemoveExisting(name) {
@@ -96,11 +99,14 @@ function checkTcp(host, port, timeoutMs = 2000) {
 
 async function ensureLocalDbIfRequestedOrMissing() {
   log("Checking DB status");
-  const useComposeDb = (process.env.USE_COMPOSE_DB || "true").toLowerCase() === "true";
+  const useComposeDb =
+      (process.env.USE_COMPOSE_DB || "true").toLowerCase() === "true";
   if (!useComposeDb) return {usedCompose: false};
 
   log("Ensuring compose Postgres (service 'db') is up...");
-  const r = spawnSync("docker", ["compose", "up", "-d", "db"], {stdio: "inherit"});
+  const r = spawnSync("docker", ["compose", "up", "-d", "db"], {
+    stdio: "inherit",
+  });
   if (r.status !== 0) {
     log("Failed to start compose db service.");
     return {usedCompose: true, reachable: false};
@@ -161,11 +167,24 @@ async function main() {
 
   // If we are using compose DB, prefer starting backend via docker compose so it can reach the `db` service by name.
   if (dbStatus.usedCompose && useComposeDb) {
-    log("Starting backend via docker compose (service 'backend') to reuse compose network...");
-    const composeEnv = {...process.env, GCP_REGION: REGION, GCP_PROJECT_ID: PROJECT, AR_REPO, BACKEND_SERVICE: SERVICE};
-    const up = spawnSync("docker", ["compose", "up", "-d", "backend"], {stdio: "inherit", env: composeEnv});
+    log(
+        "Starting backend via docker compose (service 'backend') to reuse compose network...",
+    );
+    const composeEnv = {
+      ...process.env,
+      GCP_REGION: REGION,
+      GCP_PROJECT_ID: PROJECT,
+      AR_REPO,
+      BACKEND_SERVICE: SERVICE,
+    };
+    const up = spawnSync("docker", ["compose", "up", "-d", "backend"], {
+      stdio: "inherit",
+      env: composeEnv,
+    });
     if (up.status !== 0) {
-      log("docker compose up backend failed. Falling back to direct docker run path.");
+      log(
+          "docker compose up backend failed. Falling back to direct docker run path.",
+      );
     } else {
       // Wait for health on localhost:8080
       log("Waiting for service to become healthy...");
@@ -176,19 +195,24 @@ async function main() {
         const apiOk = await check("http://localhost:8080/api/health");
         const actOk = await check("http://localhost:8080/actuator/health");
         if (!firstHealthy2) {
-          if (apiOk) firstHealthy2 = "/api/health"; else if (actOk) firstHealthy2 = "/actuator/health";
+          if (apiOk) firstHealthy2 = "/api/health";
+          else if (actOk) firstHealthy2 = "/actuator/health";
           if (firstHealthy2) log(`Health first responded at ${firstHealthy2}`);
         }
         if (apiOk || actOk) {
           log("Backend is up at http://localhost:8080");
           return;
         }
-        await new Promise(r2 => setTimeout(r2, 1500));
+        await new Promise((r2) => setTimeout(r2, 1500));
       }
       log("Backend (compose) did not become ready in time. Showing logs:");
       try {
-        spawnSync("docker", ["compose", "logs", "--tail", "200", "backend"], {stdio: "inherit", env: composeEnv});
-      } catch {
+        spawnSync("docker", ["compose", "logs", "--tail", "200", "backend"], {
+          stdio: "inherit",
+          env: composeEnv,
+        });
+      } catch (error) {
+        log(`Failed to show logs: ${error.message}`);
       }
       process.exit(1);
     }
@@ -196,13 +220,21 @@ async function main() {
   // If we brought up compose db, prefer host.docker.internal with compose creds
   // Prefer explicit SPRING_DATASOURCE_URL if provided; otherwise, build from parts.
   // When compose DB is used, default to gamehub creds and host.docker.internal.
-  const dbHost = dbStatus.usedCompose ? "host.docker.internal" : (env.DB_HOST || "localhost");
+  const dbHost = dbStatus.usedCompose
+      ? "host.docker.internal"
+      : env.DB_HOST || "localhost";
   const dbPort = env.DB_PORT || "5432";
-  const dbName = dbStatus.usedCompose ? "gamehub" : (env.DB_NAME || "gamesdb");
-  const dbUser = env.SPRING_DATASOURCE_USERNAME || (dbStatus.usedCompose ? "gamehub" : (env.DB_USER || "postgres"));
-  const dbPassword = env.SPRING_DATASOURCE_PASSWORD || (dbStatus.usedCompose ? "gamehub" : (env.DB_PASSWORD || "postgres"));
+  const dbName = dbStatus.usedCompose ? "gamehub" : env.DB_NAME || "gamesdb";
+  const dbUser =
+      env.SPRING_DATASOURCE_USERNAME ||
+      (dbStatus.usedCompose ? "gamehub" : env.DB_USER || "postgres");
+  const dbPassword =
+      env.SPRING_DATASOURCE_PASSWORD ||
+      (dbStatus.usedCompose ? "gamehub" : env.DB_PASSWORD || "postgres");
 
-  let springDatasourceUrl = env.SPRING_DATASOURCE_URL || `jdbc:postgresql://${dbHost}:${dbPort}/${dbName}`;
+  let springDatasourceUrl =
+      env.SPRING_DATASOURCE_URL ||
+      `jdbc:postgresql://${dbHost}:${dbPort}/${dbName}`;
   // Some backend images expect SPRING_DATASOURCE_* alias envs; provide them too for compatibility
   const legacyAliases = {
     DB_HOST: dbHost,
@@ -213,8 +245,8 @@ async function main() {
   };
 
   // Backend profile configurability
-  const backendProfile = env.BACKEND_PROFILE
-      || env.SPRING_PROFILES_ACTIVE || "local";
+  const backendProfile =
+      env.BACKEND_PROFILE || env.SPRING_PROFILES_ACTIVE || "local";
 
   const baseEnv = {
     // Spring profile and server port
@@ -227,7 +259,8 @@ async function main() {
     // Auth / tokens (defaults match issue description)
     APP_JWT_SECRET: env.APP_JWT_SECRET || "change_me",
     APP_JWT_EXPIRATION_IN_MS: env.APP_JWT_EXPIRATION_IN_MS || "3600000",
-    REFRESH_TOKEN_EXPIRATION_MS: env.REFRESH_TOKEN_EXPIRATION_MS || "2592000000",
+    REFRESH_TOKEN_EXPIRATION_MS:
+        env.REFRESH_TOKEN_EXPIRATION_MS || "2592000000",
     // CORS (allow common localhost origins)
     CORS_ALLOWED_ORIGINS:
         env.CORS_ALLOWED_ORIGINS || "http://localhost:3000,http://127.0.0.1:3000",
@@ -249,19 +282,24 @@ async function main() {
     if (env[k]) baseEnv[k] = env[k];
   });
 
-  const envArgs = Object.entries(baseEnv).flatMap(([k, v]) => ["-e", `${k}=${v}`]);
+  const envArgs = Object.entries(baseEnv).flatMap(([k, v]) => [
+    "-e",
+    `${k}=${v}`,
+  ]);
   // Log effective datasource (mask password)
   try {
     const maskedUrl = baseEnv.SPRING_DATASOURCE_URL;
     const maskedUser = baseEnv.SPRING_DATASOURCE_USERNAME;
     log(`Effective datasource URL: ${maskedUrl}`);
     log(`Effective datasource user: ${maskedUser}`);
-  } catch {
+  } catch (error) {
+    log(`Warning: Could not log datasource info: ${error.message}`);
   }
 
   // Linux-specific host mapping to make host.docker.internal work when using compose DB
-  const addHostGateway = (dbStatus.usedCompose && (process.platform === "linux"))
-      || (String(env.ADD_HOST_GATEWAY || "").toLowerCase() === "true");
+  const addHostGateway =
+      (dbStatus.usedCompose && process.platform === "linux") ||
+      String(env.ADD_HOST_GATEWAY || "").toLowerCase() === "true";
 
   let runArgs = [
     "run",
@@ -271,7 +309,9 @@ async function main() {
     CONTAINER_NAME,
     "-p",
     "8080:8080",
-    ...(addHostGateway ? ["--add-host", "host.docker.internal:host-gateway"] : []),
+    ...(addHostGateway
+        ? ["--add-host", "host.docker.internal:host-gateway"]
+        : []),
     ...envArgs,
     image,
   ];
@@ -288,7 +328,9 @@ async function main() {
 
   function isContainerRunning(nameOrId) {
     try {
-      const res = execSync(`docker inspect -f {{.State.Running}} ${nameOrId}`, {stdio: ["ignore", "pipe", "ignore"]});
+      const res = execSync(`docker inspect -f {{.State.Running}} ${nameOrId}`, {
+        stdio: ["ignore", "pipe", "ignore"],
+      });
       return String(res.toString()).trim() === "true";
     } catch {
       return false;
@@ -309,28 +351,44 @@ async function main() {
         // Try logs for the latest container with this name
         const latestId = (function () {
           try {
-            const out = execSync(`docker ps -a -q --filter name=${CONTAINER_NAME} --no-trunc`, {stdio: ["ignore", "pipe", "ignore"]});
-            return String(out.toString()).trim().split(/\r?\n/).filter(Boolean)[0] || containerId;
+            const out = execSync(
+                `docker ps -a -q --filter name=${CONTAINER_NAME} --no-trunc`,
+                {stdio: ["ignore", "pipe", "ignore"]},
+            );
+            return (
+                String(out.toString()).trim().split(/\r?\n/).filter(Boolean)[0] ||
+                containerId
+            );
           } catch {
             return containerId;
           }
         })();
-        spawnSync("docker", ["logs", "--tail", "200", latestId || containerId || CONTAINER_NAME], {stdio: "inherit"});
-      } catch {
+        spawnSync(
+            "docker",
+            ["logs", "--tail", "200", latestId || containerId || CONTAINER_NAME],
+            {stdio: "inherit"},
+        );
+      } catch (error) {
+        log(`Failed to show container logs: ${error.message}`);
       }
 
       // If using compose DB and running on Windows/macOS, try one retry with localhost instead of host.docker.internal
       const isWin = process.platform === "win32";
       const isMac = process.platform === "darwin";
       if (!retriedLocalhost && dbStatus.usedCompose && (isWin || isMac)) {
-        log("Retrying once with SPRING_DATASOURCE_URL using localhost instead of host.docker.internal ...");
+        log(
+            "Retrying once with SPRING_DATASOURCE_URL using localhost instead of host.docker.internal ...",
+        );
         tryRemoveExisting(CONTAINER_NAME);
         const retryEnv = {
           ...baseEnv,
           SPRING_DATASOURCE_URL: `jdbc:postgresql://localhost:${dbPort}/${dbName}`,
           DB_HOST: "localhost",
         };
-        const retryEnvArgs = Object.entries(retryEnv).flatMap(([k, v]) => ["-e", `${k}=${v}`]);
+        const retryEnvArgs = Object.entries(retryEnv).flatMap(([k, v]) => [
+          "-e",
+          `${k}=${v}`,
+        ]);
         runArgs = [
           "run",
           "-d",
@@ -371,12 +429,19 @@ async function main() {
 
     await new Promise((r2) => setTimeout(r2, 1500));
   }
-  log("Backend container did not become ready in time. It may require DB env vars.");
+  log(
+      "Backend container did not become ready in time. It may require DB env vars.",
+  );
   // Tail logs for diagnostics
   try {
     log("Showing last 200 lines of backend container logs:");
-    spawnSync("docker", ["logs", "--tail", "200", containerId || CONTAINER_NAME], {stdio: "inherit"});
-  } catch {
+    spawnSync(
+        "docker",
+        ["logs", "--tail", "200", containerId || CONTAINER_NAME],
+        {stdio: "inherit"},
+    );
+  } catch (error) {
+    log(`Failed to display container logs: ${error.message}`);
   }
   process.exit(1);
 }

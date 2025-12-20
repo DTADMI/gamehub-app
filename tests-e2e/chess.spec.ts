@@ -13,7 +13,7 @@ test.describe("Chess MVP", () => {
             await start.click();
         }
 
-        const canvas = page.locator('canvas[aria-label="Chess board"]');
-        await expect(canvas).toBeVisible();
+        const board = page.locator('[data-testid="chess-board"]');
+        await expect(board).toBeVisible();
     });
 });

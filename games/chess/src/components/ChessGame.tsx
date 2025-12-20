@@ -629,6 +629,7 @@ export const ChessGame: React.FC = () => {
       <div
           ref={boardRef}
           className="grid"
+          data-testid="chess-board"
           style={{gridTemplateColumns: `repeat(${SIZE}, 3rem)`}}
       >
         {uiBoard.map((row, r) =>

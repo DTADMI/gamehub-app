@@ -34,27 +34,27 @@ designed to be backend-agnostic, communicating with a separate API service.
 
 ### New Priority Track — Playable MVPs (ordered)
 
-- [ ] Knitzy — playable MVP
-  - [ ] Scaffold game module under `games/knitzy` and add manifest entry (slug `knitzy`)
-  - [ ] Core loop: board/grid, stitch interaction, scoring, game over/reset
-  - [ ] Mobile UX: tap/drag controls; non‑blocking overlays
-  - [ ] Sounds/backgrounds wired via `public/` assets
-  - [ ] Page route `/games/knitzy` loads via launcher; basic E2E: canvas visible, start/pause, simple scoring increments
-- [ ] Bubble Pop — playable MVP
-  - [ ] Scaffold `games/bubble-pop` and manifest entry (slug `bubble-pop`)
-  - [ ] Core mechanics: aim/launch, match‑3 pops, next bubble preview, game over
-  - [ ] Mobile aim/drag, sound effects, lightweight particles (optional)
-  - [ ] E2E: start game, pop reduces remaining count/score increases
-- [ ] Checkers — playable MVP
-  - [ ] Scaffold `games/checkers` and manifest entry (slug `checkers`)
-  - [ ] Rules: legal moves, captures (including multiple), turn system, win detection
-  - [ ] Local 2‑player (same device) + simple AI (optional follow‑up)
-  - [ ] E2E: board renders, legal move executes, capture reduces piece count
-- [ ] Chess — playable MVP
-  - [ ] Scaffold `games/chess` and manifest entry (slug `chess`)
-  - [ ] Rules: legal moves, check/checkmate/stalemate, basic move validation
-  - [ ] Local 2‑player; PGN export/import (optional)
-  - [ ] E2E: board renders, legal move executes, checkmate detection smoke test
+- [x] Knitzy — playable MVP
+  - [x] Scaffold game module under `games/knitzy` and add manifest entry (slug `knitzy`)
+  - [x] Core loop: board/grid, stitch interaction, scoring, game over/reset
+  - [x] Mobile UX: tap/drag controls; non‑blocking overlays
+  - [x] Sounds/backgrounds wired via `public/` assets
+  - [x] Page route `/games/knitzy` loads via launcher; basic E2E: canvas visible, start/pause, simple scoring increments
+- [x] Bubble Pop — playable MVP
+  - [x] Scaffold `games/bubble-pop` and manifest entry (slug `bubble-pop`)
+  - [x] Core mechanics: aim/launch, match‑3 pops, next bubble preview, game over
+  - [x] Mobile aim/drag, sound effects, lightweight particles (optional)
+  - [x] E2E: start game, pop reduces remaining count/score increases
+- [x] Checkers — playable MVP
+  - [x] Scaffold `games/checkers` and manifest entry (slug `checkers`)
+  - [x] Rules: legal moves, captures (including multiple), turn system, win detection
+  - [x] Local 2‑player (same device) + simple AI (optional follow‑up)
+  - [x] E2E: board renders, legal move executes, capture reduces piece count
+- [x] Chess — playable MVP
+  - [x] Scaffold `games/chess` and manifest entry (slug `chess`)
+  - [x] Rules: legal moves, check/checkmate/stalemate, basic move validation
+  - [x] Local 2‑player; PGN export/import (optional)
+  - [x] E2E: board renders, legal move executes, checkmate detection smoke test
 
 ## Planned Features
 

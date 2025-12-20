@@ -70,7 +70,7 @@ test.describe("Access control via middleware", () => {
   });
 
   test("non-public route redirects to /login with redirect param", async ({
-                                                                              page,
+                                                                            page,
                                                                           }) => {
     await page.goto("/dashboard");
     await expect(page).toHaveURL(/\/login/);

@@ -52,7 +52,7 @@ export default function HomePage() {
               <div className="flex gap-4">
                 <Button asChild size="lg" className="gap-2">
                   <Link href="/explore">
-                      <ExternalLink className="w-4 h-4"/>
+                    <ExternalLink className="w-4 h-4"/>
                     Explore All
                   </Link>
                 </Button>

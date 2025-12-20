@@ -250,6 +250,7 @@ export const CheckersGame: React.FC = () => {
       <div
           ref={boardRef}
           className="grid"
+          data-testid="checkers-board"
           style={{gridTemplateColumns: `repeat(${SIZE}, 3rem)`}}
       >
         {uiBoard.map((row, r) =>

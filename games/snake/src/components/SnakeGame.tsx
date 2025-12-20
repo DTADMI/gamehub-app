@@ -88,16 +88,16 @@ export const SnakeGame: React.FC = () => {
   // Generate random position
   const getRandomPosition = useCallback(
       (exclude: Position[] = []): Position => {
-        let position: Position;
-        do {
-          position = {
-            x: Math.floor(Math.random() * config.gridSize),
-            y: Math.floor(Math.random() * config.gridSize),
-          };
-        } while (
-            exclude.some((pos) => pos.x === position.x && pos.y === position.y)
-            );
-        return position;
+          let position: Position;
+          do {
+              position = {
+                  x: Math.floor(Math.random() * config.gridSize),
+                  y: Math.floor(Math.random() * config.gridSize),
+              };
+          } while (
+              exclude.some((pos) => pos.x === position.x && pos.y === position.y)
+              );
+          return position;
       },
       [config.gridSize],
   );
@@ -105,7 +105,7 @@ export const SnakeGame: React.FC = () => {
   // Generate food at random position
   const generateFood = useCallback(
       (exclude: Position[]): Position => {
-        return getRandomPosition(exclude);
+          return getRandomPosition(exclude);
       },
       [getRandomPosition],
   );
@@ -113,14 +113,14 @@ export const SnakeGame: React.FC = () => {
   // Generate obstacles
   const generateObstacles = useCallback(
       (exclude: Position[]): Obstacle[] => {
-        const obstacles: Obstacle[] = [];
-        const obstacleCount = Math.floor(config.gridSize * config.gridSize * 0.1); // 10% of grid
+          const obstacles: Obstacle[] = [];
+          const obstacleCount = Math.floor(config.gridSize * config.gridSize * 0.1); // 10% of grid
 
-        for (let i = 0; i < obstacleCount; i++) {
-          obstacles.push(getRandomPosition([...exclude, ...obstacles]));
-        }
+          for (let i = 0; i < obstacleCount; i++) {
+              obstacles.push(getRandomPosition([...exclude, ...obstacles]));
+          }
 
-        return obstacles;
+          return obstacles;
       },
       [config.gridSize, getRandomPosition],
   );
@@ -147,38 +147,38 @@ export const SnakeGame: React.FC = () => {
   // Initialize game
   const initGame = useCallback(
       (nextCfg?: GameConfig) => {
-        // Use provided config or fall back to current state
-        const currentConfig = nextCfg || config;
+          // Use provided config or fall back to current state
+          const currentConfig = nextCfg || config;
 
-        // Set up initial snake
-        const initialSnake = [
-          {x: 5, y: 10},
-          {x: 4, y: 10},
-          {x: 3, y: 10},
-        ];
+          // Set up initial snake
+          const initialSnake = [
+              {x: 5, y: 10},
+              {x: 4, y: 10},
+              {x: 3, y: 10},
+          ];
 
-        setSnake(initialSnake);
-        setDirection("RIGHT");
-        setNextDirection("RIGHT");
-        setScore(0);
-        setGameOver(false);
-        setFood(generateFood(initialSnake));
+          setSnake(initialSnake);
+          setDirection("RIGHT");
+          setNextDirection("RIGHT");
+          setScore(0);
+          setGameOver(false);
+          setFood(generateFood(initialSnake));
 
-        if (currentConfig.hasObstacles) {
-          setObstacles(generateObstacles(initialSnake));
-        } else {
-          setObstacles([]);
-        }
+          if (currentConfig.hasObstacles) {
+              setObstacles(generateObstacles(initialSnake));
+          } else {
+              setObstacles([]);
+          }
 
-        if (currentConfig.hasPortals) {
-          setPortals(generatePortals());
-        } else {
-          setPortals([]);
-        }
+          if (currentConfig.hasPortals) {
+              setPortals(generatePortals());
+          } else {
+              setPortals([]);
+          }
 
-        soundManager.playMusic("background");
+          soundManager.playMusic("background");
 
-        return initialSnake;
+          return initialSnake;
       },
       [config, generateFood, generateObstacles, generatePortals],
   );
@@ -186,8 +186,8 @@ export const SnakeGame: React.FC = () => {
   // Restart helper that applies a provided configuration immediately
   const restartWithConfig = useCallback(
       (nextCfg: GameConfig) => {
-        setConfig(nextCfg);
-        initGame(nextCfg);
+          setConfig(nextCfg);
+          initGame(nextCfg);
       },
       [initGame],
   );
@@ -345,9 +345,9 @@ export const SnakeGame: React.FC = () => {
       e.preventDefault();
     };
 
-    canvas.addEventListener("touchstart", onTouchStart, {passive: false});
-    canvas.addEventListener("touchmove", onTouchMove, {passive: false});
-    canvas.addEventListener("touchend", onTouchEnd, {passive: false});
+      canvas.addEventListener("touchstart", onTouchStart, {passive: false});
+      canvas.addEventListener("touchmove", onTouchMove, {passive: false});
+      canvas.addEventListener("touchend", onTouchEnd, {passive: false});
 
     return () => {
       canvas.removeEventListener("touchstart", onTouchStart as any);
@@ -409,7 +409,7 @@ export const SnakeGame: React.FC = () => {
       // Do not preventDefault so page can still scroll when not tapping canvas
     };
 
-    canvas.addEventListener("click", onClick as any, {passive: true} as any);
+      canvas.addEventListener("click", onClick as any, {passive: true} as any);
     canvas.addEventListener(
         "touchstart",
         onTouchStart as any,
@@ -777,7 +777,7 @@ export const SnakeGame: React.FC = () => {
       (async () => {
         try {
           if (score > 0) {
-            await submitScore({gameType: "SNAKE", score});
+              await submitScore({gameType: "SNAKE", score});
           }
         } catch {
           // ignore network/auth errors in game flow
@@ -859,13 +859,13 @@ export const SnakeGame: React.FC = () => {
               | null) || "normal";
       window.dispatchEvent(
           new CustomEvent("snake:setDifficulty", {
-            detail: {difficulty: saved},
+              detail: {difficulty: saved},
           }),
       );
     } catch {
       window.dispatchEvent(
           new CustomEvent("snake:setDifficulty", {
-            detail: {difficulty: "normal"},
+              detail: {difficulty: "normal"},
           }),
       );
     }
@@ -905,7 +905,7 @@ export const SnakeGame: React.FC = () => {
 
   // Handle game mode changes
   const buildConfigForMode = (base: GameConfig, mode: GameMode): GameConfig => {
-    const next: GameConfig = {...base, mode};
+      const next: GameConfig = {...base, mode};
     switch (mode) {
       case "obstacles":
         next.hasObstacles = true;
@@ -989,7 +989,7 @@ export const SnakeGame: React.FC = () => {
                               : "bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600"
                       }`}
                   >
-                    {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                      {mode.charAt(0).toUpperCase() + mode.slice(1)}
                   </button>
               ),
           )}
@@ -998,31 +998,31 @@ export const SnakeGame: React.FC = () => {
         {/* Inline confirm for mode change */}
         {pendingMode && (
             <div className="mx-auto mb-4 max-w-md rounded-md border bg-card text-card-foreground p-3 shadow-sm">
-              <p className="text-sm mb-2">
-                Restart the game in <b>{pendingMode}</b> mode? Current progress
-                will be lost.
-              </p>
-              <div className="flex gap-2 justify-end">
-                <button
-                    className="px-4 py-2 text-sm rounded-md min-h-11 bg-secondary text-secondary-foreground hover:bg-secondary/80"
-                    onClick={() => {
-                      setPendingMode(null);
-                      setIsPaused(false);
-                    }}
-                >
-                  Cancel
-                </button>
-                <button
-                    className="px-4 py-2 text-sm rounded-md min-h-11 bg-primary text-primary-foreground hover:bg-primary/90"
-                    onClick={() => {
-                      const nextCfg = buildConfigForMode(config, pendingMode);
-                      setPendingMode(null);
-                      restartWithConfig(nextCfg);
-                    }}
-                >
-                  Restart
-                </button>
-              </div>
+                <p className="text-sm mb-2">
+                    Restart the game in <b>{pendingMode}</b> mode? Current progress
+                    will be lost.
+                </p>
+                <div className="flex gap-2 justify-end">
+                    <button
+                        className="px-4 py-2 text-sm rounded-md min-h-11 bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                        onClick={() => {
+                            setPendingMode(null);
+                            setIsPaused(false);
+                        }}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        className="px-4 py-2 text-sm rounded-md min-h-11 bg-primary text-primary-foreground hover:bg-primary/90"
+                        onClick={() => {
+                            const nextCfg = buildConfigForMode(config, pendingMode);
+                            setPendingMode(null);
+                            restartWithConfig(nextCfg);
+                        }}
+                    >
+                        Restart
+                    </button>
+                </div>
             </div>
         )}
 
@@ -1051,47 +1051,47 @@ export const SnakeGame: React.FC = () => {
                 aria-label={!gameStarted ? "Tap to start" : "Tap to resume"}
                 className="mt-3 w-full max-w-xl mx-auto flex items-center justify-center bg-black/40 text-white text-base sm:text-lg font-semibold select-none rounded-md h-16"
                 onClick={() => {
-                  if (!gameStarted) {
-                    setGameStarted(true);
-                  } else {
-                    setIsPaused(false);
-                  }
+                    if (!gameStarted) {
+                        setGameStarted(true);
+                    } else {
+                        setIsPaused(false);
+                    }
                 }}
             >
-              {!gameStarted ? "Tap to start" : "Paused — Tap to resume"}
+                {!gameStarted ? "Tap to start" : "Paused — Tap to resume"}
             </button>
         )}
 
         {/* Virtual joystick for mobile when selected (optional; doesn't block page scroll) */}
         {controlScheme === "joystick" && (
             <div className="mt-4 flex justify-center">
-              <VirtualJoystick
-                  onDirection={(dir) => {
-                    // Map to cardinal and avoid 180° reversals
-                    switch (dir) {
-                      case "UP":
-                        if (direction !== "DOWN") {
-                          setNextDirection("UP");
+                <VirtualJoystick
+                    onDirection={(dir) => {
+                        // Map to cardinal and avoid 180° reversals
+                        switch (dir) {
+                            case "UP":
+                                if (direction !== "DOWN") {
+                                    setNextDirection("UP");
+                                }
+                                break;
+                            case "DOWN":
+                                if (direction !== "UP") {
+                                    setNextDirection("DOWN");
+                                }
+                                break;
+                            case "LEFT":
+                                if (direction !== "RIGHT") {
+                                    setNextDirection("LEFT");
+                                }
+                                break;
+                            case "RIGHT":
+                                if (direction !== "LEFT") {
+                                    setNextDirection("RIGHT");
+                                }
+                                break;
                         }
-                        break;
-                      case "DOWN":
-                        if (direction !== "UP") {
-                          setNextDirection("DOWN");
-                        }
-                        break;
-                      case "LEFT":
-                        if (direction !== "RIGHT") {
-                          setNextDirection("LEFT");
-                        }
-                        break;
-                      case "RIGHT":
-                        if (direction !== "LEFT") {
-                          setNextDirection("RIGHT");
-                        }
-                        break;
-                    }
-                  }}
-              />
+                    }}
+                />
             </div>
         )}
 
@@ -1134,41 +1134,41 @@ const VirtualJoystick: React.FC<JoystickProps> = ({onDirection}) => {
   // Convert movement vector to a cardinal direction
   const vectorToDir = useCallback(
       (dx: number, dy: number): Direction | null => {
-        const dead = JOYSTICK_DEADZONE_PX; // px deadzone
-        const ax = Math.abs(dx);
-        const ay = Math.abs(dy);
-        if (ax < dead && ay < dead) {
-          return null;
-        }
-        if (ax > ay) {
-          return dx > 0 ? "RIGHT" : "LEFT";
-        }
-        return dy > 0 ? "DOWN" : "UP";
+          const dead = JOYSTICK_DEADZONE_PX; // px deadzone
+          const ax = Math.abs(dx);
+          const ay = Math.abs(dy);
+          if (ax < dead && ay < dead) {
+              return null;
+          }
+          if (ax > ay) {
+              return dx > 0 ? "RIGHT" : "LEFT";
+          }
+          return dy > 0 ? "DOWN" : "UP";
       },
       [],
   );
 
   const handleMoveFromEvent = useCallback(
       (clientX: number, clientY: number) => {
-        const pad = padRef.current;
-        const knob = knobRef.current;
-        if (!pad || !knob) {
-          return;
-        }
-        const rect = pad.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        const dx = clientX - cx;
-        const dy = clientY - cy;
-        const maxR = rect.width * 0.32; // knob travel radius
-        const len = Math.hypot(dx, dy) || 1;
-        const nx = (dx / len) * Math.min(maxR, len);
-        const ny = (dy / len) * Math.min(maxR, len);
-        knob.style.transform = `translate(${nx}px, ${ny}px)`;
-        const dir = vectorToDir(dx, dy);
-        if (dir) {
-          onDirection(dir);
-        }
+          const pad = padRef.current;
+          const knob = knobRef.current;
+          if (!pad || !knob) {
+              return;
+          }
+          const rect = pad.getBoundingClientRect();
+          const cx = rect.left + rect.width / 2;
+          const cy = rect.top + rect.height / 2;
+          const dx = clientX - cx;
+          const dy = clientY - cy;
+          const maxR = rect.width * 0.32; // knob travel radius
+          const len = Math.hypot(dx, dy) || 1;
+          const nx = (dx / len) * Math.min(maxR, len);
+          const ny = (dy / len) * Math.min(maxR, len);
+          knob.style.transform = `translate(${nx}px, ${ny}px)`;
+          const dir = vectorToDir(dx, dy);
+          if (dir) {
+              onDirection(dir);
+          }
       },
       [onDirection, vectorToDir],
   );
@@ -1223,19 +1223,19 @@ const VirtualJoystick: React.FC<JoystickProps> = ({onDirection}) => {
 
   return (
       <div className="select-none">
-        <div
-            ref={padRef}
-            aria-label="Virtual joystick"
-            className="relative h-32 w-32 rounded-full bg-gray-200 dark:bg-gray-700 shadow-inner"
-            style={{touchAction: "none"}}
-        >
           <div
-              ref={knobRef}
-              className={`absolute left-1/2 top-1/2 h-16 w-16 -translate-x-1/2 -translate-y-1/2 rounded-full shadow-md ${
-                  active ? "bg-blue-500" : "bg-white dark:bg-gray-400"
-              }`}
-          />
-        </div>
+              ref={padRef}
+              aria-label="Virtual joystick"
+              className="relative h-32 w-32 rounded-full bg-gray-200 dark:bg-gray-700 shadow-inner"
+              style={{touchAction: "none"}}
+          >
+              <div
+                  ref={knobRef}
+                  className={`absolute left-1/2 top-1/2 h-16 w-16 -translate-x-1/2 -translate-y-1/2 rounded-full shadow-md ${
+                      active ? "bg-blue-500" : "bg-white dark:bg-gray-400"
+                  }`}
+              />
+          </div>
       </div>
   );
 };

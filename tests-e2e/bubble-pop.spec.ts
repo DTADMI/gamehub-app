@@ -1,7 +1,7 @@
 import {expect, test} from "@playwright/test";
 
 test.describe("Bubble Pop MVP", () => {
-  test("canvas renders and popping increases score text", async ({page}) => {
+    test("canvas renders and popping increases score text", async ({page}) => {
     await page.goto("/games/bubble-pop");
     await page.waitForLoadState("domcontentloaded");
     await expect(
