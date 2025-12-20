@@ -181,10 +181,20 @@
   * {
     @apply border-border outline-ring/50;
   }
+
+  :root, html, body {
+    /* Mirror body background on the root element to avoid being obscured by full-bleed containers */
+    background-color: var(--background);
+    background-image: var(--app-bg) !important;
+    background-size: cover, cover, cover, auto, auto, cover;
+    background-repeat: no-repeat, no-repeat, no-repeat, repeat, repeat, no-repeat;
+    background-attachment: scroll;
+    min-height: 100%;
+  }
   body {
     @apply bg-background text-foreground;
     /* Apply galaxy/star‑glow background image via CSS variables */
-    background-image: var(--app-bg);
+    background-image: var(--app-bg) !important;
     /* Size/repeat values match the maximum layer count used in dark mode; extra values are ignored in light */
     background-size: cover, cover, cover, auto, auto, cover;
     background-repeat: no-repeat, no-repeat, no-repeat, repeat, repeat, no-repeat;

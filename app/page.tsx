@@ -41,7 +41,7 @@ export default function HomePage() {
           <section className="mb-12">
             <div className="max-w-4xl">
               <h1 className="text-4xl font-bold text-foreground mb-4 text-balance">
-                JavaScript Games & Interactive Projects
+                Fun Games & Projects
               </h1>
               <p className="text-lg text-muted-foreground mb-6 text-pretty">
                 Welcome to my collection of interactive games and projects built
