@@ -381,4 +381,6 @@ export const BubblePopGame: React.FC = () => {
       </div>
     </div>
   );
-};
+}
+
+export default BubblePopGame;

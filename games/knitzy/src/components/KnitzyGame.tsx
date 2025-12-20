@@ -286,4 +286,6 @@ export const KnitzyGame: React.FC = () => {
       </div>
     </div>
   );
-};
+}
+
+export default KnitzyGame;

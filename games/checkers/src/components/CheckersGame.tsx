@@ -300,4 +300,6 @@ export const CheckersGame: React.FC = () => {
       )}
     </div>
   );
-};
+}
+
+export default CheckersGame;

@@ -685,4 +685,6 @@ export const ChessGame: React.FC = () => {
       )}
     </div>
   );
-};
+}
+
+export default ChessGame;

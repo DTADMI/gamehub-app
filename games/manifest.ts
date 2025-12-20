@@ -2,7 +2,7 @@
 import dynamic from "next/dynamic";
 import React from "react";
 
-export type GameSlug = "breakout" | "memory" | "snake";
+export type GameSlug = "breakout" | "memory" | "snake" | "knitzy" | "bubble-pop" | "checkers" | "chess";
 
 export type GameEntry = {
     slug: GameSlug;
@@ -67,6 +67,56 @@ export const games: GameManifest = {
         backgroundImage: undefined,
         preloadAssets: [],
         getComponent: () => import("@games/snake").then((m) => m.SnakeGame),
+    },
+    "knitzy": {
+        slug: "knitzy",
+        title: "Knitzy",
+        shortDescription: "Relaxing stitch puzzler — knit patterns and score combos.",
+        tags: ["Puzzle", "Casual", "Mobile"],
+        image: "/images/bg-pastel-pattern.jpg",
+        enabled: true,
+        backgroundImage: "/images/bg-pastel-pattern.jpg",
+        preloadAssets: [
+            {key: "click", url: "/sounds/click.mp3"},
+            {key: "background", url: "/sounds/memory-bg.mp3", loop: true},
+        ],
+        getComponent: () => import("@games/knitzy").then((m) => m.KnitzyGame),
+    },
+    "bubble-pop": {
+        slug: "bubble-pop",
+        title: "Bubble Pop",
+        shortDescription: "Aim, match and pop bubbles before the board fills!",
+        tags: ["Arcade", "Match-3", "Casual"],
+        image: "/images/bg-abstract-dark.jpg",
+        enabled: true,
+        backgroundImage: "/images/bg-abstract-dark.jpg",
+        preloadAssets: [
+            {key: "pop", url: "/sounds/brick-hit.mp3"},
+            {key: "background", url: "/sounds/breakout-bg.mp3", loop: true},
+        ],
+        getComponent: () => import("@games/bubble-pop").then((m) => m.BubblePopGame),
+    },
+    "checkers": {
+        slug: "checkers",
+        title: "Checkers",
+        shortDescription: "Classic draughts on an 8×8 board — local two player.",
+        tags: ["Board", "Local 2P", "Strategy"],
+        image: "/images/bg-abstract-dark.jpg",
+        enabled: true,
+        backgroundImage: "/images/bg-abstract-dark.jpg",
+        preloadAssets: [],
+        getComponent: () => import("@games/checkers").then((m) => m.CheckersGame),
+    },
+    "chess": {
+        slug: "chess",
+        title: "Chess",
+        shortDescription: "Open‑source chessboard — local two player (MVP).",
+        tags: ["Board", "Local 2P", "Strategy"],
+        image: "/images/bg-abstract-dark.jpg",
+        enabled: true,
+        backgroundImage: "/images/bg-abstract-dark.jpg",
+        preloadAssets: [],
+        getComponent: () => import("@games/chess").then((m) => m.ChessGame),
     },
 };
 

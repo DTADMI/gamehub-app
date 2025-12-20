@@ -897,6 +897,20 @@ Current integration
 - Implemented: catalog page `app/games/page.tsx` now renders from the manifest (mapped to the existing `GamesList`
   component) so new games only need a manifest entry.
 
+New MVP routes available
+
+- Knitzy: `/games/knitzy` — stitch grid MVP (tap to stitch, score increments)
+- Bubble Pop: `/games/bubble-pop` — bubble pop MVP (tap to pop, score increments)
+- Checkers: `/games/checkers` — local 2‑player board MVP (rules WIP)
+- Chess: `/games/chess` — local 2‑player board MVP (rules WIP)
+
+Run locally:
+
+```
+pnpm dev
+# Then open the routes listed above
+```
+
 Testing
 
 - Playwright checks: navigation loads the dynamic chunk; disabled/upcoming states are respected; flags updated in Admin
