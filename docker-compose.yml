@@ -24,7 +24,9 @@ services:
       - db
     environment:
       # Spring Boot / App env
-      SPRING_PROFILES_ACTIVE: dev
+      SPRING_PROFILES_ACTIVE: local
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
       PORT: 8080
       # Datasource (adjust as needed; aligns with README guidelines)
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/gamehub

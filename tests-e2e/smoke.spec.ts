@@ -2,7 +2,7 @@
 import {expect, test} from "@playwright/test";
 
 test.describe("home routes", () => {
-    test("home page renders", async ({page}) => {
+  test("home page renders", async ({page}) => {
     await page.goto("/");
 
     // Check for error first
