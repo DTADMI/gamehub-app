@@ -344,6 +344,7 @@ export const MemoryGame: React.FC = () => {
               removedIds.has(card.id) ? null : (
                   <div
                       key={card.id}
+                      data-testid="memory-card"
                       onClick={() => handleCardClick(index)}
                       className={`
                 aspect-square rounded-xl cursor-pointer transition-transform duration-200

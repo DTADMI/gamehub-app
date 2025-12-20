@@ -4,7 +4,7 @@
 import {soundManager} from "@games/shared";
 import React, {useCallback, useEffect, useMemo, useRef, useState,} from "react";
 
-import {Board, Color, GameState, Move, Piece, PieceType, Pos, SIZE, Square,} from "../logic/types";
+import {Board, Color, GameState, Move, Piece, PieceType, Pos, SIZE, Square,} from "@games/chess";
 
 function inBounds(r: number, c: number) {
   return r >= 0 && r < SIZE && c >= 0 && c < SIZE;
@@ -465,7 +465,7 @@ export const ChessGame: React.FC = () => {
       return false;
     }
     return isSquareAttacked(state.board, k, state.turn === "w" ? "b" : "w");
-  }, [state]);
+  }, [state.board, state.turn]);
 
   const hasAnyMove = useMemo(() => {
     for (let r = 0; r < SIZE; r++) {
@@ -479,7 +479,7 @@ export const ChessGame: React.FC = () => {
       }
     }
     return false;
-  }, [state]);
+  }, [state, state.turn]);
 
   const gameOver = useMemo(() => !hasAnyMove, [hasAnyMove]);
   const mate = gameOver && inCheck;
@@ -544,7 +544,7 @@ export const ChessGame: React.FC = () => {
         soundManager.playSound("invalid", 0.6);
       }
     },
-    [state, selected, legal, promotion, mate, gameOver],
+      [state, selected, legal, promotion, gameOver],
   );
 
   const confirmPromotion = (t: PieceType) => {

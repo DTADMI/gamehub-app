@@ -148,6 +148,16 @@ We include Playwright in devDependencies and a smoke test suite that:
 - Asserts a container with `role="application"` renders.
 - Verifies pressing Space doesn’t scroll the page (thanks to the shared key‑capture helper).
 
+Featured playable games (MVP)
+
+- Breakout
+- Memory
+- Snake
+- Knitzy
+- Bubble Pop
+- Checkers
+- Chess
+
 Run e2e tests:
 
 ```
@@ -714,7 +724,7 @@ bun run build
 bun run test
 ```
 
-## Brand color palette (GameHub)
+## Brand color palette and themes (GameHub)
 
 Order of importance and usage mapping (light and dark supported via CSS variables in `frontend/app/globals.css` and
 Tailwind `theme.extend.colors`):
@@ -726,6 +736,37 @@ Tailwind `theme.extend.colors`):
 - Neutrals — Black, Dark Grey, White: foreground/background and borders.
 
 These tokens are wired to shadcn/ui semantic colors (`bg-primary`, `text-primary`, `bg-accent`, etc.) for consistency.
+
+### Light/Dark themes — backgrounds and rationale
+
+- Light theme: a warm star‑glow background. We render a subtle radial glow (golden/royal‑orange) over a bright surface
+  to evoke “illuminated by a star” while preserving contrast for text and controls. Alternatives (cool glow or minimal
+  flat with vignette) are documented as commented variants in `app/globals.css`.
+- Dark theme: a CSS‑only galaxy background. Layered radial gradients create distant nebulae; two repeating radial layers
+  add sparse tiny stars; a deep space gradient forms the base. There are no image assets; everything is vector/gradient
+  for performance and simplicity.
+
+Where to change tokens/backgrounds:
+
+- Edit `app/globals.css`:
+  - Palette variables (order requested): `--c-purple`, `--c-auburn`, `--c-royal-blue`, `--c-emerald`,
+    `--c-royal-orange`, `--c-indigo`, `--c-royal-green`, `--c-pink`, `--c-red`, `--c-salmon`, `--c-black`, `--c-white`,
+    `--c-grey-*`.
+  - Semantic mappings: `--background`, `--foreground`, `--card`, `--primary`, `--accent`, `--muted`, `--border`,
+    `--ring`, etc. in `:root` (light) and `.dark` (dark).
+  - Background layers via `--app-bg` (light star‑glow vs dark galaxy). The `body` uses `background-image: var(--app-bg)`
+    so the effect applies globally.
+
+Accessibility and contrast:
+
+- Body text meets ≥ 4.5:1 contrast in both themes; large headings and UI chrome target ≥ 3:1. Panels use `bg-card` with
+  subtle translucency and `backdrop-blur` to float over the rich backgrounds without harming readability.
+
+Game cards (catalog) are fully clickable:
+
+- The entire card links to `/games/[slug]` while the Play button remains as an explicit CTA. Keyboard users can focus
+  the card (visible ring) and press Enter/Space; middle‑click/open‑in‑new‑tab works natively. See
+  `components/game-card.tsx`.
 
 ## Next steps: UX and multiplayer enhancements
 
@@ -816,10 +857,16 @@ On a push to `main`, the workflow will build, push, and deploy. The frontend ste
 - Unit/Integration: React Testing Library (RTL)
 - E2E: Playwright
 
-Relevant e2e specs (run with `bun run test:e2e` or `pnpm test:e2e` in `frontend/`):
+Relevant e2e specs (run with `pnpm test:e2e` at repo root):
 
-- `tests-e2e/access-control.spec.ts` — verifies that `/` and `/projects` are public and that a private route (e.g.,
-  `/dashboard`) redirects to `/login?redirect=...` via Edge Middleware.
+- `tests-e2e/smoke.spec.ts` — home route smoke
+- `tests-e2e/breakout.spec.ts` — Breakout paddle/pause smokes
+- `tests-e2e/memory.spec.ts` — Memory flip two cards, moves increments
+- `tests-e2e/snake.spec.ts` — Snake canvas visible and HUD shows Score after simple input
+- `tests-e2e/knitzy.spec.ts` — Knitzy canvas painting updates progress
+- `tests-e2e/bubble-pop.spec.ts` — Bubble Pop popping increases score text
+- `tests-e2e/checkers.spec.ts` — Checkers board renders
+- `tests-e2e/chess.spec.ts` — Chess board renders
 
 # Admin Dashboard (frontend-only) and Feature Flags
 

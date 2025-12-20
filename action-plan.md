@@ -18,6 +18,7 @@ designed to be backend-agnostic, communicating with a separate API service.
 - [x] Set up deployment to Google Cloud Run
 - [x] Added Breakout game with boosters and particles
 - [x] Added Memory game
+- [x] All 7 MVP games playable and featured (Breakout, Memory, Snake, Knitzy, Bubble Pop, Checkers, Chess)
 
 ## In Progress
 
@@ -32,29 +33,13 @@ designed to be backend-agnostic, communicating with a separate API service.
 - [ ] Implement leaderboard functionality
 - [ ] Implement game settings and preferences
 
-### New Priority Track — Playable MVPs (ordered)
+### MVP Playables Track (completed)
 
-- [x] Knitzy — playable MVP
-  - [x] Scaffold game module under `games/knitzy` and add manifest entry (slug `knitzy`)
-  - [x] Core loop: board/grid, stitch interaction, scoring, game over/reset
-  - [x] Mobile UX: tap/drag controls; non‑blocking overlays
-  - [x] Sounds/backgrounds wired via `public/` assets
-  - [x] Page route `/games/knitzy` loads via launcher; basic E2E: canvas visible, start/pause, simple scoring increments
-- [x] Bubble Pop — playable MVP
-  - [x] Scaffold `games/bubble-pop` and manifest entry (slug `bubble-pop`)
-  - [x] Core mechanics: aim/launch, match‑3 pops, next bubble preview, game over
-  - [x] Mobile aim/drag, sound effects, lightweight particles (optional)
-  - [x] E2E: start game, pop reduces remaining count/score increases
-- [x] Checkers — playable MVP
-  - [x] Scaffold `games/checkers` and manifest entry (slug `checkers`)
-  - [x] Rules: legal moves, captures (including multiple), turn system, win detection
-  - [x] Local 2‑player (same device) + simple AI (optional follow‑up)
-  - [x] E2E: board renders, legal move executes, capture reduces piece count
-- [x] Chess — playable MVP
-  - [x] Scaffold `games/chess` and manifest entry (slug `chess`)
-  - [x] Rules: legal moves, check/checkmate/stalemate, basic move validation
-  - [x] Local 2‑player; PGN export/import (optional)
-  - [x] E2E: board renders, legal move executes, checkmate detection smoke test
+- All four newly added playables are complete with E2E smokes:
+  - Knitzy
+  - Bubble Pop
+  - Checkers
+  - Chess
 
 ## Planned Features
 
@@ -68,14 +53,13 @@ designed to be backend-agnostic, communicating with a separate API service.
 
 ### Games
 
-- [x] Add Snake game
 - [ ] Add Tetris
 - [ ] Add Sudoku
-- [ ] Add Chess (MVP in progress track)
-- [ ] Add Tic-tac-toe
-- [ ] Add Knitzy (MVP in progress track)
-- [ ] Add Bubble Pop (MVP in progress track)
-- [ ] Add Checkers (MVP in progress track)
+- [ ] Add Tic‑tac‑toe
+
+Shipped (already available via manifest and listed under Completed):
+
+- Breakout, Memory, Snake, Knitzy, Bubble Pop, Checkers, Chess
 
 ### Technical Improvements
 
@@ -108,6 +92,10 @@ designed to be backend-agnostic, communicating with a separate API service.
 - 2025-12-19: Implemented manifest‑driven launcher Phase 1 (manifest + `[slug]` route + catalog wired)
 - 2025-12-19: Prioritized new playable MVPs (in order): Knitzy, Bubble Pop, Checkers, Chess. Added detailed tasks to In
   Progress.
+- 2025-12-20: Finalized all 7 MVP games as playable and featured in catalog; added E2E smokes for each game and updated
+  docs
+- 2025-12-20: Theming overhaul — galaxy dark theme and star‑glow light theme via CSS variables in `app/globals.css`;
+  game cards are now fully clickable (entire card links to the game) with preserved Play CTA and accessibility.
 - 2025-12-18: Initial action plan created
 - 2025-12-18: Added Breakout and Memory games
 - 2025-12-18: Added Quest Hunt to Coming Soon projects

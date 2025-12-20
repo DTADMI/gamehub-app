@@ -360,6 +360,7 @@ export const BubblePopGame: React.FC = () => {
         ref={canvasRef}
         width={COLS * CELL}
         height={ROWS * CELL}
+        data-testid="bubblepop-canvas"
         role="img"
         aria-label={`Bubble Pop board, score ${score}, best ${best}`}
         className="rounded-lg shadow-lg border border-gray-700"

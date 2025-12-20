@@ -4,76 +4,122 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Updated color tokens to match the emerald-focused design brief */
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.35 0 0);
-  --card: oklch(0.98 0 0);
-  --card-foreground: oklch(0.35 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.35 0 0);
-  --primary: oklch(0.45 0.15 160);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.55 0.12 160);
-  --secondary-foreground: oklch(1 0 0);
-  --muted: oklch(0.98 0 0);
-  --muted-foreground: oklch(0.55 0 0);
-  --accent: oklch(0.55 0.12 160);
-  --accent-foreground: oklch(1 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.92 0 0);
-  --input: oklch(1 0 0);
-  --ring: oklch(0.45 0.15 160 / 0.5);
-  --chart-1: oklch(0.45 0.15 160);
-  --chart-2: oklch(0.55 0.12 160);
-  --chart-3: oklch(0.4 0 0);
-  --chart-4: oklch(0.98 0 0);
-  --chart-5: oklch(0.96 0.02 180);
+  /*
+   Palette base hues (light theme defaults)
+   Order requested: purple, auburn, royal blue, emerald, royal orange, indigo, royal green, pink, red, salmon, black, white, grey
+   Values use OKLCH for consistent contrast across themes.
+  */
+  --c-purple: oklch(0.60 0.20 310);
+  --c-auburn: oklch(0.62 0.18 30); /* primary on light */
+  --c-royal-blue: oklch(0.62 0.17 265); /* accent on light */
+  --c-emerald: oklch(0.68 0.13 155);
+  --c-royal-orange: oklch(0.78 0.18 55);
+  --c-indigo: oklch(0.54 0.17 282);
+  --c-royal-green: oklch(0.70 0.10 140);
+  --c-pink: oklch(0.78 0.20 345);
+  --c-red: oklch(0.64 0.22 25);
+  --c-salmon: oklch(0.78 0.14 25);
+  --c-black: oklch(0.12 0 0);
+  --c-white: oklch(0.99 0 0);
+  --c-grey-100: oklch(0.97 0 0);
+  --c-grey-200: oklch(0.92 0 0);
+  --c-grey-300: oklch(0.86 0 0);
+  --c-grey-600: oklch(0.45 0 0);
+  --c-grey-800: oklch(0.25 0 0);
+
+  /* Semantic tokens (light) */
+  --background: var(--c-white);
+  --foreground: oklch(0.20 0 0);
+  --card: oklch(0.99 0 0);
+  --card-foreground: oklch(0.20 0 0);
+  --popover: var(--c-white);
+  --popover-foreground: oklch(0.20 0 0);
+  --primary: var(--c-auburn);
+  --primary-foreground: var(--c-white);
+  --secondary: var(--c-purple);
+  --secondary-foreground: var(--c-white);
+  --muted: var(--c-grey-100);
+  --muted-foreground: oklch(0.40 0 0);
+  --accent: var(--c-royal-blue);
+  --accent-foreground: var(--c-white);
+  --destructive: var(--c-red);
+  --destructive-foreground: var(--c-white);
+  --border: var(--c-grey-200);
+  --input: var(--c-white);
+  --ring: color-mix(in oklch, var(--c-royal-blue) 50%, transparent);
+  --chart-1: var(--c-emerald);
+  --chart-2: var(--c-royal-blue);
+  --chart-3: var(--c-indigo);
+  --chart-4: var(--c-royal-orange);
+  --chart-5: var(--c-pink);
   --radius: 0.5rem;
-  --sidebar: oklch(0.99 0 0);
-  --sidebar-foreground: oklch(0.35 0 0);
-  --sidebar-primary: oklch(1 0 0);
-  --sidebar-primary-foreground: oklch(0.35 0 0);
-  --sidebar-accent: oklch(0.55 0.12 160);
-  --sidebar-accent-foreground: oklch(1 0 0);
-  --sidebar-border: oklch(0.92 0 0);
-  --sidebar-ring: oklch(0.45 0.15 160 / 0.5);
+  --sidebar: var(--c-white);
+  --sidebar-foreground: oklch(0.20 0 0);
+  --sidebar-primary: var(--c-auburn);
+  --sidebar-primary-foreground: var(--c-white);
+  --sidebar-accent: var(--c-royal-blue);
+  --sidebar-accent-foreground: var(--c-white);
+  --sidebar-border: var(--c-grey-200);
+  --sidebar-ring: color-mix(in oklch, var(--c-auburn) 50%, transparent);
+
+  /* Light theme background — star glow (warm) */
+  --app-bg: radial-gradient(1200px 800px at 85% 10%, oklch(0.98 0.02 85) 0%, transparent 60%),
+  radial-gradient(800px 600px at 10% 20%, color-mix(in oklch, var(--c-royal-orange) 10%, transparent) 0%, transparent 70%),
+  linear-gradient(180deg, oklch(0.99 0 0) 0%, oklch(0.98 0 0) 100%);
 }
 
 .dark {
-  /* Updated dark mode tokens to maintain emerald theme with proper contrast */
-  --background: oklch(0.08 0 0);
-  --foreground: oklch(0.95 0 0);
-  --card: oklch(0.12 0 0);
-  --card-foreground: oklch(0.95 0 0);
-  --popover: oklch(0.08 0 0);
-  --popover-foreground: oklch(0.95 0 0);
-  --primary: oklch(0.55 0.12 160);
-  --primary-foreground: oklch(0.08 0 0);
-  --secondary: oklch(0.2 0 0);
-  --secondary-foreground: oklch(0.95 0 0);
-  --muted: oklch(0.2 0 0);
-  --muted-foreground: oklch(0.65 0 0);
-  --accent: oklch(0.55 0.12 160);
-  --accent-foreground: oklch(0.08 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.95 0 0);
-  --border: oklch(0.2 0 0);
-  --input: oklch(0.2 0 0);
-  --ring: oklch(0.55 0.12 160 / 0.5);
-  --chart-1: oklch(0.55 0.12 160);
-  --chart-2: oklch(0.65 0.1 160);
-  --chart-3: oklch(0.6 0 0);
-  --chart-4: oklch(0.2 0 0);
-  --chart-5: oklch(0.25 0.02 180);
-  --sidebar: oklch(0.12 0 0);
-  --sidebar-foreground: oklch(0.95 0 0);
-  --sidebar-primary: oklch(0.55 0.12 160);
-  --sidebar-primary-foreground: oklch(0.08 0 0);
-  --sidebar-accent: oklch(0.2 0 0);
-  --sidebar-accent-foreground: oklch(0.95 0 0);
-  --sidebar-border: oklch(0.2 0 0);
-  --sidebar-ring: oklch(0.55 0.12 160 / 0.5);
+  /* Dark theme mappings — galaxy space */
+  --background: oklch(0.10 0 0);
+  --foreground: oklch(0.96 0 0);
+  --card: oklch(0.14 0 0);
+  --card-foreground: var(--foreground);
+  --popover: oklch(0.12 0 0);
+  --popover-foreground: var(--foreground);
+  /* On dark, primary leans royal blue for clarity; accent uses indigo/purple */
+  --primary: var(--c-royal-blue);
+  --primary-foreground: oklch(0.16 0 0);
+  --secondary: color-mix(in oklch, var(--c-indigo) 70%, var(--c-purple) 30%);
+  --secondary-foreground: var(--foreground);
+  --muted: oklch(0.20 0 0);
+  --muted-foreground: oklch(0.75 0 0);
+  --accent: var(--c-indigo);
+  --accent-foreground: var(--foreground);
+  --destructive: var(--c-red);
+  --destructive-foreground: var(--foreground);
+  --border: oklch(0.22 0 0);
+  --input: oklch(0.18 0 0);
+  --ring: color-mix(in oklch, var(--c-royal-blue) 45%, transparent);
+  --chart-1: var(--c-emerald);
+  --chart-2: var(--c-royal-blue);
+  --chart-3: var(--c-indigo);
+  --chart-4: var(--c-royal-orange);
+  --chart-5: var(--c-pink);
+  --sidebar: oklch(0.14 0 0);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--c-royal-blue);
+  --sidebar-primary-foreground: oklch(0.16 0 0);
+  --sidebar-accent: var(--c-indigo);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: oklch(0.22 0 0);
+  --sidebar-ring: color-mix(in oklch, var(--c-indigo) 45%, transparent);
+
+  /* Dark theme background — CSS‑only galaxy (stars, nebula, deep space) */
+  /* STARFIELD + NEBULA layers — tuned to be subtle and performant */
+  --app-bg: /* distant nebula blobs */ radial-gradient(1200px 800px at 15% 20%, color-mix(in oklch, var(--c-indigo) 22%, transparent) 0%, transparent 70%),
+  radial-gradient(1000px 900px at 80% 10%, color-mix(in oklch, var(--c-royal-blue) 18%, transparent) 0%, transparent 65%),
+  radial-gradient(800px 700px at 75% 70%, color-mix(in oklch, var(--c-purple) 16%, transparent) 0%, transparent 70%),
+    /* tiny stars via repeating radial gradients */ repeating-radial-gradient(
+          circle at 20% 30%,
+          color-mix(in oklch, var(--c-white) 35%, transparent) 0 0.6px,
+          transparent 0.6px 2.2px
+  ),
+  repeating-radial-gradient(
+          circle at 75% 25%,
+          color-mix(in oklch, var(--c-white) 25%, transparent) 0 0.5px,
+          transparent 0.5px 2.0px
+  ),
+    /* base deep space */ linear-gradient(180deg, oklch(0.12 0.02 270) 0%, oklch(0.10 0 0) 60%, oklch(0.08 0 0) 100%);
 }
 
 @theme inline {
@@ -126,5 +172,25 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Apply galaxy/star‑glow background image via CSS variables */
+    background-image: var(--app-bg);
+    background-size: cover, cover, cover, auto, auto, cover;
+    background-repeat: no-repeat, no-repeat, no-repeat, repeat, repeat, no-repeat;
+    /* On mobile, avoid fixed backgrounds for perf; desktop can handle it */
+    background-attachment: scroll;
   }
 }
+
+/* Optional: slightly translucent panels over rich backgrounds */
+.surface {
+  background-color: color-mix(in oklch, var(--card) 92%, transparent);
+  backdrop-filter: saturate(1.1) blur(4px);
+}
+
+/* Light theme alternatives (commented) — switch by overriding --app-bg in :root if desired */
+/*
+:root { --app-bg: radial-gradient(1000px 700px at 80% 0%, oklch(0.99 0 0) 0%, transparent 60%), linear-gradient(180deg, oklch(0.995 0 0) 0%, oklch(0.985 0 0) 100%); }
+  Pros: maximum readability, neutral. Cons: less character.
+:root { --app-bg: radial-gradient(1200px 900px at 85% 10%, color-mix(in oklch, var(--c-royal-blue) 10%, transparent) 0%, transparent 60%), linear-gradient(180deg, oklch(0.995 0 0) 0%, oklch(0.985 0 0) 100%); }
+  Pros: cooler palette, high contrast. Cons: colder feel.
+*/

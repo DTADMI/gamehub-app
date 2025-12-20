@@ -1032,6 +1032,7 @@ export const SnakeGame: React.FC = () => {
             ref={canvasRef}
             width={config.gridSize * CELL_SIZE}
             height={config.gridSize * CELL_SIZE}
+            data-testid="snake-canvas"
             className="bg-white rounded-lg shadow-md block"
             aria-label="Snake playfield"
             tabIndex={0}

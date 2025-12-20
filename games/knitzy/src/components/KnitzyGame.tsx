@@ -258,6 +258,7 @@ export const KnitzyGame: React.FC = () => {
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
         onMouseLeave={onMouseLeave}
+        data-testid="knitzy-canvas"
         className="rounded-lg shadow-lg border border-gray-700"
         width={SIZE * CELL * 2 + 60}
         height={SIZE * CELL + 120}
