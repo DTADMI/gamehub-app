@@ -19,9 +19,13 @@ designed to be backend-agnostic, communicating with a separate API service.
 - [x] Added Breakout game with boosters and particles
 - [x] Added Memory game
 - [x] All 7 MVP games playable and featured (Breakout, Memory, Snake, Knitzy, Bubble Pop, Checkers, Chess)
+- [x] Background re‑looking — galaxy (dark) and star‑glow (light) backgrounds implemented with fallbacks for browsers
+  without OKLCH/color-mix support
 
 ## In Progress
 
+- [ ] Backgrounds — visibility fix and verification (galaxy dark, star‑glow light); ensure `--app-bg` applied on all
+  pages (awaiting confirmation)
 - [ ] Game Launcher — Phase 2: flags‑driven gating via frontend‑only flags provider (localStorage) with unit/E2E checks
 - [ ] Breakout particles reliability — ensure normal brick‑hit emissions and live effect switching; hide particle
   controls in non‑particle games
@@ -56,6 +60,8 @@ designed to be backend-agnostic, communicating with a separate API service.
 - [ ] Add Tetris
 - [ ] Add Sudoku
 - [ ] Add Tic‑tac‑toe
+- [ ] Breakout — Ball color change after first brick hit (not on paddle) to allow pre‑planning next angle (documentation
+  added; implementation scheduled)
 
 Shipped (already available via manifest and listed under Completed):
 
@@ -78,6 +84,11 @@ Shipped (already available via manifest and listed under Completed):
 - [ ] Set up A/B testing framework
 - [ ] Implement automated backup strategy
 
+### Monetization & Ads
+
+- [ ] Advertisement band (right side) visible only for non‑subscribed users — design and gating rules; avoid impacting
+  gameplay viewports (planned)
+
 ## Notes
 
 - Backend API is expected to be running on port 8080 locally
@@ -94,8 +105,15 @@ Shipped (already available via manifest and listed under Completed):
   Progress.
 - 2025-12-20: Finalized all 7 MVP games as playable and featured in catalog; added E2E smokes for each game and updated
   docs
-- 2025-12-20: Theming overhaul — galaxy dark theme and star‑glow light theme via CSS variables in `app/globals.css`;
-  game cards are now fully clickable (entire card links to the game) with preserved Play CTA and accessibility.
+- 2025-12-20: Theming overhaul — galaxy dark + star‑glow light via CSS variables in `app/globals.css`; palette tokens
+  defined in requested order and mapped to shadcn semantic tokens for both themes; `--app-bg` drives backgrounds with
+  documented light alternatives (cool/minimal). Playwright smoke asserts `body` background-image contains `gradient` in
+  both themes. Game cards are fully clickable with preserved accessibility.
+- 2025-12-20: Fixed background visibility regression (`:root`), added broad browser FALLBACKs (no oklch/color-mix) so
+  backgrounds render everywhere; smoke test validates gradients in both themes. Added plan items: Breakout ball‑color
+  change (doc now), advertisement band for non‑subscribers.
+- 2025-12-20: Follow-up fix — corrected `:root` selector (typo recovery), re‑asserted
+  `body{background-image:var(--app-bg)}`; added explicit verification task under In Progress and awaiting confirmation.
 - 2025-12-18: Initial action plan created
 - 2025-12-18: Added Breakout and Memory games
 - 2025-12-18: Added Quest Hunt to Coming Soon projects

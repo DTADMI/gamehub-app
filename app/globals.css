@@ -62,10 +62,10 @@
   --sidebar-border: var(--c-grey-200);
   --sidebar-ring: color-mix(in oklch, var(--c-auburn) 50%, transparent);
 
-  /* Light theme background — star glow (warm) */
-  --app-bg: radial-gradient(1200px 800px at 85% 10%, oklch(0.98 0.02 85) 0%, transparent 60%),
-  radial-gradient(800px 600px at 10% 20%, color-mix(in oklch, var(--c-royal-orange) 10%, transparent) 0%, transparent 70%),
-  linear-gradient(180deg, oklch(0.99 0 0) 0%, oklch(0.98 0 0) 100%);
+  /* Light theme background — FALLBACK (broad browser support: no oklch/color-mix) */
+  --app-bg: radial-gradient(1000px 700px at 80% 8%, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 60%),
+  radial-gradient(700px 500px at 12% 22%, rgba(255, 179, 71, 0.08) 0%, rgba(255, 179, 71, 0) 70%),
+  linear-gradient(180deg, #ffffff 0%, #fbfbfb 100%);
 }
 
 .dark {
@@ -104,22 +104,33 @@
   --sidebar-border: oklch(0.22 0 0);
   --sidebar-ring: color-mix(in oklch, var(--c-indigo) 45%, transparent);
 
-  /* Dark theme background — CSS‑only galaxy (stars, nebula, deep space) */
-  /* STARFIELD + NEBULA layers — tuned to be subtle and performant */
-  --app-bg: /* distant nebula blobs */ radial-gradient(1200px 800px at 15% 20%, color-mix(in oklch, var(--c-indigo) 22%, transparent) 0%, transparent 70%),
-  radial-gradient(1000px 900px at 80% 10%, color-mix(in oklch, var(--c-royal-blue) 18%, transparent) 0%, transparent 65%),
-  radial-gradient(800px 700px at 75% 70%, color-mix(in oklch, var(--c-purple) 16%, transparent) 0%, transparent 70%),
-    /* tiny stars via repeating radial gradients */ repeating-radial-gradient(
-          circle at 20% 30%,
-          color-mix(in oklch, var(--c-white) 35%, transparent) 0 0.6px,
-          transparent 0.6px 2.2px
-  ),
-  repeating-radial-gradient(
-          circle at 75% 25%,
-          color-mix(in oklch, var(--c-white) 25%, transparent) 0 0.5px,
-          transparent 0.5px 2.0px
-  ),
-    /* base deep space */ linear-gradient(180deg, oklch(0.12 0.02 270) 0%, oklch(0.10 0 0) 60%, oklch(0.08 0 0) 100%);
+  /* Dark theme background — FALLBACK galaxy (no oklch/color-mix) */
+  --app-bg: radial-gradient(1000px 700px at 18% 22%, rgba(99, 102, 241, 0.18) 0%, rgba(99, 102, 241, 0) 70%),
+  radial-gradient(900px 650px at 82% 12%, rgba(59, 130, 246, 0.16) 0%, rgba(59, 130, 246, 0) 65%),
+  radial-gradient(800px 600px at 78% 72%, rgba(147, 51, 234, 0.14) 0%, rgba(147, 51, 234, 0) 70%),
+  repeating-radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.35) 0 0.6px, rgba(0, 0, 0, 0) 0.6px 2.2px),
+  repeating-radial-gradient(circle at 75% 25%, rgba(255, 255, 255, 0.25) 0 0.5px, rgba(0, 0, 0, 0) 0.5px 2px),
+  linear-gradient(180deg, #141726 0%, #101218 60%, #0b0d12 100%);
+}
+
+/* Prefer advanced color spaces when supported */
+@supports (color: oklch(0.7 0.1 200)) {
+  :root {
+    /* Light theme background — star glow (warm) with oklch/color-mix */
+    --app-bg: radial-gradient(1200px 800px at 85% 10%, oklch(0.98 0.02 85) 0%, transparent 60%),
+    radial-gradient(800px 600px at 10% 20%, color-mix(in oklch, var(--c-royal-orange) 10%, transparent) 0%, transparent 70%),
+    linear-gradient(180deg, oklch(0.99 0 0) 0%, oklch(0.98 0 0) 100%);
+  }
+
+  .dark {
+    /* Dark theme background — CSS‑only galaxy (stars, nebula, deep space) */
+    --app-bg: radial-gradient(1200px 800px at 15% 20%, color-mix(in oklch, var(--c-indigo) 22%, transparent) 0%, transparent 70%),
+    radial-gradient(1000px 900px at 80% 10%, color-mix(in oklch, var(--c-royal-blue) 18%, transparent) 0%, transparent 65%),
+    radial-gradient(800px 700px at 75% 70%, color-mix(in oklch, var(--c-purple) 16%, transparent) 0%, transparent 70%),
+    repeating-radial-gradient(circle at 20% 30%, color-mix(in oklch, var(--c-white) 35%, transparent) 0 0.6px, transparent 0.6px 2.2px),
+    repeating-radial-gradient(circle at 75% 25%, color-mix(in oklch, var(--c-white) 25%, transparent) 0 0.5px, transparent 0.5px 2.0px),
+    linear-gradient(180deg, oklch(0.12 0.02 270) 0%, oklch(0.10 0 0) 60%, oklch(0.08 0 0) 100%);
+  }
 }
 
 @theme inline {
@@ -174,10 +185,12 @@
     @apply bg-background text-foreground;
     /* Apply galaxy/star‑glow background image via CSS variables */
     background-image: var(--app-bg);
+    /* Size/repeat values match the maximum layer count used in dark mode; extra values are ignored in light */
     background-size: cover, cover, cover, auto, auto, cover;
     background-repeat: no-repeat, no-repeat, no-repeat, repeat, repeat, no-repeat;
     /* On mobile, avoid fixed backgrounds for perf; desktop can handle it */
     background-attachment: scroll;
+    min-height: 100dvh;
   }
 }
 

@@ -25,5 +25,14 @@ test.describe("home routes", () => {
       timeout: 30000,
       ignoreCase: true,
     });
+
+    // Background should be driven by CSS gradients via --app-bg
+    const bgImageLight = await page.locator('body').evaluate((el) => getComputedStyle(el).backgroundImage);
+    expect(bgImageLight).toMatch(/gradient/);
+
+    // Toggle dark theme by adding the .dark class and verify galaxy background also uses gradients
+    await page.evaluate(() => document.documentElement.classList.add('dark'));
+    const bgImageDark = await page.locator('body').evaluate((el) => getComputedStyle(el).backgroundImage);
+    expect(bgImageDark).toMatch(/gradient/);
   });
 });

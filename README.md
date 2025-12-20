@@ -1049,6 +1049,57 @@ Testing notes (Breakout):
   - Boost button decrements the HUD rocket counter.
 - Unit tests cover settings persistence and UI gating for particles and modes.
 
+12. Theme & Design Tokens (light/dark, backgrounds)
+
+Theming in GameHub is driven by CSS variables defined in `app/globals.css`. shadcn/ui components consume semantic tokens
+so the palette cascades consistently across buttons, badges, inputs, and cards.
+
+Palette — single source of truth (order)
+
+Defined under `:root` as OKLCH values for perceptual consistency:
+
+- `--c-purple`, `--c-auburn`, `--c-royal-blue`, `--c-emerald`, `--c-royal-orange`, `--c-indigo`, `--c-royal-green`,
+  `--c-pink`, `--c-red`, `--c-salmon`, `--c-black`, `--c-white`, `--c-grey-*`.
+
+Semantic token mapping
+
+- Light (`:root`):
+  - `--background`, `--foreground`, `--card`, `--card-foreground`, `--muted`, `--muted-foreground`, `--border`,
+    `--ring`, `--sidebar-*`
+  - `--primary` = auburn, `--accent` = royal blue, `--secondary` = purple
+  - Charts: `--chart-1..5` set from emerald/royal‑blue/indigo/royal‑orange/pink
+- Dark (`.dark`): neutrals are deepened; foregrounds increase contrast
+  - `--primary` = royal blue (for contrast), `--accent` = indigo, `--secondary` mixes indigo/purple
+  - Borders/inputs muted, ring leans royal blue, same chart mapping
+
+Backgrounds — CSS only
+
+- Applied via `--app-bg`, used by `body { background-image: var(--app-bg) }`.
+- Dark (galaxy): layered radial gradients (nebula) + two subtle repeating radial gradients (starfield) + deep space
+  base.
+- Light (star‑glow default): warm radial glow with royal‑orange hint over a bright surface.
+- Alternatives (light):
+  - Cool glow: swap orange hint for royal‑blue for a crisper, cooler look.
+  - Minimal: flat bright base with faint vignette for maximal readability.
+
+How to change tokens / backgrounds
+
+- Edit `app/globals.css`:
+  - Palette: update the `--c-*` variables in `:root` (keep the order).
+  - Semantic mapping: adjust `--primary`, `--accent`, etc. in `:root` and `.dark`.
+  - Backgrounds: overwrite `--app-bg` in `:root` (or `.dark`) — two light alternatives are provided as commented
+    examples at the bottom of the file.
+
+Brand alternative (dark primary)
+
+- If you prefer brand continuity in dark mode, set `.dark { --primary: var(--c-auburn) }`. Pros: brand consistency;
+  Cons: lower perceived contrast on dark surfaces.
+
+Accessibility targets
+
+- Body text aims for ≥ 4.5:1; large headings/UI chrome ≥ 3:1.
+- Focus rings are driven by `--ring` and remain visible in both themes.
+
 ## Upcoming Projects
 
 - Quest Hunt — Mobile-first social geocaching: create, participate in, and share location-based treasure hunts.
