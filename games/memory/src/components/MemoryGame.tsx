@@ -38,8 +38,9 @@ export const MemoryGame: React.FC = () => {
     const [gameStarted, setGameStarted] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-    // Track cards visually hidden after match (keep layout space for continuity)
+    // Track cards visually hidden after match, then removed from layout after animation
     const [hiddenIds, setHiddenIds] = useState<Set<number>>(() => new Set());
+    const [removedIds, setRemovedIds] = useState<Set<number>>(() => new Set());
     // Throttle rapid sound effects on low-end devices
     const lastPlayRef = useRef<Record<string, number>>({});
     const playSound = useCallback((name: string, minIntervalMs = 60) => {
@@ -115,7 +116,7 @@ export const MemoryGame: React.FC = () => {
           ),
         );
           playSound("match", 80);
-          // After a brief spin animation, visually hide matched cards but keep their grid space
+          // After a brief spin animation, visually hide matched cards then remove from layout
           const idsToHide = [firstCard.id, secondCard.id];
           setTimeout(() => {
               setHiddenIds((prev) => {
@@ -123,6 +124,14 @@ export const MemoryGame: React.FC = () => {
                   idsToHide.forEach((id) => next.add(id));
                   return next;
               });
+              // After fade completes, remove from layout
+              setTimeout(() => {
+                  setRemovedIds((prev) => {
+                      const next = new Set(prev);
+                      idsToHide.forEach((id) => next.add(id));
+                      return next;
+                  });
+              }, 250);
           }, 500);
       } else {
         // No match, flip back after delay
@@ -332,6 +341,7 @@ export const MemoryGame: React.FC = () => {
                 </button>
             )}
           {cards.map((card, index) => (
+              removedIds.has(card.id) ? null : (
             <div
               key={card.id}
               onClick={() => handleCardClick(index)}
@@ -362,6 +372,7 @@ export const MemoryGame: React.FC = () => {
                     <span aria-hidden>{getEmojiForValue(card.value)}</span>
               </div>
             </div>
+              )
           ))}
         </div>
 

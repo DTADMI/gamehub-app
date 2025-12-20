@@ -25,7 +25,7 @@ designed to be backend-agnostic, communicating with a separate API service.
 - [ ] Breakout particles reliability — ensure normal brick‑hit emissions and live effect switching; hide particle
   controls in non‑particle games
 - [ ] Snake mobile controllers — Swipe (default), optional Joystick/D‑pad and Taps; non‑blocking scroll; mobile E2E
-- [ ] Memory game UX — matched cards spin+fade then become invisible while preserving grid space; add tests
+- [ ] Memory game UX — matched cards spin+fade then are removed from layout after animation; add tests
 - [ ] Assets & backgrounds — wire initial Kenney SFX and backgrounds; maintain public/credits.md
 - [ ] Documentation — keep README and guidelines updated with Admin/Launcher/Snake controls
 - [ ] Add user profile and game statistics tracking
