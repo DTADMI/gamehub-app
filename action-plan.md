@@ -80,6 +80,13 @@ designed to be backend-agnostic, communicating with a separate API service.
     - [ ] Create package: games/rite-of-discovery with `RiteGame.tsx`, `state.ts`, `scenes/*`, `ui/*`
     - [ ] Add manifest entry (upcoming=false only at ship time)
     - [ ] Route `/games/rite-of-discovery` wired via dynamic import
+  - Designer/Animator Brief (docs)
+    - [x] Write English brief (designer deliverables, formats, sizes, naming, budgets) —
+      docs/rite-of-discovery-designer-brief.md
+    - [x] Add full French mirror (terminology aligned, specs identical)
+    - [ ] Review with designer/animator and collect Q&A
+    - [ ] Episode A asset pack delivery (BGs, props, badge/collectible) per checklist
+    - [ ] Iteration pass after first integration video
   - Systems
     - [ ] Scene controller (registry + onEnter/next)
     - [ ] Hotspot component (ARIA, focus, keyboard, data-testid)
@@ -137,17 +144,17 @@ designed to be backend-agnostic, communicating with a separate API service.
         E2E/RTL green
 
   - Thinking Tools (12+ Extension — Rationality & Biases)
-    - Curriculum & framing
-      - [ ] Define first 6 vignettes (confirmation bias; base‑rate neglect; post hoc fallacy; framing/loss aversion;
-        authority/social proof; availability)
-      - [ ] Debiasing strategies per vignette (steel‑man, base rates, alternative hypotheses, reframing, source
+    - Curriculum & framing (story‑driven, fun, replayable; kindness/morality centered)
+      - [ ] Define first 5 story cases with A/B routes + twist (Anchoring/Framing; Confirmation/Filter Bubble; Gambler’s
+        Fallacy; Post Hoc/Placebo; Authority/Ad Hominem)
+      - [ ] Debiasing strategies per case (steel‑man, base rates, alternative hypotheses, reframing, source
         triangulation, representative sampling)
     - Systems
       - [ ] 12+ confirmation / parental consent gate (where applicable)
       - [ ] Hint system + difficulty tiers (Easy/Normal/Expert)
       - [ ] “Thinking Tools” Codex section + mastery badges
     - Content (first pack)
-      - [ ] Build 6 vignettes with ≥2 branches and one debias action each
+      - [ ] Build 3 cases with ≥2 routes + 1 twist ending each (medals: Bronze/Silver/Gold)
       - [ ] Reflection cards (Codex entries) and mastery badges hooked up
     - Testing & A11y
       - [ ] Playwright: run through 2 branches per vignette; verify debias actions and Codex unlocks
@@ -203,6 +210,9 @@ Shipped (already available via manifest and listed under Completed):
 - 2025-12-21: Post‑MVP roadmap approved for Rite of Discovery (episodes A–D, systems v2, collectibles/journal) and
   designer asset specs appended. Added 12+ “Thinking Tools” extension plan (rationality & biases) with replayable
   vignettes and mastery.
+- 2025-12-21: Added bilingual Designer/Animator Brief (EN/FR) with niceness/morality guardrails, fun & replayable 12+
+  case
+  structures, and full asset specs/checklists. Linked from docs/rite-of-discovery.md.
 - 2025-12-20: Theming overhaul — galaxy dark + star‑glow light via CSS variables in `app/globals.css`; palette tokens
   defined in requested order and mapped to shadcn semantic tokens for both themes; `--app-bg` drives backgrounds with
   documented light alternatives (cool/minimal). Playwright smoke asserts `body` background-image contains `gradient` in

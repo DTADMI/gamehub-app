@@ -109,6 +109,37 @@ magic. The ending frames it as a rite of passage.
 - Local save works; reload resumes the latest scene
 - E2E and key unit tests are green
 
+## Designer/Animator Brief (assets & delivery)
+
+For detailed asset specifications (formats, sizes, naming, budgets, hand‑off checklist), see the dedicated brief:
+
+- docs/rite-of-discovery-designer-brief.md
+
+This brief is the single source of truth for art delivery. It also includes a full French mirror.
+
+## 12+ Extension update — fun, replayable, and kindness‑centered
+
+Framing: a lighthearted “Junior Investigator Club” mini‑arc with short, witty cases that teach thinking tools through
+play, not lectures. Each case has at least two distinct routes plus a twist ending; medals track replay (
+Bronze/Silver/Gold). All scenarios center niceness and morality — players resolve confusion kindly and constructively.
+
+Example cases (hooks → routes → twist):
+
+- The Mystery Coupon (Anchoring + Framing) → (A) assemble receipt shards to reframe total cost; (B) mini‑experiment with
+  sample items → twist epilogue “Price Detective”.
+- The Echo Thread (Confirmation + Filter Bubbles) → (A) cross‑check sources collage; (B) respectful debate mini‑duel (
+  avoid fallacies) → journalist side scene with enough “Media Lenses”.
+- The Coin‑Flip Streak (Gambler’s Fallacy) → (A) simulate flips + histogram; (B) playful zine to defang superstition →
+  co‑op mini‑game unlock.
+- The Miracle Patch (Post Hoc + Placebo) → (A) A/B test with swapped patches; (B) timeline of alternate causes → team
+  montage ending with “Coach’s Clipboard”.
+- The Amazing Poster (Authority + Ad Hominem) → (A) credential stamping; (B) clean arguments of personal jabs → Town
+  Hall celebration if prior cases cleared without fallacies.
+
+Kindness guardrails:
+
+- Respectful humor; no ridicule. Emphasize listening, empathy, and strengthening ideas rather than attacking people.
+
 ---
 
 ## Post‑MVP Roadmap (Episodic + Branching)
