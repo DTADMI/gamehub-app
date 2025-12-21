@@ -125,18 +125,21 @@ Point it to a running backend (port 8080):
 export NEXT_PUBLIC_API_URL=http://localhost:8080/api
 ```
 
-Playable Narrative MVPs (Alpha)
+Playable Narrative Betas
 
-- Three point‑and‑click games have an initial, minimal playable slice wired with a shared scene engine (localStorage
-  saves, keyboard‑accessible hotspots):
+- Three point‑and‑click games are playable using a shared scene engine (localStorage saves, keyboard‑accessible
+  hotspots):
   - Rite of Discovery → http://localhost:3000/games/rite-of-discovery
-  - Systems Discovery → http://localhost:3000/games/systems-discovery
-  - Toymaker Escape → http://localhost:3000/games/toymaker-escape
+  - Systems Discovery (Core pack) → http://localhost:3000/games/systems-discovery
+  - Toymaker Escape (E1) → http://localhost:3000/games/toymaker-escape
 
 Notes:
 
-- These are alpha MVPs: visuals and puzzles are stubbed to simple choices; state persists under `rod:save:v1`,
-  `sysdisc:save:v1`, and `tme:save:v1`.
+- These are Betas: visuals use minimal placeholders; accessibility is implemented (focus/targets, captions region,
+  volume control);
+  state persists under `rod:save:v1`, `sysdisc:save:v1`, and `tme:save:v1`.
+- Toymaker Escape E1 includes an interactive gears mini and a sorter; medals are awarded per route/hints.
+- Systems Discovery Core includes an ordered loop, a route planner with two solutions, and a waste sorter with hints.
 - The GraphQL client targets `${NEXT_PUBLIC_API_URL.replace(/\/api$/, "")}/graphql` if used by a given screen. Ensure
   your backend serves `/api/*` REST and `/graphql` with CORS allowing `http://localhost:3000`.
 

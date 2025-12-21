@@ -99,6 +99,7 @@ export function SceneController({scenes, initial, saveKey}: { scenes: Scene[]; i
     if (!scene) return <div className="p-8">Unknown scene: {state.scene}</div>;
 
     const gentle = Boolean(state.flags["gentle"]);
+    const volume = Number(state.flags["volume"] ?? 100);
 
     return (
         <div className="mx-auto max-w-3xl p-4">
@@ -113,6 +114,22 @@ export function SceneController({scenes, initial, saveKey}: { scenes: Scene[]; i
                         className="h-5 w-5"
                     />
                     <span>Gentle Mode</span>
+                </label>
+            </div>
+            <div className="flex items-center justify-between gap-4 mb-3">
+                <div className="text-sm opacity-80">{/* reserved for breadcrumbs */}</div>
+                <label className="inline-flex items-center gap-2 text-sm">
+                    <span>Volume</span>
+                    <select
+                        aria-label="Volume"
+                        className="border rounded px-2 py-1"
+                        value={volume}
+                        onChange={(e) => setFlag("volume", Number(e.target.value))}
+                    >
+                        <option value={0}>Mute</option>
+                        <option value={50}>50%</option>
+                        <option value={100}>100%</option>
+                    </select>
                 </label>
             </div>
             {/* Inventory placeholder (global), keyboard/focusable items */}
