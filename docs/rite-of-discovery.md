@@ -117,6 +117,114 @@ For detailed asset specifications (formats, sizes, naming, budgets, hand‑off c
 
 This brief is the single source of truth for art delivery. It also includes a full French mirror.
 
+## 15+ Extensions
+
+Two new, optional tracks extend Rite of Discovery for ages 15+ with fun, replayable, kindness‑centered scenarios. Both
+tracks keep the project’s moral guardrails (no endorsement of unkind behavior) and emphasize engaging stories with
+branching paths, collectibles, and a Codex.
+
+### Track A — Mythologies & Pantheons (MythWays)
+
+- Framing: Cultural Field Journal club. You and a small group of friends catalog artifacts, inscriptions, and oral
+  histories with empathy and curiosity. Tone is respectful, witty, and humble.
+- Design goal: Reveal similarities/differences across pantheons and how environment, geography, trade, and history shape
+  deity roles (river/nile cycles, sea‑ice pragmatism, syncretism under empire, etc.).
+
+First content pack (2 shorts + 1 long):
+
+- A1 River of Two Lands (Egypt — Nile cycles)
+    - Hooks: Flood markers (nilometer), grain barges, festival calendar.
+    - Routes: (A) Seasonal cycles and fertility rituals vs. (B) Civic/administrative memory (temple records).
+    - Twist: Discover an older pre‑dynastic marker; unlock “Cycles Remembered” Codex entry.
+    - Collectible: `collect_nilometer.svg`; Badge: `badge_fertility_cycles.svg`.
+- A2 Meeting of Winds (Norse or Inuit coastal communities)
+    - Hooks: Weather bones, sail fragments, oral history about a storm.
+    - Routes: (A) Maritime pragmatism → weather deities as navigational archetypes; (B) Oral tradition → spirits mapped
+      to hazards.
+    - Twist: Optional elder interview unlocks “Resilience” epilogue snippet.
+    - Collectible: `collect_weather_bone.svg`; Badge: `badge_resilience.svg`.
+- A3 Paths of Exchange (Greco‑Roman + Persian + Egyptian syncretism)
+    - Hooks: Bilingual inscription, coinage, shared epithets (Isis/Demeter analogies; Hermes/Mercury; local protectors).
+    - Routes: (A) Syncretic bridges (shared roles) vs. (B) Imperial adoption/administration of cults.
+    - Twist: A traveling merchant’s ledger reveals pragmatic cross‑worship; unlock “Concordia” ending.
+    - Collectible: `collect_bilingual_inscription.svg`; Badge: `badge_concordia.svg`.
+
+Core systems (MythWays):
+
+- Evidence sorter (cards for epithets/roles/contexts); Map/path assembly; Parallel‑inscription mini‑puzzle.
+- Codex sections: Role Archetypes (e.g., sky, river, hearth), Syncretic Bridges (who maps to whom and why),
+  Environmental Constraints.
+
+Sensitivity & cultural guardrails:
+
+- Use precise terminology; show intra‑cultural diversity; avoid caricatures and inappropriate sacred depictions.
+- Center kindness and curiosity; invite comparisons, not hierarchies. Include notes on contested scholarship.
+
+### Track B — Evolution & Nature (Origins)
+
+- Framing: Origins Lab & Field Notes. You run playful lab simulations and field observations; humor is gentle and
+  curious. Medals reward careful inference.
+- Design goal: Explore the beauty of nature and the nuances of evolutionary theory with engaging, interactive cases.
+
+First content pack (2 shorts + 1 long):
+
+- O1 Island Shuffle (island biogeography)
+    - Hooks: Island chain map, driftwood seeds, lizards/bird photos.
+    - Routes: (A) Dispersal/drift/niche colonization vs. (B) Convergent evolution on separate islands.
+    - Twist: Unlock a rare dispersal event card; Codex “Parallel Solutions.”
+    - Collectible: `collect_fossil_feather.svg`; Badge: `badge_island_biogeography.svg`.
+- O2 Patterns in Pollen (coevolution)
+    - Hooks: UV flower images, pollinator morphologies, flowering calendar.
+    - Routes: (A) Trait matching (tongue length vs. corolla depth) vs. (B) Landscape/phenology constraints.
+    - Twist: Night‑blooming variant unlocks “Invisible Colors” epilogue.
+    - Collectible: `collect_uv_filter.svg`; Badge: `badge_coevolution.svg`.
+- O3 Tails, Songs, and Signals (sexual vs. natural selection)
+    - Hooks: Spectrograms, tail length charts, predator density map.
+    - Routes: (A) Predation risk vs. (B) Mate choice dynamics; balance models with sliders.
+    - Twist: Balanced configuration unlocks a co‑author credit in a mock “Club Zine.”
+    - Collectible: `collect_signal_card.svg`; Badge: `badge_selection_balance.svg`.
+
+Core systems (Origins):
+
+- Trait sliders + fitness landscape mini‑games; Phylogeny builder; Spot‑the‑adaptation.
+- Codex sections: Mechanisms (mutation, selection, drift, gene flow), Patterns (convergence/divergence), Case Albums.
+
+Kindness & scientific guardrails:
+
+- Emphasize humility of inference; never mock wrong ideas; show how evidence updates beliefs.
+- Clear separation of models vs. real data; cite examples generically without needing backend.
+
+### Shared Stack & Alternatives (for both tracks)
+
+- Chosen: Next.js 16 + React; DOM/CSS illustrated scenes + hotspots; Context + Reducer state; soundManager; i18n‑ready;
+  localStorage `save:v3`.
+- Alternatives: XState seam for longer chapters; Pixi/Phaser optional later for complex effects.
+- Accessibility: keyboard/focus order; aria‑live updates; reduced‑motion support.
+
+### Data Model (save v3)
+
+```
+version: 3
+age15Confirmed: boolean
+track: 'mythways' | 'origins' | null
+caseId: string | null
+endingId: string | null
+medals: Record<string, 'bronze' | 'silver' | 'gold' | undefined>
+collectibles: Record<string, boolean>
+codex: Record<string, boolean>
+```
+
+Migration: v1/v2 → v3 preserves prior progress and adds defaults for new fields.
+
+### Testing Strategy (15+ tracks)
+
+- Playwright: age‑gate flow; branch A/B + twist per case; medals/codex unlock assertions.
+- RTL: reducer v2→v3 migration; trait slider logic; evidence sorter rules.
+
+### Acceptance (first packs per track)
+
+- Each track ships: 2 short cases + 1 long case with ≥ 2 routes + 1 twist; medals + Codex unlock; E2E/RTL green.
+
 ## 12+ Extension update — fun, replayable, and kindness‑centered
 
 Framing: a lighthearted “Junior Investigator Club” mini‑arc with short, witty cases that teach thinking tools through
@@ -139,6 +247,87 @@ Example cases (hooks → routes → twist):
 Kindness guardrails:
 
 - Respectful humor; no ridicule. Emphasize listening, empathy, and strengthening ideas rather than attacking people.
+
+## 15+ Extensions — Mythologies & Evolution (design, branching, stack, data)
+
+Two extensive, replayable tracks for ages 15+ that remain kind, moral, and engaging. Both reuse core systems (hotspots,
+dialogue, Codex, collectibles, medals) and expand the data model to v3 saves.
+
+### Track A — Mythologies & Pantheons (MythWays)
+
+- Framing: Cultural Field Journal club. We document artifacts, inscriptions, and oral traditions. Goal: show how
+  environmental, historical, and cultural constraints shape deity roles; compare similarities/differences and syncretism
+  without ranking cultures.
+- First content pack (2 shorts + 1 long):
+    1) A1 River of Two Lands (Egypt — Nile cycles)
+        - Hooks: Nilometer notches, flood calendars, grain barges.
+        - Routes: (A) Seasonal cycles → fertility archetypes; (B) Civic memory → temple records/calendrics.
+        - Twist: Pre‑dynastic marker → Codex “Cycles Remembered”.
+        - Collectible/Badge: collect_nilometer.svg, badge_fertility_cycles.svg.
+    2) A2 Meeting of Winds (Norse or Inuit coastal)
+        - Hooks: Weather bones, sailwork, oral storm tale.
+        - Routes: (A) Maritime pragmatism → weather deities as navigational archetypes; (B) Oral tradition → spirits
+          mapped to hazards.
+        - Twist: Elder interview epilogue “Resilience”.
+        - Collectible/Badge: collect_weather_bone.svg, badge_resilience.svg.
+    3) A3 Paths of Exchange (Greco‑Roman + Persian + Egyptian syncretism)
+        - Hooks: Bilingual inscription, coinage, shared epithets.
+        - Routes: (A) Syncretic bridges; (B) Administrative adoption of local cults.
+        - Twist: Merchant ledger → “Concordia” ending.
+        - Collectible/Badge: collect_bilingual_inscription.svg, badge_concordia.svg.
+- Mini‑games: evidence sorter (role/epithet/context), inscription match‑up, route/path assembly on trade maps.
+- Sensitivity: avoid caricatures; represent intra‑cultural diversity; annotate contested scholarship; emphasize empathy.
+
+### Track B — Evolution & Nature (Origins)
+
+- Framing: Origins Lab & Field Notes. Run light simulations and field observations to explore evolution’s nuance and
+  beauty.
+- First content pack (2 shorts + 1 long):
+    1) O1 Island Shuffle (island biogeography)
+        - Hooks: island chain map, driftwood seeds, lizard/bird snapshots.
+        - Routes: (A) Dispersal/drift/niche; (B) Convergent evolution across islands.
+        - Twist: rare dispersal event → Codex “Parallel Solutions”.
+        - Collectible/Badge: collect_fossil_feather.svg, badge_island_biogeography.svg.
+    2) O2 Patterns in Pollen (coevolution)
+        - Hooks: UV flower images, pollinator morphologies, phenology calendars.
+        - Routes: (A) Trait matching (tongue vs. corolla); (B) Timing/landscape constraints.
+        - Twist: night‑blooming variant → “Invisible Colors”.
+        - Collectible/Badge: collect_uv_filter.svg, badge_coevolution.svg.
+    3) O3 Tails, Songs, and Signals (sexual vs. natural selection)
+        - Hooks: spectrograms, tail length charts, predator density map.
+        - Routes: (A) Predation risk tradeoffs; (B) Mate choice dynamics; an interactive balance mini‑game.
+        - Twist: optimal balance unlocks “Club Zine” co‑author credit.
+        - Collectible/Badge: collect_signal_card.svg, badge_selection_balance.svg.
+- Mini‑games: trait sliders + fitness curves; phylogeny builder; spot‑the‑adaptation.
+- Scientific guardrails: clarify model vs. data; emphasize humility; avoid dunking on “wrong” ideas.
+
+### Stack (shared) & Alternatives
+
+- Chosen: Next.js 16 + React 19; DOM/CSS hotspots; Context+Reducer state (seam for XState later); key‑based t() en.json;
+  soundManager; localStorage v3 saves; Playwright + RTL.
+- Alternatives: XState (explicit charts; more boilerplate). Pixi/Phaser (effects; heavier, a11y trade‑offs).
+
+### Data model (save v3) & migration
+
+- Fields: `age15Confirmed:boolean`, `track:'mythways'|'origins'|null`, `caseId`, `endingId`,
+  `medals:Record<string,'bronze'|'silver'|'gold'>`, `collectibles:Record<string,boolean>`,
+  `codex:Record<string,boolean>`.
+- Migration: v1/v2 → v3 preserving prior progress; default new fields.
+
+### File layout additions
+
+- `games/rite-of-discovery/src/tracks/mythways/cases/{A1_RiverTwoLands,A2_MeetingWinds,A3_PathsOfExchange}.tsx`
+- `games/rite-of-discovery/src/tracks/origins/cases/{O1_IslandShuffle,O2_PatternsInPollen,O3_TailsSongsSignals}.tsx`
+- `games/rite-of-discovery/src/systems/{evidenceSorter,traitSliders,phylogeny}.tsx`
+- `games/rite-of-discovery/src/state.migrations.ts` (v1/v2 → v3)
+
+### Testing & Acceptance (per track, first release)
+
+- Playwright: age‑gate → case select → branch A/B → twist ending; Codex/collectibles/medals unlocks; reduced‑motion alt
+  present.
+- RTL: reducer migrations; evidence sorter rules; trait slider math.
+- Acceptance: 2 short + 1 long case per track; ≥2 routes + 1 twist each; Codex/medals wired; E2E/RTL green; a11y basics
+  verified.
 
 ---
 

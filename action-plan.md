@@ -162,6 +162,47 @@ designed to be backend-agnostic, communicating with a separate API service.
     - Acceptance
       - [ ] All 6 vignettes playable; hints/difficulty function; Codex + badges unlock; E2E/RTL green
 
+  - 15+ Extension — Mythologies & Pantheons (MythWays)
+    - Design & Curriculum (kindness‑centered, culturally sensitive)
+      - [ ] Outline role archetypes, syncretic bridges, and environmental constraints
+      - [ ] Define first pack: A1 River of Two Lands; A2 Meeting of Winds; A3 Paths of Exchange
+    - Systems
+      - [ ] Evidence sorter mini‑game (roles/epithets/contexts)
+      - [ ] Route/path assembly on trade maps
+      - [ ] Codex sections (Archetypes, Syncretic Bridges, Environmental Notes)
+    - Content (first pack)
+      - [ ] Build A1 with ≥2 routes + 1 twist; collectible + badge; Codex
+      - [ ] Build A2 with ≥2 routes + 1 twist; collectible + badge; Codex
+      - [ ] Build A3 (long case) with ≥2 routes + 1 twist; collectible + badge; Codex
+    - Art & Audio (optional, non‑blocking)
+      - [ ] Backgrounds (AVIF/WEBP) per case; inscriptions/props as SVG layers
+      - [ ] Badges/collectibles; subtle ambient loops with reduced‑motion stills
+    - Testing & A11y
+      - [ ] Playwright: age‑gate → case select → A/B routes → twist → medals/Codex
+      - [ ] RTL: sorter rules; save v3 migration; Codex unlock logic
+    - Acceptance
+      - [ ] Ship 2 shorts + 1 long; medals/Codex wired; E2E/RTL green; cultural sensitivity checklist signed off
+
+  - 15+ Extension — Evolution & Nature (Origins)
+    - Design & Curriculum (beauty of nature + evolutionary nuance)
+      - [ ] Define first pack: O1 Island Shuffle; O2 Patterns in Pollen; O3 Tails/Songs/Signals
+    - Systems
+      - [ ] Trait sliders + fitness landscape mini‑games
+      - [ ] Phylogeny builder; spot‑the‑adaptation flows
+      - [ ] Codex sections (Mechanisms, Patterns, Case Albums)
+    - Content (first pack)
+      - [ ] Build O1 with ≥2 routes + 1 twist; collectible + badge; Codex
+      - [ ] Build O2 with ≥2 routes + 1 twist; collectible + badge; Codex
+      - [ ] Build O3 (long case) with ≥2 routes + 1 twist; collectible + badge; Codex
+    - Art & Audio (optional, non‑blocking)
+      - [ ] Backgrounds (field/lab) per case; charts/overlays as SVG
+      - [ ] Badges/collectibles; subtle ambient loops with reduced‑motion stills
+    - Testing & A11y
+      - [ ] Playwright: age‑gate → case select → A/B routes → twist → medals/Codex
+      - [ ] RTL: slider math; save v3 migration; Codex unlock logic
+    - Acceptance
+      - [ ] Ship 2 shorts + 1 long; medals/Codex wired; E2E/RTL green; a11y basics verified
+
 Shipped (already available via manifest and listed under Completed):
 
 - Breakout, Memory, Snake, Knitzy, Bubble Pop, Checkers, Chess
