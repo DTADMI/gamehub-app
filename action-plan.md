@@ -32,33 +32,28 @@ designed to be backend-agnostic, communicating with a separate API service.
 
 ## In Progress
 
-### Next Priority — Point & Click MVPs (Rite of Discovery, Systems Discovery, Toymaker Escape, Human History)
+### Next Priority — Point & Click MVPs (Alpha) — Rite of Discovery, Systems Discovery, Toymaker Escape
 
-- [ ] Ship playable MVP vertical slices for all four upcoming narrative games (client-only; assets can be stubs)
+- [ ] Ship playable MVP vertical slices for the three narrative games (client-only; assets can be stubs)
   - Common Systems
-    - [ ] Scene/Room controller (registry + onEnter/next) ✓ scaffolds exist for routes and pages
-    - [ ] Hotspot component (ARIA, keyboard, focus, data-testid)
-    - [ ] Dialogue/Prompt UI with 2–3 choices
-    - [ ] Save/Load service (localStorage v1; per-game keys: `rod:save:v1`, `sysdisc:save:v1`, `tme:save:v1`)
+    - [✓] Scene/Room controller (registry + onEnter/next) — implemented in `games/_engine` ✓
+    - [✓] Hotspot component (ARIA, keyboard, focus, data-testid) — `HotspotButton` ✓
+    - [✓] Dialogue/Prompt UI with 2–3 choices — `ChoiceList` ✓
+    - [✓] Save/Load service (localStorage v1; per-game keys: `rod:save:v1`, `sysdisc:save:v1`, `tme:save:v1`) ✓
   - Rite of Discovery MVP
     - [ ] S1 tag reassembly (3 pieces)
     - [ ] S2 note letter-match (3 differences)
     - [ ] S3 proof moment (receipt/overhear) with branch
-    - [ ] Epilogue; unlock Helper Badge; New Game+ gate visible
+    - [*] Epilogue; unlock Helper Badge; New Game+ gate visible — stubbed in alpha
   - Systems Discovery MVP (Core Pack)
     - [ ] B1 loop puzzle (kitchen→compost→soil→herbs)
     - [ ] B2 route planner (bus/bike sequence)
     - [ ] B3 waste sorting with hints toggle
-    - [ ] Wrap screen + Systems Scout badge
+    - [*] Wrap screen + Systems Scout badge — stubbed in alpha
   - Toymaker Escape MVP (E1 only)
     - [ ] Workshop gear alignment OR music box (one route to finish)
     - [ ] Playroom sorter to reveal Key Fragment 1
-    - [ ] Episode complete screen + Codex seed
-  - Human History MVP (Origins pack only)
-    - [ ] O1 Savannah Signals — smoke pattern sequence + role selection
-    - [ ] O2 Shore Exchange — fair‑bundle balancing mini + currents map match
-    - [ ] O3 Painted Memory — memory wall ordering + teach choice (signs/song)
-    - [ ] Wrap screen + “Origins” badge; Community Web meter UI stub
+    - [*] Episode complete screen + Codex seed — stubbed in alpha
   - Accessibility (all three)
     - [ ] 44px targets, visible focus, reduced motion stills, captions for any SFX
   - Testing
