@@ -72,7 +72,8 @@ export function Carousel({children, options, className}: CarouselProps) {
           <div className="overflow-hidden" ref={emblaRef}>
               <div className="flex gap-4">
                   {React.Children.map(children, (child) => (
-                      <div className="min-w-0 flex-[0_0_85%] sm:flex-[0_0_50%] lg:flex-[0_0_33.333%]">
+                      <div
+                          className="min-w-0 flex-[0_0_85%] sm:flex-[0_0_50%] lg:flex-[0_0_33.333%] xl:flex-[0_0_calc((100%_-_2rem)/3)]">
                           {child}
                       </div>
                   ))}

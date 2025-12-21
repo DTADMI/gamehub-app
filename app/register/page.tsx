@@ -66,17 +66,18 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-10">
-      <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border border-gray-100 dark:border-gray-700">
-        <h1 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">
+      <div className="min-h-screen flex items-center justify-center px-4 py-10">
+        <div
+            className="w-full max-w-md rounded-2xl shadow-lg p-8 bg-card/90 backdrop-blur-sm text-card-foreground border border-transparent">
+          <h1 className="text-3xl font-bold mb-2 text-foreground">
           Create an account
         </h1>
-        <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
+          <p className="text-sm text-muted-foreground mb-6">
           Sign up to save progress, post scores and access more features.
         </p>
         <form onSubmit={onSubmit} className="space-y-4" autoComplete="on">
           <div>
-            <label className="block text-sm mb-1 text-gray-700 dark:text-gray-200">
+            <label className="block text-sm mb-1 text-foreground">
               Email
             </label>
             <input
@@ -88,7 +89,7 @@ export default function RegisterPage() {
             />
           </div>
           <div>
-            <label className="block text-sm mb-1 text-gray-700 dark:text-gray-200">
+            <label className="block text-sm mb-1 text-foreground">
               Username
             </label>
             <input
@@ -100,7 +101,7 @@ export default function RegisterPage() {
             />
           </div>
           <div>
-            <label className="block text-sm mb-1 text-gray-700 dark:text-gray-200">
+            <label className="block text-sm mb-1 text-foreground">
               Password
             </label>
             <input
@@ -112,7 +113,7 @@ export default function RegisterPage() {
             />
           </div>
           <div>
-            <label className="block text-sm mb-1 text-gray-700 dark:text-gray-200">
+            <label className="block text-sm mb-1 text-foreground">
               Confirm Password
             </label>
             <input
@@ -132,7 +133,7 @@ export default function RegisterPage() {
           </button>
         </form>
         <div className="mt-4 flex items-center justify-between text-sm">
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-muted-foreground">
             Already have an account?{" "}
             <Link className="text-accent hover:underline" href="/login">
               Sign in

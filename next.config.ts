@@ -102,6 +102,17 @@ const nextConfig: NextConfig = {
     ];
   },
 
+    // Redirects for renamed routes
+    async redirects() {
+        return [
+            {
+                source: "/games/knitzy",
+                destination: "/games/pattern-matching",
+                permanent: true,
+            },
+        ];
+    },
+
   // Security headers with CSP tuned for Next.js 16, next/font, and optional Google Fonts
   async headers() {
     const backend =

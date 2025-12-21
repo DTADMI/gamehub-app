@@ -21,11 +21,14 @@ designed to be backend-agnostic, communicating with a separate API service.
 - [x] All 7 MVP games playable and featured (Breakout, Memory, Snake, Knitzy, Bubble Pop, Checkers, Chess)
 - [x] Background re‑looking — galaxy (dark) and star‑glow (light) backgrounds implemented with fallbacks for browsers
   without OKLCH/color-mix support
+- [x] Section separators softened for seamless layout; backgrounds made clearly visible again (header/footer
+  translucent);
+  game cards normalized to consistent heights while remaining responsive
 
 ## In Progress
 
-- [ ] Backgrounds — visibility fix and verification (galaxy dark, star‑glow light); ensure `--app-bg` applied on all
-  pages (awaiting confirmation)
+- [x] Backgrounds — visibility fix and verification (galaxy dark, star‑glow light); ensure `--app-bg` applied on all
+  pages (tuned intensities, enhanced starfield/nebula; verified on home, catalog, and game pages)
 - [ ] Game Launcher — Phase 2: flags‑driven gating via frontend‑only flags provider (localStorage) with unit/E2E checks
 - [ ] Breakout particles reliability — ensure normal brick‑hit emissions and live effect switching; hide particle
   controls in non‑particle games
@@ -114,6 +117,8 @@ Shipped (already available via manifest and listed under Completed):
   change (doc now), advertisement band for non‑subscribers.
 - 2025-12-20: Follow-up fix — corrected `:root` selector (typo recovery), re‑asserted
   `body{background-image:var(--app-bg)}`; added explicit verification task under In Progress and awaiting confirmation.
+- 2025-12-20: Seamless layout pass — removed heavy borders on home sections, made header/footer translucent, exposed
+  galaxy/star‑glow backgrounds; unified card sizing (flex, line‑clamp) for consistent grids.
 - 2025-12-18: Initial action plan created
 - 2025-12-18: Added Breakout and Memory games
 - 2025-12-18: Added Quest Hunt to Coming Soon projects

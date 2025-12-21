@@ -6,6 +6,7 @@ export type GameSlug =
     | "breakout"
     | "memory"
     | "snake"
+    | "pattern-matching"
     | "knitzy"
     | "bubble-pop"
     | "checkers"
@@ -76,11 +77,11 @@ export const games: GameManifest = {
         preloadAssets: [],
         getComponent: () => import("@games/snake").then((m) => m.SnakeGame),
     },
-    knitzy: {
-        slug: "knitzy",
-        title: "Knitzy",
+    "pattern-matching": {
+        slug: "pattern-matching",
+        title: "Pattern Matching",
         shortDescription:
-            "Relaxing stitch puzzler — knit patterns and score combos.",
+            "Relaxing stitch puzzler — match the pattern and score combos.",
         tags: ["Puzzle", "Casual", "Mobile"],
         image: "/images/bg-pastel-pattern.jpg",
         enabled: true,
@@ -89,6 +90,19 @@ export const games: GameManifest = {
             {key: "click", url: "/sounds/click.mp3"},
             {key: "background", url: "/sounds/memory-bg.mp3", loop: true},
         ],
+        getComponent: () => import("@games/knitzy").then((m) => m.KnitzyGame),
+    },
+    knitzy: {
+        slug: "knitzy",
+        title: "Knitzy",
+        shortDescription: "Cozy puzzler with rolling balls of wool (upcoming).",
+        tags: ["Puzzle", "Casual"],
+        image: "/images/bg-pastel-pattern.jpg",
+        upcoming: true,
+        enabled: false,
+        backgroundImage: "/images/bg-pastel-pattern.jpg",
+        preloadAssets: [],
+        // Placeholder component (not used while upcoming). Keeping import signature for future.
         getComponent: () => import("@games/knitzy").then((m) => m.KnitzyGame),
     },
     "bubble-pop": {

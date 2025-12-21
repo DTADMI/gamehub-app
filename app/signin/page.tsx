@@ -86,18 +86,20 @@ export default function SignInPage() {
   return (
       <div className="min-h-[70svh] grid grid-cols-1 md:grid-cols-5">
         {/* Side panel */}
-        <div className="hidden md:block md:col-span-2 bg-gradient-to-b from-primary/15 to-accent/15 p-8">
+        <div className="hidden md:block md:col-span-2 p-8">
+          <div className="h-full rounded-xl bg-gradient-to-b from-primary/15 to-accent/15 backdrop-blur-sm">
           <div className="h-full flex flex-col justify-end">
             <h2 className="text-2xl font-bold mb-2">Welcome to GameHub</h2>
             <p className="text-sm text-muted-foreground">
               Play web games, track progress, and compete on leaderboards.
             </p>
           </div>
+          </div>
         </div>
 
         {/* Auth card */}
         <div className="md:col-span-3 flex items-center justify-center p-6">
-          <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-xl shadow p-6">
+          <div className="w-full max-w-md rounded-xl shadow p-6 bg-card/90 backdrop-blur-sm text-card-foreground">
             <div className="flex gap-4 mb-4">
               <button
                   className={`flex-1 py-2 rounded-md text-sm font-medium ${

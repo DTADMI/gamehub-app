@@ -1,10 +1,10 @@
 import {expect, test} from "@playwright/test";
 
-test.describe("Knitzy MVP", () => {
-  test("canvas renders and painting updates progress", async ({page}) => {
+test.describe("Pattern Matching MVP (formerly Knitzy)", () => {
+  test("canvas renders and painting updates progress (redirect works)", async ({page}) => {
     await page.goto("/games/knitzy");
     await page.waitForLoadState("domcontentloaded");
-    await expect(page.getByRole("heading", {name: "Knitzy"})).toBeVisible();
+    await expect(page.getByRole("heading", {name: /Pattern Matching/i})).toBeVisible();
 
     // Dismiss overlay if present
     const start = page.getByRole("button", {name: /Tap to start|Tap to resume/i});

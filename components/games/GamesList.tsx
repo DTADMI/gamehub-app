@@ -22,20 +22,20 @@ export default function GamesList({ games }: GamesListProps) {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white sm:text-5xl sm:tracking-tight lg:text-6xl">
+          <h1 className="text-4xl font-extrabold text-foreground sm:text-5xl sm:tracking-tight lg:text-6xl">
             Our Games Collection
           </h1>
-          <p className="mt-5 max-w-xl mx-auto text-xl text-gray-500 dark:text-gray-300">
+          <p className="mt-5 max-w-xl mx-auto text-xl text-muted-foreground">
             Discover and play our selection of fun and engaging games
           </p>
         </div>
 
         {!user && (
-          <div className="mb-8 p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg text-center">
-            <p className="text-blue-800 dark:text-blue-200">
+            <div className="mb-8 p-4 rounded-lg text-center bg-card/80 backdrop-blur-sm text-card-foreground">
+              <p>
               Sign in to track your progress and compete on the leaderboards!
             </p>
           </div>
@@ -45,7 +45,7 @@ export default function GamesList({ games }: GamesListProps) {
           {games.map((game) => (
             <div
               key={game.id}
-              className="group relative bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300"
+              className="group relative bg-card text-card-foreground rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300"
             >
               <div className="relative h-48 w-full">
                 <Image
@@ -55,36 +55,42 @@ export default function GamesList({ games }: GamesListProps) {
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
-                {game.featured && (
-                  <div className="absolute top-2 right-2 bg-yellow-400 text-yellow-800 text-xs font-bold px-2.5 py-1 rounded-full">
+                {game.featured ? (
+                    <div
+                        className="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">
                     Featured
                   </div>
-                )}
-                  {!game.featured && (
-                  <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
-                    <span className="bg-white text-gray-900 px-4 py-2 rounded-full font-bold">
-                      Coming Soon
-                    </span>
-                  </div>
+                ) : (
+                    <>
+                      <div
+                          className="absolute top-2 right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2.5 py-1 rounded-full">
+                        Upcoming
+                      </div>
+                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                      <span className="bg-card text-card-foreground px-4 py-2 rounded-full font-bold">
+                        Coming Soon
+                      </span>
+                      </div>
+                    </>
                 )}
               </div>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                  <h3 className="text-xl font-bold text-card-foreground">
                     {game.title}
                   </h3>
                   <div className="flex flex-wrap gap-1 justify-end">
                     {game.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-accent/15 text-foreground"
                       >
                         {tag}
                       </span>
                     ))}
                   </div>
                 </div>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                <p className="text-muted-foreground mb-4">
                   {game.description}
                 </p>
                   {!game.featured ? (
@@ -97,7 +103,7 @@ export default function GamesList({ games }: GamesListProps) {
                 ) : (
                   <Link
                     href={`/games/${game.id}`}
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm bg-primary text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200"
                   >
                     Play Now
                     <svg

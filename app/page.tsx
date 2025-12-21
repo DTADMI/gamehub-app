@@ -4,41 +4,43 @@ import Link from "next/link";
 import {Carousel} from "@/components/Carousel";
 import {GameCard} from "@/components/GameCard";
 import {Button} from "@/components/ui/button";
-import {GAMES} from "@/lib/games";
+import {getGameById} from "@/lib/games";
+import {listGames} from "@/games/manifest";
+import {FEATURED_PROJECTS} from "@/lib/projects";
 
 type HomeGame = {
-  id: number;
+  id: string;
   title: string;
   description: string;
   image: string;
   tags: string[];
   slug: string;
   featured?: boolean;
-  upcoming?: boolean;
 };
 
-const games: HomeGame[] = GAMES.map((g, idx) => ({
-  id: idx + 1,
-  title: g.title,
-  description: g.description,
-  image: g.image,
-  tags: g.tags,
-  slug: g.id,
-  featured: !!g.featured,
-  // Upcoming is defined as any game that is NOT featured (MVPs are featured)
-  upcoming: !g.featured,
-}));
-
 export default function HomePage() {
-  const featured = games.filter((g) => g.featured);
-  const upcoming = games.filter((g) => g.upcoming);
+  // Build games from manifest; overlay images from lib/games.ts
+  const entries = listGames();
+  const allGames: HomeGame[] = entries.map((e) => {
+    const lib = getGameById(e.slug);
+    return {
+      id: e.slug,
+      title: e.title,
+      description: e.shortDescription,
+      image: lib?.image || e.image,
+      tags: e.tags,
+      slug: e.slug,
+      featured: e.enabled !== false && !e.upcoming,
+    };
+  });
+  const featured = allGames.filter((g) => g.featured);
 
   return (
-    <div className="min-h-screen bg-background">
+      <div className="min-h-screen">
       <main className="flex-1">
-        <div className="px-6 md:px-8 py-6">
+        <div className="px-6 md:px-8 py-6 space-y-10">
           {/* Hero Section */}
-          <section className="mb-12">
+          <section className="surface rounded-xl p-6">
             <div className="max-w-4xl">
               <h1 className="text-4xl font-bold text-foreground mb-4 text-balance">
                 Fun Games & Projects
@@ -60,8 +62,9 @@ export default function HomePage() {
             </div>
           </section>
 
-          {/* Featured Games */}
-          <section className="mb-12">
+          {/* Featured Games */
+          }
+          <section className="rounded-xl p-0">
             <h2 className="text-2xl font-semibold text-foreground mb-6">
               Featured Games
             </h2>
@@ -72,19 +75,37 @@ export default function HomePage() {
             </Carousel>
           </section>
 
-          {/* Upcoming Games */}
-          <section>
+          {/* Featured Projects */}
+          <section className="rounded-xl p-0">
             <h2 className="text-2xl font-semibold text-foreground mb-6">
-              Upcoming Games
+              Featured Projects
             </h2>
             <Carousel>
-              {upcoming.map((game) => (
-                  <GameCard key={game.id} game={game}/>
+              {FEATURED_PROJECTS.map((p) => (
+                  <a
+                      key={p.id}
+                      href={p.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary rounded-md"
+                      aria-label={`Open project ${p.title}`}
+                  >
+                    <div
+                        className="group h-full flex flex-col overflow-hidden rounded-lg shadow hover:shadow-lg transition-all duration-300">
+                      <div className="relative w-full aspect-[16/9] bg-muted/30">
+                        <img src={p.image} alt={p.title} className="w-full h-full object-cover"/>
+                      </div>
+                      <div className="p-4 bg-card/80 backdrop-blur-sm text-card-foreground flex-1 flex flex-col">
+                        <h3 className="text-lg font-semibold mb-1">{p.title}</h3>
+                        <p className="text-sm text-muted-foreground line-clamp-2">{p.description}</p>
+                      </div>
+                    </div>
+                  </a>
               ))}
             </Carousel>
           </section>
 
-          {/* No separate "More Games" section: Upcoming shows all non-featured */}
+          {/* No Upcoming on Home; upcoming items live on /games or /projects */}
         </div>
       </main>
     </div>

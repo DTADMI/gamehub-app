@@ -36,7 +36,9 @@ export function GameCard({ game, featured = false }: GameCardProps) {
   // Full-card clickable for better UX; keep Play button overlay for affordance.
   const CardInner = (
       <Card
-          className={`group overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${featured ? "ring-2 ring-primary/20" : ""}`}
+          className={`group h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
+              featured ? "ring-2 ring-primary/20" : ""
+          }`}
       >
         <CardHeader className="p-0">
           <div className="relative overflow-hidden">
@@ -82,14 +84,14 @@ export function GameCard({ game, featured = false }: GameCardProps) {
           </div>
         </CardHeader>
 
-        <CardContent className="p-6">
+        <CardContent className="p-6 flex flex-col flex-1">
           <h3 className="text-xl font-semibold text-card-foreground mb-2 text-balance">
             {game.title}
           </h3>
-          <p className="text-muted-foreground mb-4 text-pretty">
+          <p className="text-muted-foreground mb-4 text-pretty line-clamp-2">
             {game.description}
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className="mt-auto pt-2 flex flex-wrap gap-2">
             {game.tags.map((tag) => (
                 <Badge key={tag} variant="secondary" className="text-xs">
                   {tag}
@@ -101,14 +103,14 @@ export function GameCard({ game, featured = false }: GameCardProps) {
   );
 
   return (
-      <div className="block">
+      <div className="block h-full">
         {game.upcoming ? (
             CardInner
         ) : (
             // Wrap in Link to make the entire card clickable
             <Link
                 href={`/games/${game.slug}`}
-                className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary rounded-md"
+                className="block h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary rounded-md"
                 aria-label={`View details for ${game.title}`}
             >
               {CardInner}
