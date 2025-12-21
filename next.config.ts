@@ -32,6 +32,7 @@ const nextConfig: NextConfig = {
     "@games/knitzy",
     "@games/tower-defense",
     // New point-and-click games (scaffolded)
+    "@games/_engine",
     "@games/rite-of-discovery",
     "@games/systems-discovery",
     "@games/toymaker-escape",
@@ -58,6 +59,7 @@ const nextConfig: NextConfig = {
     config.resolve = config.resolve || {};
     config.resolve.alias = {
       ...(config.resolve.alias || {}),
+      "@games/_engine": path.resolve(__dirname, "games/_engine"),
       "@games/shared": path.resolve(__dirname, "libs/shared/src"),
       "@games/breakout": path.resolve(__dirname, "games/breakout/src"),
       "@games/bubble-pop": path.resolve(__dirname, "games/bubble-pop/src"),

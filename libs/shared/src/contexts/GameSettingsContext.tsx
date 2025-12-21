@@ -1,3 +1,5 @@
+"use client";
+
 // libs/shared/src/contexts/GameSettingsContext.tsx
 import React, {createContext, useContext, useEffect, useMemo, useState,} from "react";
 

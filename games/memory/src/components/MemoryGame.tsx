@@ -1,3 +1,5 @@
+"use client";
+
 // games/memory/src/components/MemoryGame.tsx
 import {GameContainer, soundManager} from "@games/shared";
 import React, {useCallback, useEffect, useMemo, useRef, useState,} from "react";

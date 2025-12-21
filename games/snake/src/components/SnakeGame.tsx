@@ -1,3 +1,5 @@
+"use client";
+
 // games/snake/src/components/SnakeGame.tsx
 import {GameContainer, soundManager} from "@games/shared";
 import React, {useCallback, useEffect, useRef, useState} from "react";

@@ -1,3 +1,5 @@
+"use client";
+
 // Shared: contexts/SoundContext.tsx
 
 import React, {createContext, useContext, useEffect, useState} from "react";
