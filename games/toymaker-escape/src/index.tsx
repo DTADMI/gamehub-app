@@ -1,6 +1,7 @@
 "use client";
-import React from "react";
 import {Scene, SceneController} from "@games/_engine";
+import React from "react";
+
 import {tmeStrings as t} from "./strings.en";
 
 const scenes: Scene[] = [
@@ -138,9 +139,15 @@ const scenes: Scene[] = [
             const path = String(state.flags["e1.path"] ?? "");
             const helper = String(state.flags["e1.helper"] ?? "");
             let medal: "bronze" | "silver" | "gold" = "bronze";
-            if (helper === "noHints") medal = "silver";
-            if (helper === "noHints" && path === "gears") medal = "gold";
-            if (state.flags["medals.e1"] !== medal) setFlag("medals.e1", medal);
+            if (helper === "noHints") {
+                medal = "silver";
+            }
+            if (helper === "noHints" && path === "gears") {
+                medal = "gold";
+            }
+            if (state.flags["medals.e1"] !== medal) {
+                setFlag("medals.e1", medal);
+            }
             return (
                 <div>
                     <p>{t.done.prompt}</p>

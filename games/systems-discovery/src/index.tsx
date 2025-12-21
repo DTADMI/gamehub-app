@@ -1,6 +1,7 @@
 "use client";
-import React from "react";
 import {Scene, SceneController} from "@games/_engine";
+import React from "react";
+
 import {sysStrings as t} from "./strings.en";
 
 const scenes: Scene[] = [

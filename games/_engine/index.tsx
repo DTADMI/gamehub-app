@@ -37,7 +37,9 @@ function reducer(state: GameState, action: Action): GameState {
         case "SET_FLAG":
             return {...state, flags: {...state.flags, [action.key]: action.value}};
         case "ADD_ITEM": {
-            if (state.inventory.includes(action.id)) return state;
+            if (state.inventory.includes(action.id)) {
+                return state;
+            }
             return {...state, inventory: [...state.inventory, action.id]};
         }
         case "REMOVE_ITEM": {
@@ -67,7 +69,7 @@ export function useSaveService(key: string, initial: GameState) {
             }
         } catch {
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
     }, []);
 
     useEffect(() => {
@@ -92,11 +94,15 @@ export function SceneController({scenes, initial, saveKey}: { scenes: Scene[]; i
     const scene = map.get(state.scene);
 
     useEffect(() => {
-        if (scene?.onEnter) scene.onEnter(state);
+        if (scene?.onEnter) {
+            scene.onEnter(state);
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [state.scene]);
 
-    if (!scene) return <div className="p-8">Unknown scene: {state.scene}</div>;
+    if (!scene) {
+        return <div className="p-8">Unknown scene: {state.scene}</div>;
+    }
 
     const gentle = Boolean(state.flags["gentle"]);
     const volume = Number(state.flags["volume"] ?? 100);
