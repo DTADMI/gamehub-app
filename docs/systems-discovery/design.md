@@ -1,1 +1,0 @@
-Systems Discovery — Design Doc (placeholder)

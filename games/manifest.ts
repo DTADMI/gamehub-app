@@ -176,7 +176,7 @@ export const games: GameManifest = {
         title: "Toymaker Escape",
         shortDescription: "Episodic escape game with a twisty mystery (Alpha MVP).",
         tags: ["Escape", "Puzzles", "Story"],
-        image: "/images/bg-abstract-dark.jpg",
+        image: "/images/patience-games-toys.jpg",
         enabled: true,
         backgroundImage: "/images/bg-abstract-dark.jpg",
         preloadAssets: [],
