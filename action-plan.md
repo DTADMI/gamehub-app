@@ -76,6 +76,7 @@ designed to be backend-agnostic, communicating with a separate API service.
     - [ ] Lock tone for ages 7–9; include “gentle mode” copy variants ✓ (see docs/rite-of-discovery.md)
     - [ ] Finalize scene beats and choices for S1/S2/S3 + Epilogue
     - [ ] Write i18n keys and English strings (en.json)
+    - [ ] New Game+ — Mentor Mini (Sibling Helper): finalize beats, mentor‑tips copy; add 12+ reflection prompts
   - Scaffolding
     - [ ] Create package: games/rite-of-discovery with `RiteGame.tsx`, `state.ts`, `scenes/*`, `ui/*`
     - [ ] Add manifest entry (upcoming=false only at ship time)
@@ -84,6 +85,8 @@ designed to be backend-agnostic, communicating with a separate API service.
     - [x] Write English brief (designer deliverables, formats, sizes, naming, budgets) —
       docs/rite-of-discovery-designer-brief.md
     - [x] Add full French mirror (terminology aligned, specs identical)
+    - [x] Add 15+ tracks section (MythWays & Origins) with asset templates and guardrails (EN+FR)
+    - [x] Add New Game+ — Mentor Mini assets/checklist (EN+FR) with `epMM_*` and `ui_mentor_tips.svg`
     - [ ] Review with designer/animator and collect Q&A
     - [ ] Episode A asset pack delivery (BGs, props, badge/collectible) per checklist
     - [ ] Iteration pass after first integration video
@@ -97,22 +100,30 @@ designed to be backend-agnostic, communicating with a separate API service.
     - [ ] Scene 2 — note letter-match micro-puzzle (3 differences)
     - [ ] Scene 3 — proof moment (receipt/overhear) with choice branch
     - [ ] Epilogue — rite-of-passage framing; reflect prior choices
+    - [ ] New Game+ — Mentor Mini dynamic echo (Tag/Note/Talk) based on S1–S3 flags; replay to see others
+    - [ ] 12+ Reflection — optional MM1‑R journal prompts (framing/evidence/timing) after MM1
   - Art & Audio
     - [ ] 3–4 illustrated 16:9 scenes (WEBP/AVIF) + light parallax (reduced motion aware)
     - [ ] Ambient loop per scene; click/creak SFX using soundManager
+    - [ ] Mentor Mini assets: `epMM_bg.avif`, `ui_mentor_tips.svg`, `ui_moment_cards_[1..3].svg`; reuse S1/S2 props
   - Accessibility
     - [ ] Visible focus on hotspots; keyboard traversal; aria-live for dialogue
     - [ ] Subtitles/captions for any voiced SFX (if added later)
+    - [ ] Mentor Mini: ≥44px targets, readable tips, reduced‑motion stills, privacy‑respecting copy
   - Persistence & Telemetry
     - [ ] Persist on scene/choice; restore on reload
     - [ ] (Optional) Add analytics hooks (page/scene events) guarded by consent
+    - [ ] Save keys: add `mentor.unlocked`, `mentor.seenRoutes`, `mentor.mentorStyle`; unit tests for defaulting
   - Testing
     - [ ] Playwright: flow through S1→S2→S3→Epilogue; assert text changes in gentle mode
     - [ ] RTL: reducer transitions; save/load; hotspot guards
+    - [ ] Playwright: Mentor Mini unlock after Epilogue; route adapts to flags; replay shows alternates
+    - [ ] RTL: mentor slice derivation (from S1–S3), tips overlay logic, persistence
   - Ship
     - [ ] Flip `enabled: true` in manifest; Featured follows Playable==Featured
     - [ ] Add card in catalog with image and tags
     - [ ] Update README with controls and notes
+    - [ ] Docs cross‑links: design doc (Mentor Mini), stories tracker (MM1/MM1‑R), brief EN/FR
 
   - Post‑MVP (Episodes & Systems)
     - Systems foundation (v2)

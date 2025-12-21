@@ -39,6 +39,27 @@ magic. The ending frames it as a rite of passage.
     - Player choices reflect in tone: proud/celebratory vs. cozy/affirming
     - Unlock a small ‘Helper Badge’ and optional credits page
 
+### New Game+ — Mentor Mini (Sibling Helper)
+
+- Unlock: Appears after finishing the Epilogue and earning `ep.badgeHelper = true`. Accessible from the episode card as
+  “Mentor Mini (Help your sibling).” Replayable; routes unlock based on prior choices.
+- Framing: You’re now a “helper.” Your younger sibling is going through their own rite of discovery. You coach them
+  kindly, echoing the earlier puzzles without spoiling the magic.
+- Duration: 3–5 minutes; 1 short interactive beat chosen dynamically from three echoes of S1–S3.
+- Routes (auto‑selected by state, but player can replay to see others):
+    - Tag Echo (S1): A gentle “find the match” moment using 2–3 gift‑tag shards. Focus = noticing patterns, not exposing
+      secrets.
+    - Note Echo (S2): Compare 2 letterforms with a “spot the similarity” overlay that celebrates observation.
+    - Talk Echo (S3): Plan a cozy conversation timing (now vs. later) by arranging 3 “good moments” cards (e.g., after
+      snack, during story time, weekend morning).
+- State carry‑over mapping (affects copy, hint strength, and which route is offered first):
+    - If `s1.askParent === true`, initial mentor copy leans toward model‑by‑asking rather than telling.
+    - If `s2.keepNote === true`, the Note Echo is prioritized; hints emphasize “look closely together.”
+    - If `s3.confrontNow === false`, the Talk Echo highlights patience and picking a gentle moment.
+- Kindness & privacy guardrails: Never depict trickery. The “helper” role models empathy and timing, not “busting” a
+  secret. Sibling agency is respected; outcomes are positive and cozy.
+- Outcome: A small “Mentor” sticker added to the Codex; optional reflection lines. No fail states.
+
 ## Gameplay & UX
 
 - Hotspots with clear focus/hover, keyboard accessible
@@ -79,12 +100,25 @@ magic. The ending frames it as a rite of passage.
 - SceneId = S1 | S2 | S3 | EPILOGUE
 - GameState fields: scene, gentle, flags, inventory, choices, version=1
 
+New Game+ additions (save v3 already covers 15+; extend with Mentor Mini keys):
+
+- mentor: {
+  unlocked: boolean // ep.badgeHelper earned
+  seenRoutes: { tagEcho?: boolean; noteEcho?: boolean; talkEcho?: boolean }
+  mentorStyle?: 'askFirst' | 'observeTogether' | 'planTiming' // derived from S1–S3 choices
+  }
+
 ## File Layout (proposal)
 
 - games/rite-of-discovery/src/RiteGame.tsx
 - games/rite-of-discovery/src/state.ts
 - games/rite-of-discovery/src/scenes/{S1_NightBefore,S2_ToothTradition,S3_ProofMoment,Epilogue}.tsx
 - games/rite-of-discovery/src/ui/{Dialogue,Hotspot,Inventory}.tsx
+
+New Game+ (Mentor Mini):
+
+- games/rite-of-discovery/src/scenes/MM_MentorMini.tsx
+- games/rite-of-discovery/src/ui/MentorTips.tsx
 
 ## Hotspot Schema (example)
 
@@ -96,6 +130,8 @@ magic. The ending frames it as a rite of passage.
 - Scaffolding: create package, add manifest entry (enable at ship), route /games/rite-of-discovery
 - Systems: scene controller, Hotspot component, Dialogue, Save/Load service
 - Content: S1 tag reassembly; S2 letter-match; S3 proof moment; Epilogue framing
+- New Game+: Mentor Mini (Sibling Helper) — 1 dynamic echo (Tag/Note/Talk) driven by S1–S3 flags; add Mentor Tips UI
+  overlay
 - Art & Audio: 3–4 illustrated 16:9 scenes (WEBP/AVIF) + light parallax; ambient loop per scene; click/creak SFX
 - Accessibility: focus, keyboard traversal, aria-live; captions for any voiced SFX
 - Persistence & Telemetry: persist on scene/choice; optional analytics (consent-gated)
@@ -108,6 +144,8 @@ magic. The ending frames it as a rite of passage.
 - Backgrounds and hotspots are accessible; focus management verified
 - Local save works; reload resumes the latest scene
 - E2E and key unit tests are green
+- Mentor Mini unlocks after Epilogue, adapts to prior choices, is replayable to see alternate echoes, and preserves
+  kindness/privacy guardrails
 
 ## Designer/Animator Brief (assets & delivery)
 
