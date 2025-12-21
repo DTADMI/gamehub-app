@@ -73,7 +73,7 @@ designed to be backend-agnostic, communicating with a separate API service.
 
 - [ ] Point & Click — Rite of Discovery (working title)
   - Design & Narrative
-    - [ ] Lock tone for ages 7–9; include “gentle mode” copy variants ✓ (see docs/rite-of-discovery.md)
+    - [ ] Lock tone for ages 7–9; include “gentle mode” copy variants ✓ (see docs/rite-of-discovery-design.md)
     - [ ] Finalize scene beats and choices for S1/S2/S3 + Epilogue
     - [ ] Write i18n keys and English strings (en.json)
     - [ ] New Game+ — Mentor Mini (Sibling Helper): finalize beats, mentor‑tips copy; add 12+ reflection prompts
@@ -256,7 +256,8 @@ Shipped (already available via manifest and listed under Completed):
   Progress.
 - 2025-12-20: Finalized all 7 MVP games as playable and featured in catalog; added E2E smokes for each game and updated
   docs
-- 2025-12-21: Added design doc outline for “Rite of Discovery” point-and-click MVP (docs/rite-of-discovery.md) and
+- 2025-12-21: Added design doc outline for “Rite of Discovery” point-and-click MVP (docs/rite-of-discovery-design.md)
+  and
   planned tasks under
   Planned Features → Games; scope includes gentle mode, i18n-ready strings, local save, and E2E coverage.
 - 2025-12-21: Post‑MVP roadmap approved for Rite of Discovery (episodes A–D, systems v2, collectibles/journal) and
@@ -264,7 +265,7 @@ Shipped (already available via manifest and listed under Completed):
   vignettes and mastery.
 - 2025-12-21: Added bilingual Designer/Animator Brief (EN/FR) with niceness/morality guardrails, fun & replayable 12+
   case
-  structures, and full asset specs/checklists. Linked from docs/rite-of-discovery.md.
+  structures, and full asset specs/checklists. Linked from docs/rite-of-discovery-design.md.
 - 2025-12-20: Theming overhaul — galaxy dark + star‑glow light via CSS variables in `app/globals.css`; palette tokens
   defined in requested order and mapped to shadcn semantic tokens for both themes; `--app-bg` drives backgrounds with
   documented light alternatives (cool/minimal). Playwright smoke asserts `body` background-image contains `gradient` in

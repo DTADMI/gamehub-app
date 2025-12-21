@@ -12,7 +12,11 @@ export type GameSlug =
     | "knitzy"
     | "bubble-pop"
     | "checkers"
-    | "chess";
+    | "chess"
+    // New point-and-click games (scaffolded as Upcoming)
+    | "rite-of-discovery"
+    | "systems-discovery"
+    | "toymaker-escape";
 
 export type GameEntry = {
     slug: GameSlug;
@@ -35,7 +39,7 @@ export const games: GameManifest = {
         title: "Breakout",
         shortDescription: "Break all the bricks and don’t let the ball fall!",
         tags: ["Arcade", "Canvas", "Particles"],
-        image: "/images/bg-neon-grid.jpg",
+        image: "/breakout-game-with-paddle-and-colorful-bricks.jpg",
         enabled: true,
         backgroundImage: "/images/bg-neon-grid.jpg",
         preloadAssets: [
@@ -57,7 +61,7 @@ export const games: GameManifest = {
         shortDescription:
             "Flip cards and match all pairs in as few moves as possible.",
         tags: ["Casual", "Memory", "Puzzle"],
-        image: "/images/bg-pastel-pattern.jpg",
+        image: "/colorful-memory-cards-game-interface.jpg",
         enabled: true,
         backgroundImage: "/images/bg-pastel-pattern.jpg",
         preloadAssets: [
@@ -73,7 +77,7 @@ export const games: GameManifest = {
         title: "Snake",
         shortDescription: "Eat food, grow longer, and avoid crashing.",
         tags: ["Arcade", "Grid", "Swipe"],
-        image: "/images/bg-abstract-dark.jpg",
+        image: "/retro-snake-game-with-neon-colors.jpg",
         enabled: true,
         backgroundImage: undefined,
         preloadAssets: [],
@@ -85,7 +89,7 @@ export const games: GameManifest = {
         shortDescription:
             "Relaxing stitch puzzler — match the pattern and score combos.",
         tags: ["Puzzle", "Casual", "Mobile"],
-        image: "/images/bg-pastel-pattern.jpg",
+        image: "/colorful-knitting-wool-baskets.jpg",
         enabled: true,
         backgroundImage: "/images/bg-pastel-pattern.jpg",
         preloadAssets: [
@@ -99,7 +103,7 @@ export const games: GameManifest = {
         title: "Knitzy",
         shortDescription: "Cozy puzzler with rolling balls of wool (upcoming).",
         tags: ["Puzzle", "Casual"],
-        image: "/images/bg-pastel-pattern.jpg",
+        image: "/colorful-knitting-wool-baskets.jpg",
         upcoming: true,
         enabled: false,
         backgroundImage: "/images/bg-pastel-pattern.jpg",
@@ -112,7 +116,7 @@ export const games: GameManifest = {
         title: "Bubble Pop",
         shortDescription: "Aim, match and pop bubbles before the board fills!",
         tags: ["Arcade", "Match-3", "Casual"],
-        image: "/images/bg-abstract-dark.jpg",
+        image: "/soap-bubbles-colorful-nature.jpg",
         enabled: true,
         backgroundImage: "/images/bg-abstract-dark.jpg",
         preloadAssets: [
@@ -127,7 +131,7 @@ export const games: GameManifest = {
         title: "Checkers",
         shortDescription: "Classic draughts on an 8×8 board — local two player.",
         tags: ["Board", "Local 2P", "Strategy"],
-        image: "/images/bg-abstract-dark.jpg",
+        image: "/activity-checkers.jpg",
         enabled: true,
         backgroundImage: "/images/bg-abstract-dark.jpg",
         preloadAssets: [],
@@ -138,11 +142,48 @@ export const games: GameManifest = {
         title: "Chess",
         shortDescription: "Open‑source chessboard — local two player (MVP).",
         tags: ["Board", "Local 2P", "Strategy"],
-        image: "/images/bg-abstract-dark.jpg",
+        image: "/king-chess-pieces.jpg",
         enabled: true,
         backgroundImage: "/images/bg-abstract-dark.jpg",
         preloadAssets: [],
         getComponent: () => import("@games/chess").then((m) => m.ChessGame),
+    },
+    "rite-of-discovery": {
+        slug: "rite-of-discovery",
+        title: "Rite of Discovery",
+        shortDescription: "Gentle point‑and‑click about family‑made magic (Upcoming).",
+        tags: ["Adventure", "Point & Click", "Story"],
+        image: "/images/bg-pastel-pattern.jpg",
+        upcoming: true,
+        enabled: false,
+        backgroundImage: "/images/bg-pastel-pattern.jpg",
+        preloadAssets: [],
+        // Placeholder component (not used while upcoming)
+        getComponent: () => import("@games/rite-of-discovery").then((m) => m.RiteOfDiscoveryGame),
+    },
+    "systems-discovery": {
+        slug: "systems-discovery",
+        title: "Systems Discovery",
+        shortDescription: "Explore everyday systems with extendable packs (Upcoming).",
+        tags: ["Adventure", "Point & Click", "Educational"],
+        image: "/images/bg-abstract-dark.jpg",
+        upcoming: true,
+        enabled: false,
+        backgroundImage: "/images/bg-abstract-dark.jpg",
+        preloadAssets: [],
+        getComponent: () => import("@games/systems-discovery").then((m) => m.SystemsDiscoveryGame),
+    },
+    "toymaker-escape": {
+        slug: "toymaker-escape",
+        title: "Toymaker Escape",
+        shortDescription: "Episodic escape game with a twisty mystery (Upcoming).",
+        tags: ["Escape", "Puzzles", "Story"],
+        image: "/images/bg-abstract-dark.jpg",
+        upcoming: true,
+        enabled: false,
+        backgroundImage: "/images/bg-abstract-dark.jpg",
+        preloadAssets: [],
+        getComponent: () => import("@games/toymaker-escape").then((m) => m.ToymakerEscapeGame),
     },
 };
 

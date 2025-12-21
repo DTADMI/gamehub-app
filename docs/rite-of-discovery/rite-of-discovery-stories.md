@@ -4,7 +4,7 @@ Purpose
 
 - Single source of truth to describe, review, and evolve all stories/scenarios for Rite of Discovery.
 - Usable by newcomers and domain experts to fact‑check details, add/remove beats, and steer tone and direction.
-- Cross‑links to the main design (`docs/rite-of-discovery.md`) and the Designer Brief (
+- Cross‑links to the main design (`docs/rite-of-discovery-design.md`) and the Designer Brief (
   `docs/rite-of-discovery-designer-brief.md`).
 
 How to use this document
@@ -16,7 +16,7 @@ How to use this document
 
 Related docs
 
-- Main design: docs/rite-of-discovery.md
+- Main design: docs/rite-of-discovery-design.md
 - Asset brief: docs/rite-of-discovery-designer-brief.md
 
 Status key

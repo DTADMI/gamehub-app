@@ -58,7 +58,7 @@ Local backend fallback (optional helper):
 
 Note: This design has been moved to a dedicated document under `docs/`. The canonical, up-to-date version now lives at:
 
-- docs/rite-of-discovery.md
+- docs/rite-of-discovery-design.md
 
 The content below is kept temporarily for historical context and will be pruned; please edit the file in `docs/` going
 forward.

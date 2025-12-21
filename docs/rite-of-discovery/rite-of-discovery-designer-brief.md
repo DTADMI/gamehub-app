@@ -1,12 +1,13 @@
 # Rite of Discovery — Designer/Animator Brief (EN)
 
 This brief is the production guide for visual assets and motion for the point‑and‑click game “Rite of Discovery.” It
-complements the design document in `docs/rite-of-discovery.md` and focuses on concrete deliverables, formats, sizes,
+complements the design document in `docs/rite-of-discovery-design.md` and focuses on concrete deliverables, formats,
+sizes,
 naming, and workflow — so art can be produced independently and plugged into the game with minimal back‑and‑forth.
 
 Link back to the main design doc (systems, scenes, 12+ extension):
 
-- docs/rite-of-discovery.md
+- docs/rite-of-discovery-design.md
 
 Key principles for all content
 
@@ -20,7 +21,7 @@ Key principles for all content
 Designer tasks & workflow (at a glance)
 
 - Intake & alignment
-  - Read `docs/rite-of-discovery.md` (main design) and `docs/rite-of-discovery-stories.md` (stories tracker).
+  - Read `docs/rite-of-discovery-design.md` (main design) and `docs/rite-of-discovery-stories.md` (stories tracker).
   - Confirm audience tone (MVP 7–9 or 12+ case), accessibility needs, and the Definition of Done (below).
 - Concept pass (per scene/case)
   - Produce 1 mood thumbnail (values/composition) and a quick palette swatch.
@@ -305,12 +306,13 @@ PR checklist (paste into PR description)
 # Rite of Discovery — Cahier pour le/la designer/animateur·rice (FR)
 
 Ce cahier est le guide de production des visuels et de l’animation pour le jeu point‑and‑click “Rite of Discovery”. Il
-complète le document de conception `docs/rite-of-discovery.md` et détaille les livrables (formats, tailles, nommage) et
+complète le document de conception `docs/rite-of-discovery-design.md` et détaille les livrables (formats, tailles,
+nommage) et
 le flux de livraison.
 
 Lien vers le document de conception (systèmes, scènes, extension 12+) :
 
-- docs/rite-of-discovery.md
+- docs/rite-of-discovery-design.md
 
 Principes clés pour tout le contenu
 
@@ -324,7 +326,8 @@ Principes clés pour tout le contenu
 Tâches & flux de travail (vue d’ensemble)
 
 - Cadrage
-  - Lire `docs/rite-of-discovery.md` (doc principal) et `docs/rite-of-discovery-stories.md` (suivi des histoires).
+  - Lire `docs/rite-of-discovery-design.md` (doc principal) et `docs/rite-of-discovery-stories.md` (suivi des
+    histoires).
   - Confirmer l’audience/le ton (MVP 7–9 ou 12+), les besoins d’accessibilité, et la Définition de Fini (ci‑dessous).
 - Concept
   - 1 vignette d’ambiance (valeurs/compo) + nuancier rapide.

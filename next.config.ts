@@ -31,6 +31,10 @@ const nextConfig: NextConfig = {
     "@games/bubble-pop",
     "@games/knitzy",
     "@games/tower-defense",
+    // New point-and-click games (scaffolded)
+    "@games/rite-of-discovery",
+    "@games/systems-discovery",
+    "@games/toymaker-escape",
     "@react-three/fiber",
     "@react-three/drei",
   ],
@@ -67,6 +71,19 @@ const nextConfig: NextConfig = {
       "@games/tower-defense": path.resolve(
           __dirname,
           "games/tower-defense/src",
+      ),
+      // New point-and-click games (scaffolded)
+      "@games/rite-of-discovery": path.resolve(
+          __dirname,
+          "games/rite-of-discovery/src",
+      ),
+      "@games/systems-discovery": path.resolve(
+          __dirname,
+          "games/systems-discovery/src",
+      ),
+      "@games/toymaker-escape": path.resolve(
+          __dirname,
+          "games/toymaker-escape/src",
       ),
     };
     return config;
