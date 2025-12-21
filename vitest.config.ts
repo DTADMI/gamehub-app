@@ -45,6 +45,12 @@ export default defineConfig({
         replacement: path.resolve(__dirname, "games/chess/src"),
       },
 
+      // Engine package
+      {
+        find: /^@games\/_engine$/,
+        replacement: path.resolve(__dirname, "games/_engine"),
+      },
+
       // Games packages — import from package root
       {
         find: /^@games\/([^/]+)$/,
