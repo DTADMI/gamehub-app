@@ -153,7 +153,7 @@ Featured playable games (MVP)
 - Breakout
 - Memory
 - Snake
-- Knitzy
+- Pattern Matching (formerly Knitzy)
 - Bubble Pop
 - Checkers
 - Chess
@@ -863,7 +863,7 @@ Relevant e2e specs (run with `pnpm test:e2e` at repo root):
 - `tests-e2e/breakout.spec.ts` — Breakout paddle/pause smokes
 - `tests-e2e/memory.spec.ts` — Memory flip two cards, moves increments
 - `tests-e2e/snake.spec.ts` — Snake canvas visible and HUD shows Score after simple input
-- `tests-e2e/knitzy.spec.ts` — Knitzy canvas painting updates progress
+- `tests-e2e/knitzy.spec.ts` — Pattern Matching (redirects from /games/knitzy) painting updates progress
 - `tests-e2e/bubble-pop.spec.ts` — Bubble Pop popping increases score text
 - `tests-e2e/checkers.spec.ts` — Checkers board renders
 - `tests-e2e/chess.spec.ts` — Chess board renders

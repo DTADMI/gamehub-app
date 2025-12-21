@@ -20,6 +20,6 @@ test.describe("Bubble Pop MVP", () => {
         await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
         await page.mouse.click(box.x + box.width * 0.52, box.y + box.height * 0.48);
 
-        await expect(page.locator(/Score:\s*\d+/)).toBeVisible();
+        await expect(page.getByText(/Score:\s*\d+/)).toBeVisible();
   });
 });

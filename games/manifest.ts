@@ -1,6 +1,8 @@
 // games/manifest.ts
-import dynamic from "next/dynamic";
-import React from "react";
+// Note: Do not import next/dynamic in this file. This module is used by Server Components
+// (e.g., Home page) to read the manifest, and importing next/dynamic with ssr:false here
+// triggers a Next.js error. Dynamic loading should be handled in the client page that
+// renders the game (e.g., app/games/[slug]/page.tsx).
 
 export type GameSlug =
     | "breakout"
@@ -152,14 +154,4 @@ export function listGames(): GameEntry[] {
     return Object.values(games);
 }
 
-export function dynamicComponent(entry: GameEntry) {
-    return dynamic(() => entry.getComponent().then((m) => m.default ?? m), {
-        ssr: false,
-        loading: () =>
-            React.createElement(
-                "div",
-                {className: "min-h-[50vh] flex items-center justify-center"},
-                React.createElement("div", {className: "text-xl"}, "Loading game..."),
-            ),
-    });
-}
+// Client pages should handle dynamic import using entry.getComponent().

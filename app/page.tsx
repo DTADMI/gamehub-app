@@ -4,8 +4,8 @@ import Link from "next/link";
 import {Carousel} from "@/components/Carousel";
 import {GameCard} from "@/components/GameCard";
 import {Button} from "@/components/ui/button";
-import {getGameById} from "@/lib/games";
 import {listGames} from "@/games/manifest";
+import {getGameById} from "@/lib/games";
 import {FEATURED_PROJECTS} from "@/lib/projects";
 
 type HomeGame = {

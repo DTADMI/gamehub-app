@@ -21,6 +21,7 @@ test.describe("Snake MVP", () => {
         await page.keyboard.press("ArrowLeft");
 
         // Assert Score label is present (value may still be 0)
-        await expect(page.locator(/Score:\s*\d+/)).toBeVisible();
+        await expect(page.getByText(/Score:\s*\d+/)).toBeVisible();
+
     });
 });

@@ -1,4 +1,5 @@
 // libs/shared/src/lib/ErrorBoundary.tsx
+"use client";
 import React, {Component, ErrorInfo, ReactNode} from "react";
 
 interface ErrorBoundaryProps {
