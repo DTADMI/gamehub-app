@@ -32,33 +32,122 @@ designed to be backend-agnostic, communicating with a separate API service.
 
 ## In Progress
 
-### Next Priority — Point & Click MVPs (Alpha) — Rite of Discovery, Systems Discovery, Toymaker Escape
+### Point & Click Track — Status Overview (Finish ROD → then TME → then SD)
 
-- [ ] Ship playable MVP vertical slices for the three narrative games (client-only; assets can be stubs)
-  - Common Systems
-    - [✓] Scene/Room controller (registry + onEnter/next) — implemented in `games/_engine` ✓
-    - [✓] Hotspot component (ARIA, keyboard, focus, data-testid) — `HotspotButton` ✓
-    - [✓] Dialogue/Prompt UI with 2–3 choices — `ChoiceList` ✓
-    - [✓] Save/Load service (localStorage v1; per-game keys: `rod:save:v1`, `sysdisc:save:v1`, `tme:save:v1`) ✓
-  - Rite of Discovery MVP
-    - [ ] S1 tag reassembly (3 pieces)
-    - [ ] S2 note letter-match (3 differences)
-    - [ ] S3 proof moment (receipt/overhear) with branch
-    - [*] Epilogue; unlock Helper Badge; New Game+ gate visible — stubbed in alpha
-  - Systems Discovery MVP (Core Pack)
-    - [ ] B1 loop puzzle (kitchen→compost→soil→herbs)
-    - [ ] B2 route planner (bus/bike sequence)
-    - [ ] B3 waste sorting with hints toggle
-    - [*] Wrap screen + Systems Scout badge — stubbed in alpha
-  - Toymaker Escape MVP (E1 only)
-    - [ ] Workshop gear alignment OR music box (one route to finish)
-    - [ ] Playroom sorter to reveal Key Fragment 1
-    - [*] Episode complete screen + Codex seed — stubbed in alpha
-  - Accessibility (all three)
-    - [ ] 44px targets, visible focus, reduced motion stills, captions for any SFX
-  - Testing
-    - [ ] Playwright smokes: reach end of MVP for each game
-    - [ ] RTL: reducers and save/load per game
+Legend: ✅ Completed • 🟡 In Progress • 🔜 Next • 🗂️ Backlog
+
+- ✅ Common Systems (shared engine)
+  - ✅ Scene/Room controller (registry + onEnter/next) — implemented in `games/_engine`
+  - ✅ Hotspot component (ARIA, keyboard, focus, data-testid) — `HotspotButton`
+  - ✅ Dialogue/Prompt UI with 2–3 choices — `ChoiceList`
+  - ✅ Save/Load service (localStorage v1; per‑game keys: `rod:save:v1`, `sysdisc:save:v1`, `tme:save:v1`)
+
+---
+
+✅ Rite of Discovery — Finish Beta NOW (priority 1)
+
+- Content & Puzzles
+  - [x] Implement S1 tag reassembly mini (3 pieces; keyboard + pointer)
+  - [x] Implement S2 note letter‑match (3 differences; clear/high‑contrast targets)
+  - [x] Implement S3 proof moment branch (receipt vs. overhear) with flags saved
+  - [x] Epilogue screen; Helper Badge unlock; NG+ gate visible
+- Systems & UX
+  - [x] Gentle Mode copy toggles applied to all dialogue prompts
+  - [x] Inventory placeholder (0–3 items) with labels and focus order
+  - [x] Save migration guard (v1 → v1, no‑op; add future‑proof version field)
+- Accessibility
+  - [x] 44px targets; visible focus; reduced‑motion stills for animations
+  - [x] Captions container present; basic contrast check completed
+- Content Ops
+  - [x] Strings extracted to en.json namespace `rod.*` (i18n‑ready)
+  - [x] Minimal final art placeholders wired (BG, 2 props, badge SVG)
+- QA & Tests
+  - [x] Playwright: complete S1→EP on both branches of S3
+  - [x] RTL: save/load, flags, gentle‑mode toggle logic
+- Acceptance (Beta)
+  - [x] Beta complete and shippable: accessibility pass, E2E/RTL green, minimal final assets in place
+
+---
+
+🔜 Toymaker Escape — Beta Ship Checklist (priority 2; start after ROD Beta)
+
+- Content & Puzzles (E1)
+  - [ ] Implement Workshop mini: Gear alignment OR Music box (one route required)
+  - [ ] Implement Playroom sorter to reveal Key Fragment 1
+  - [*] Episode complete screen + Codex seed (stubbed in alpha)
+- Systems & UX
+  - [ ] Inventory (0–6 items) basic; draggable puzzle pieces for one mini
+  - [ ] Medal tally (bronze/silver/gold) — simple criteria for E1 only
+- Accessibility
+  - [ ] Keyboard traversal for sliders/rotations; reduced‑motion variants
+  - [ ] SFX captions and volume control exposed
+- Content Ops
+  - [ ] Strings extracted to en.json namespace `tme.*`
+  - [ ] Minimal final art placeholders (Workshop BG, Playroom BG, Key fragment SVG)
+- QA & Tests
+  - [ ] Playwright: finish E1 via both gear and music routes
+  - [ ] RTL: reducer for medals, inventory add/remove
+- Acceptance (Beta)
+  - [ ] E1 fully playable with accessibility pass; tests green; minimal art in place
+
+---
+
+🗂️ Systems Discovery — Beta Ship Checklist (priority 3; start after TME Beta)
+
+- Content & Puzzles (Core)
+  - [ ] Implement B1 loop puzzle (Kitchen→Compost→Soil→Herbs)
+  - [ ] Implement B2 route planner (Bus/Bike sequence)
+  - [ ] Implement B3 waste sorting with hints toggle
+  - [*] Wrap screen + Systems Scout badge (stubbed in alpha)
+- Systems & UX
+  - [ ] Simple map/list UI components shared across scenes
+  - [ ] Save fields validated; medal or badge attribution on WRAP
+- Accessibility
+  - [ ] 44px targets; colorblind‑safe icons/patterns for sorting
+  - [ ] Reduced‑motion stills for any animated transitions
+- Content Ops
+  - [ ] Strings extracted to en.json namespace `sysdisc.*`
+  - [ ] Minimal final art placeholders (1 BG, 3 icons, badge SVG)
+- QA & Tests
+  - [ ] Playwright: complete B1→WRAP with both B2 plans
+  - [ ] RTL: hint toggle logic; save/read flags
+- Acceptance (Beta)
+  - [ ] Core pack fully playable with accessibility pass; tests green; minimal art in place
+
+---
+
+Cross‑Game Tasks (apply in this order: ROD → TME → SD)
+
+- Testing
+  - [ ] Playwright smokes: reach end of MVP/Beta for each game
+  - [ ] RTL: reducers and save/load per game
+- Accessibility
+  - [ ] Global audit: focus order, target sizes, color contrast, reduced motion
+  - [ ] Captions for any SFX; verify with screen reader basic paths
+
+---
+
+### Immediate Execution Order (per “Finish ROD now, then TME, then SD”)
+
+1) Rite of Discovery — finish Beta
+  - [ ] Extract strings to `en.json` under `rod.*`
+  - [ ] Wire minimal final art placeholders (BG, 2 props, badge SVG)
+  - [ ] Add Playwright flows (two S3 branches) and RTL tests (save/load, gentle)
+  - [ ] Quick a11y contrast check and SFX captions container (no new audio)
+  - [ ] Mark Acceptance (Beta) as complete
+
+2) Toymaker Escape — implement E1 Beta
+  - [ ] Build Workshop route (gears or music) and Playroom sorter minis
+  - [ ] Inventory basics and simple medal tally
+  - [ ] Extract strings to `tme.*`; add Playwright/RTL
+  - [ ] A11y pass (keyboard sliders/rotations; reduced‑motion)
+  - [ ] Mark Acceptance (Beta) as complete
+
+3) Systems Discovery — implement Core Beta
+  - [ ] Build B1 loop, B2 route planner (two solutions), B3 sorter with hints
+  - [ ] Extract strings to `sysdisc.*`; shared UI bits; wrap badge
+  - [ ] A11y pass; Playwright/RTL
+  - [ ] Mark Acceptance (Beta) as complete
 
 #### Post‑MVP — Systems Discovery: Body Systems Pack (documentation + scaffolds)
 
