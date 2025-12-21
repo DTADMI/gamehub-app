@@ -50,6 +50,45 @@ Extensions (Replayable Content Packs)
     - O2 Currents & Climate: connect wind, currents, upwelling; empathy toward coastal communities.
     - O3 Deep Signals: match “pings/songs/lights” to creatures; captions and no-jumpscare rule.
 
+  - Body Systems (Human Biology) — multi‑sub‑pack with Homeostasis Meter
+    - Overview
+      - Age framing: 9–12 primary with optional 15+ “Deeper Science” toggles in captions/tooltips.
+      - Structure: multiple themed sub‑packs, each with 3 scenes + a wrap screen and a shared Homeostasis Meter that
+        reacts to choices.
+      - Tone & guardrails: educational, kind, body‑positive, culturally neutral; strictly schematic/abstract art; no
+        gore; reproductive topics handled with scientific clarity and consent framing.
+    - Sub‑packs
+      - BOD‑Breath (Respiration & Circulation)
+        - BB1 Respiratory Basics: air path and gas exchange (lungs → alveoli → blood).
+        - BB2 Cardiovascular Flow: heart chambers and flow directions (icons only).
+        - BB3 Coupling at the Exchange: match oxygen/carbon dioxide flow; meter responds to balanced choices.
+      - BOD‑Fuel (Digest, Absorb, Excrete)
+        - BF1 Digestive Journey: break foods into nutrients; enzyme cards (generic).
+        - BF2 Absorption & Transport: small intestine villi → bloodstream; liver/pancreas cameo.
+        - BF3 Waste & Balance: urinary system overview; hydration choices affect meter.
+      - BOD‑Move (Frame & Motion)
+        - BM1 Skeletal Support: bones as levers; joints and safety.
+        - BM2 Muscular Action: antagonistic pairs; stamina vs. strength choices.
+        - BM3 Coordination: nervous system sends motor signals; reaction mini‑game (reduced‑motion stills provided).
+      - BOD‑Signal & Defend (Sense, Signal, Protect)
+        - BSD1 Nervous & Senses: signal pathways; senses as input cards (sound/light/pressure/chemical).
+        - BSD2 Endocrine Messages: hormones as slow signals; balance concepts (sleep, energy, growth).
+        - BSD3 Immune & Lymphatic + Integumentary: barriers and defenders; match threat→response (neutral imagery).
+      - BOD‑Grow (Development & Care)
+        - BG1 Reproductive Basics: cells and growth story (gametes→zygote→embryo) with schematic iconography only.
+        - BG2 Changes Over Time: puberty and growth framed with consent/care; hormones connect back to endocrine.
+        - BG3 Care Networks: community and healthcare roles; consent/choice; social safety lens.
+    - Mechanics
+      - Per‑scene mini‑puzzles (order, match, assemble) plus cross‑scene challenges (e.g., “keep the Homeostasis Meter
+        in the green for all 3 scenes”).
+      - Meter: 0–100 scale with calm, non‑alarmist feedback; never punishes, only teaches balance trade‑offs.
+    - Accessibility
+      - Clear, abstract visuals; alt text for diagrams; captions for SFX; reduced‑motion stills for any animation.
+    - Acceptance (Body Systems)
+      - All five sub‑packs playable end‑to‑end with save/restore; meter persists within each sub‑pack; wrap awards
+        badges.
+      - Deeper Science toggles surface safe, age‑appropriate details without changing puzzle difficulty.
+
 Gameplay & UX
 
 - DOM/CSS hotspots with keyboard support; 44px minimum targets; visible focus.
@@ -69,13 +108,14 @@ Stack & Architecture
 - State: Context + reducer; localStorage key `sysdisc:save:v1`.
 - Audio: soft ambient loops; optional SFX with captions.
 - i18n: minimal `t()` util with EN JSON.
+  - 15+ toggles: `showDeeperScience` flag gates additional captions/tooltips.
 
 Data Model (sketch)
 
-- `PackId = CORE | SPACE | OCEAN`
-- `SceneId` per pack (e.g., `B1|B2|B3|WRAP`, `S1|S2|S3`, `O1|O2|O3`).
+- `PackId = CORE | SPACE | OCEAN | BOD_BREATH | BOD_FUEL | BOD_MOVE | BOD_SIGNAL | BOD_GROW`
+- `SceneId` per pack (e.g., `B1|B2|B3|WRAP`, `S1|S2|S3`, `O1|O2|O3`, `BB1|BB2|BB3|WRAP`, ...).
 - Save:
-  `{ pack, scene, flags: {b1:{focus}, b2:{route}, b3:{noHints}, space:{}, ocean:{}}, codex:{entries:string[]}, medals:{[sceneId]: 'bronze'|'silver'|'gold'} }`
+  `{ pack, scene, flags: {b1:{focus}, b2:{route}, b3:{noHints}, space:{}, ocean:{}, bod:{ meter:number, toggles:{deeper:boolean} } }, codex:{entries:string[]}, medals:{[sceneId]: 'bronze'|'silver'|'gold'} }`
 
 Acceptance Criteria (Core + Packs ready for content wiring)
 
@@ -87,6 +127,8 @@ Implementation Tasks (summary)
 
 - Scaffolding: package, manifest entry (upcoming), route, scene controller, save/load.
 - Content: B1 loop puzzle; B2 route planner; B3 sorting; Space S1–S3, Ocean O1–O3 stubs.
+- Body Systems content scaffolds: add five sub‑packs with 3 scenes each (BB1–3, BF1–3, BM1–3, BSD1–3, BG1–3),
+  Homeostasis Meter UI, wrap screens.
 - Accessibility: focus, captions, reduced motion.
 - Testing: Playwright smokes per pack; RTL for reducer and medals.
 
@@ -99,3 +141,5 @@ Suggestions — Additional Scenarios
 - Core pack add-ons: “Power at Home” (grid vs. battery), “Water In/Out” (home plumbing loop).
 - Space: “Small Worlds” (asteroids/comets families), “Signals from Space” (light spectra cards, no speculation claims).
 - Ocean: “Reef Helpers” (mutualism matches), “Seafloor Builders” (vents to carbonates; neutral tone).
+- Body Systems: “Sleep & Circadian” (link endocrine+nervous), “Microbiome Buddies” (digestive symbiosis, neutral icons),
+  “First Aid Basics” (barrier care, social safety), “Sports & Recovery” (move+fuel balance).

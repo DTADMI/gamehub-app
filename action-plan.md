@@ -60,6 +60,22 @@ designed to be backend-agnostic, communicating with a separate API service.
     - [ ] Playwright smokes: reach end of MVP for each game
     - [ ] RTL: reducers and save/load per game
 
+#### Post‑MVP — Systems Discovery: Body Systems Pack (documentation + scaffolds)
+
+- Docs & design
+  - [x] Extend design doc with Body Systems overview, sub‑packs, Homeostasis Meter, data model, acceptance, tasks
+  - [x] Update Designer Brief (EN+FR) with BOD asset templates and delivery paths
+    `assets/{core|space|ocean|bod|shared}/`
+  - [x] Add stories tracker entries for BB1–3, BF1–3, BM1–3, BSD1–3, BG1–3 (goals, hooks, beats, flags, guardrails)
+- Engineering scaffolds
+  - [ ] Add Homeostasis Meter UI component (ARIA, reduced‑motion stills)
+  - [ ] Add five BOD sub‑packs to scene registry (stubs for BB/BF/BM/BSD/BG with wrap screens)
+  - [ ] Extend save model `sysdisc:save:v1` with `bod: { meter:number, toggles:{deeper:boolean} }`
+  - [ ] Medal rules: award “Care Ally”/BOD sub‑pack badges on wrap
+- Accessibility & testing
+  - [ ] Alt text and captions for all new diagrams; colorblind‑safe patterns for O2/CO2 and flows
+  - [ ] Playwright smoke: complete one BOD sub‑pack (any 3 scenes + wrap) with meter staying green
+
 - [x] Backgrounds — visibility fix and verification (galaxy dark, star‑glow light); ensure `--app-bg` applied on all
   pages (tuned intensities, enhanced starfield/nebula; verified on home, catalog, and game pages)
 - [ ] Game Launcher — Phase 2: flags‑driven gating via frontend‑only flags provider (localStorage) with unit/E2E checks

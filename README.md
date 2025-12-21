@@ -39,6 +39,7 @@ Game design docs
   - Design: docs/systems-discovery/systems-discovery-design.md
   - Designer/Animator Brief (EN+FR): docs/systems-discovery/systems-discovery-designer-brief.md
   - Stories & Scenarios Tracker: docs/systems-discovery/systems-discovery-stories.md
+  - Packs: Core • Space • Ocean • Body Systems (Breath, Fuel, Move, Signal & Defend, Grow)
 - Toymaker Escape
   - Design: docs/toymaker-escape/toymaker-escape-design.md
   - Designer/Animator Brief (EN+FR): docs/toymaker-escape/toymaker-escape-designer-brief.md

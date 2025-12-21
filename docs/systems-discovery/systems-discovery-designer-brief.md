@@ -22,7 +22,7 @@ File formats, sizes, naming, delivery
 - UI overlays: SVG. `ui_<scope>_<name>.svg` (e.g., `ui_codex_tabs.svg`, `ui_medal_panel.svg`).
 - Badges/collectibles: SVG + 256×256 PNG fallback. `badge_<id>.svg`, `collect_<id>.svg`.
 - Optional ambient loops: ≤ 200KB after brotli; provide reduced‑motion stills.
-- Delivery path: `public/games/systems-discovery/assets/{core|space|ocean|shared}/`.
+- Delivery path: `public/games/systems-discovery/assets/{core|space|ocean|bod|shared}/`.
 - Budgets (post‑brotli targets): ≤ 800KB per pack total; ≤ 30KB per prop SVG; ≤ 200KB per loop.
 
 Definition of Done (DoD)
@@ -76,9 +76,58 @@ Ocean Pack — per‑scene asset templates
     - Props: `ocean_o2_arrow_[wind|current|upwelling].svg`, `ocean_o2_buoy.svg`, `ocean_o2_coast.svg`
     - UI: `ui_current_map.svg`
 - O3 Deep Signals
-    - BG: `ocean_o3_bg.avif`
-    - Props: `ocean_o3_signal_[ping|song|light].svg`, `ocean_o3_creature_[1..4].svg`
-    - UI: `ui_signal_match.svg`
+  - BG: `ocean_o3_bg.avif`
+  - Props: `ocean_o3_signal_[ping|song|light].svg`, `ocean_o3_creature_[1..4].svg`
+  - UI: `ui_signal_match.svg`
+
+Body Systems — per‑sub‑pack asset templates (BOD)
+
+- BOD‑Breath (Respiration & Circulation)
+  - BGs: `bod_breath_bb1_bg.avif`, `bod_breath_bb2_bg.avif`, `bod_breath_bb3_bg.avif`
+  - Props:
+    - BB1: `bod_bb1_airway.svg`, `bod_bb1_lungs.svg`, `bod_bb1_alveoli.svg`, `bod_bb1_o2_co2_cards_[1..4].svg`
+    - BB2: `bod_bb2_heart_outline.svg`, `bod_bb2_chambers_[ra|rv|la|lv].svg`, `bod_bb2_flow_arrows_[1..4].svg`
+    - BB3: `bod_bb3_exchange_panel.svg`, `bod_bb3_o2_icon.svg`, `bod_bb3_co2_icon.svg`
+  - UI: `ui_bod_meter.svg` (Homeostasis), `ui_bod_match_slots.svg`
+
+- BOD‑Fuel (Digest, Absorb, Excrete)
+  - BGs: `bod_fuel_bf1_bg.avif`, `bod_fuel_bf2_bg.avif`, `bod_fuel_bf3_bg.avif`
+  - Props:
+    - BF1: `bod_bf1_food_card_[carb|protein|fat|fiber].svg`, `bod_bf1_enzyme_card_[1..3].svg`
+    - BF2: `bod_bf2_villi.svg`, `bod_bf2_transport_arrow_[1..3].svg`, `bod_bf2_liver.svg`, `bod_bf2_pancreas.svg`
+    - BF3: `bod_bf3_kidney.svg`, `bod_bf3_bladder.svg`, `bod_bf3_water_drop.svg`
+  - UI: `ui_bod_order_strip.svg`, `ui_bod_meter.svg`
+
+- BOD‑Move (Frame & Motion)
+  - BGs: `bod_move_bm1_bg.avif`, `bod_move_bm2_bg.avif`, `bod_move_bm3_bg.avif`
+  - Props:
+    - BM1: `bod_bm1_bone_[humerus|radius|ulna].svg`, `bod_bm1_joint_[hinge|ball].svg`, `bod_bm1_safety_card.svg`
+    - BM2: `bod_bm2_muscle_pair_[flexor|extensor].svg`, `bod_bm2_weight.svg`, `bod_bm2_timer.svg`
+    - BM3: `bod_bm3_brain.svg`, `bod_bm3_nerve.svg`, `bod_bm3_signal_icon.svg`
+  - UI: `ui_bod_choice_buttons.svg`
+
+- BOD‑Signal & Defend (Sense, Signal, Protect)
+  - BGs: `bod_signal_bsd1_bg.avif`, `bod_signal_bsd2_bg.avif`, `bod_signal_bsd3_bg.avif`
+  - Props:
+    - BSD1: `bod_bsd1_sensor_[light|sound|pressure|chemical].svg`, `bod_bsd1_path_cards_[1..4].svg`
+    - BSD2: `bod_bsd2_hormone_cards_[sleep|energy|growth].svg`, `bod_bsd2_gland_[pituitary|thyroid|adrenal].svg`
+    - BSD3: `bod_bsd3_skin.svg`, `bod_bsd3_barrier_cards_[1..3].svg`, `bod_bsd3_immune_cell_[1..3].svg`,
+      `bod_bsd3_lymph.svg`
+  - UI: `ui_bod_compare.svg`, `ui_bod_meter.svg`
+
+- BOD‑Grow (Development & Care)
+  - BGs: `bod_grow_bg1.avif`, `bod_grow_bg2.avif`, `bod_grow_bg3.avif`
+  - Props:
+    - BG1: `bod_bg1_cells_[gamete|zygote|embryo].svg`, `bod_bg1_growth_arrow.svg`
+    - BG2: `bod_bg2_hormone_cards_[1..3].svg`, `bod_bg2_consent_icon.svg`, `bod_bg2_support_cards_[1..3].svg`
+    - BG3: `bod_bg3_care_network_[family|community|clinic].svg`
+  - UI: `ui_bod_wrap.svg`, `ui_bod_meter.svg`
+
+Notes & guardrails for BOD
+
+- All art is abstract/schematic; no realistic anatomy or gore. Reproductive content uses neutral icons and emphasizes
+  consent, care, and science.
+- Keep budgets identical to other packs; prefer SVG props; reuse `ui_bod_meter.svg` across sub‑packs.
 
 Hand‑off workflow
 
@@ -121,6 +170,7 @@ Formats, tailles, nommage, livraison
 - Badges/collectors : SVG + PNG 256×256 secours.
 - Boucles audio/visuelles (optionnel) : ≤ 200KB; statiques fournies.
 - Dossier : `public/games/systems-discovery/assets/{core|space|ocean|shared}/`.
+- Dossier : `public/games/systems-discovery/assets/{core|space|ocean|bod|shared}/`.
 - Budgets : ≤ 800KB par pack; ≤ 30KB/SVG; ≤ 200KB/boucle.
 
 Définition de Fini (DoD)
@@ -134,6 +184,37 @@ Définition de Fini (DoD)
 Gabarits d’assets par scène — Core, Space, Ocean
 
 - Identiques à la section EN ci‑dessus (BG, props, overlays, badge/collector).
+
+Corps humain — Sous‑packs (BOD)
+
+- BOD‑Breath (Respirer & Circuler)
+  - BGs: `bod_breath_bb1_bg.avif`, `bod_breath_bb2_bg.avif`, `bod_breath_bb3_bg.avif`
+  - Props: voies aériennes, poumons, alvéoles, icônes O2/CO2; cœur (schématique), flèches de flux.
+  - UI: `ui_bod_meter.svg`, `ui_bod_match_slots.svg`.
+
+- BOD‑Fuel (Digérer, Absorber, Éliminer)
+  - BGs: `bod_fuel_bf1_bg.avif`, `bod_fuel_bf2_bg.avif`, `bod_fuel_bf3_bg.avif`
+  - Props: cartes aliments/enzymes (génériques), villosités, foie/pancréas, rein/vessie, goutte d’eau.
+  - UI: `ui_bod_order_strip.svg`, `ui_bod_meter.svg`.
+
+- BOD‑Move (Charpente & Mouvement)
+  - BGs: `bod_move_bm1_bg.avif`, `bod_move_bm2_bg.avif`, `bod_move_bm3_bg.avif`
+  - Props: os/joints (schématiques), paires musculaires, cerveau/nerfs (icônes).
+  - UI: `ui_bod_choice_buttons.svg`.
+
+- BOD‑Signal & Defend (Percevoir, Signaler, Protéger)
+  - BGs: `bod_signal_bsd1_bg.avif`, `bod_signal_bsd2_bg.avif`, `bod_signal_bsd3_bg.avif`
+  - Props: capteurs (lumière/son/pression/chimique), cartes hormones, peau/barrières, cellules immunitaires, lymphe.
+  - UI: `ui_bod_compare.svg`, `ui_bod_meter.svg`.
+
+- BOD‑Grow (Développement & Soin)
+  - BGs: `bod_grow_bg1.avif`, `bod_grow_bg2.avif`, `bod_grow_bg3.avif`
+  - Props: cellules (gamète/zygote/embryon) schématiques, icône consentement, cartes de soutien.
+  - UI: `ui_bod_wrap.svg`, `ui_bod_meter.svg`.
+
+Garde‑fous (BOD)
+
+- Iconographie abstraite; pas d’images réalistes. Contenus reproductifs: ton scientifique, consentement, soin.
 
 Flux de remise (PR)
 
