@@ -32,6 +32,34 @@ designed to be backend-agnostic, communicating with a separate API service.
 
 ## In Progress
 
+### Next Priority — Point & Click MVPs (Rite of Discovery, Systems Discovery, Toymaker Escape)
+
+- [ ] Ship playable MVP vertical slices for all three upcoming narrative games (client-only; assets can be stubs)
+  - Common Systems
+    - [ ] Scene/Room controller (registry + onEnter/next) ✓ scaffolds exist for routes and pages
+    - [ ] Hotspot component (ARIA, keyboard, focus, data-testid)
+    - [ ] Dialogue/Prompt UI with 2–3 choices
+    - [ ] Save/Load service (localStorage v1; per-game keys: `rod:save:v1`, `sysdisc:save:v1`, `tme:save:v1`)
+  - Rite of Discovery MVP
+    - [ ] S1 tag reassembly (3 pieces)
+    - [ ] S2 note letter-match (3 differences)
+    - [ ] S3 proof moment (receipt/overhear) with branch
+    - [ ] Epilogue; unlock Helper Badge; New Game+ gate visible
+  - Systems Discovery MVP (Core Pack)
+    - [ ] B1 loop puzzle (kitchen→compost→soil→herbs)
+    - [ ] B2 route planner (bus/bike sequence)
+    - [ ] B3 waste sorting with hints toggle
+    - [ ] Wrap screen + Systems Scout badge
+  - Toymaker Escape MVP (E1 only)
+    - [ ] Workshop gear alignment OR music box (one route to finish)
+    - [ ] Playroom sorter to reveal Key Fragment 1
+    - [ ] Episode complete screen + Codex seed
+  - Accessibility (all three)
+    - [ ] 44px targets, visible focus, reduced motion stills, captions for any SFX
+  - Testing
+    - [ ] Playwright smokes: reach end of MVP for each game
+    - [ ] RTL: reducers and save/load per game
+
 - [x] Backgrounds — visibility fix and verification (galaxy dark, star‑glow light); ensure `--app-bg` applied on all
   pages (tuned intensities, enhanced starfield/nebula; verified on home, catalog, and game pages)
 - [ ] Game Launcher — Phase 2: flags‑driven gating via frontend‑only flags provider (localStorage) with unit/E2E checks

@@ -29,6 +29,23 @@ Table of contents
 
 — — —
 
+Game design docs
+
+- Rite of Discovery
+  - Design: docs/rite-of-discovery.md
+  - Designer/Animator Brief (EN+FR): docs/rite-of-discovery-designer-brief.md
+  - Stories & Scenarios Tracker: docs/rite-of-discovery-stories.md
+- Systems Discovery
+  - Design: docs/systems-discovery/systems-discovery-design.md
+  - Designer/Animator Brief (EN+FR): docs/systems-discovery/systems-discovery-designer-brief.md
+  - Stories & Scenarios Tracker: docs/systems-discovery/systems-discovery-stories.md
+- Toymaker Escape
+  - Design: docs/toymaker-escape/toymaker-escape-design.md
+  - Designer/Animator Brief (EN+FR): docs/toymaker-escape/toymaker-escape-designer-brief.md
+  - Stories & Scenarios Tracker: docs/toymaker-escape/toymaker-escape-stories.md
+
+— — —
+
 1. Prerequisites
 
 - Node.js 20+
