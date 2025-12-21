@@ -44,6 +44,14 @@ Game design docs
   - Design: docs/toymaker-escape/toymaker-escape-design.md
   - Designer/Animator Brief (EN+FR): docs/toymaker-escape/toymaker-escape-designer-brief.md
   - Stories & Scenarios Tracker: docs/toymaker-escape/toymaker-escape-stories.md
+- Human History — Many Hands Make History
+- Design: docs/human-history/human-history-design.md
+- Designer/Animator Brief (EN+FR): docs/human-history/human-history-designer-brief.md
+- Stories & Scenarios Tracker: docs/human-history/human-history-stories.md
+- Africa Prehistory — Paths of Many
+- Design: docs/africa-prehistory/africa-prehistory-design.md
+- Designer/Animator Brief (EN+FR): docs/africa-prehistory/africa-prehistory-designer-brief.md
+- Stories & Scenarios Tracker: docs/africa-prehistory/africa-prehistory-stories.md
 
 — — —
 

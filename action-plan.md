@@ -32,9 +32,9 @@ designed to be backend-agnostic, communicating with a separate API service.
 
 ## In Progress
 
-### Next Priority — Point & Click MVPs (Rite of Discovery, Systems Discovery, Toymaker Escape)
+### Next Priority — Point & Click MVPs (Rite of Discovery, Systems Discovery, Toymaker Escape, Human History)
 
-- [ ] Ship playable MVP vertical slices for all three upcoming narrative games (client-only; assets can be stubs)
+- [ ] Ship playable MVP vertical slices for all four upcoming narrative games (client-only; assets can be stubs)
   - Common Systems
     - [ ] Scene/Room controller (registry + onEnter/next) ✓ scaffolds exist for routes and pages
     - [ ] Hotspot component (ARIA, keyboard, focus, data-testid)
@@ -54,6 +54,11 @@ designed to be backend-agnostic, communicating with a separate API service.
     - [ ] Workshop gear alignment OR music box (one route to finish)
     - [ ] Playroom sorter to reveal Key Fragment 1
     - [ ] Episode complete screen + Codex seed
+  - Human History MVP (Origins pack only)
+    - [ ] O1 Savannah Signals — smoke pattern sequence + role selection
+    - [ ] O2 Shore Exchange — fair‑bundle balancing mini + currents map match
+    - [ ] O3 Painted Memory — memory wall ordering + teach choice (signs/song)
+    - [ ] Wrap screen + “Origins” badge; Community Web meter UI stub
   - Accessibility (all three)
     - [ ] 44px targets, visible focus, reduced motion stills, captions for any SFX
   - Testing
