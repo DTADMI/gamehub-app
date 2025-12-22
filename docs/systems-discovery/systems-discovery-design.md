@@ -118,6 +118,35 @@ Intro/Outro Beats (implemented)
   WRAP via a link.
 - Replay hooks (low-scope): quick restart of Core pack, alternate B2 plan quick-start, toggle hints for next run.
 
+Flow & Narrative Sequencing — Core and Extensions
+
+- Core pack (first run)
+  - SD_INTRO (first visit only) → B1 (Loop) → B2 (Planner) → B3 (Sorter) → WRAP (badge) → SD_OUTRO (first completion
+    only)
+  - Flags: `intro.seen`, `b1.route`, `b2.plan`, `b3.hints`, `b3.result`, `outro.seen`
+  - Replay hooks: from WRAP or SD_OUTRO, offer Replay Core, Alternate B2 plan, Toggle B3 hints
+- Space pack
+  - SD_SPACE_INTRO (first visit only) → S1 → S2 → S3 → Space WRAP → SD_SPACE_OUTRO (first completion only)
+  - Flags: `flags.space.intro.seen`, `flags.space.outro.seen`
+- Ocean pack
+  - SD_OCEAN_INTRO (first visit only) → O1 → O2 → O3 → Ocean WRAP → SD_OCEAN_OUTRO (first completion only)
+  - Flags: `flags.ocean.intro.seen`, `flags.ocean.outro.seen`
+- Body Systems (BOD) sub‑packs
+  - For each sub‑pack (Breath, Fuel, Move, Signal & Defend, Grow): `SD_BOD_<SUB>_INTRO` → three scenes → `<SUB> WRAP` →
+    `SD_BOD_<SUB>_OUTRO`
+  - Shared meter: `bod.meter` persists within sub‑pack; flags include `flags.bod.<sub>.intro.seen` /
+    `flags.bod.<sub>.outro.seen`
+
+Narrated journey (Core)
+
+On a first visit, a friendly SD_INTRO title card invites the player to begin. In B1, the kitchen scraps become compost,
+which enriches soil that feeds herbs back in the kitchen—a small loop the player completes step by step. In B2, they
+choose between taking the bus first or biking first to plan a safe trip; either plan works and records their choice. In
+B3, the player sorts everyday items, optionally turning hints on for supportive guidance. The WRAP screen celebrates the
+Systems Scout badge and recaps choices. The first time, SD_OUTRO appears with calm congratulations and simple replay
+options—try the alternate route, toggle hints, or replay the Core pack—keeping the tone curious and kind while setting
+up future Space, Ocean, and Body Systems explorations.
+
 Extensions — Intro/Outro Beats (now documented)
 
 - Space pack

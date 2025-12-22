@@ -25,6 +25,17 @@ Index
       Draft — Owner: Narrative
   - [TME_OUTRO Medal Wrap](#tme_outro-medal-wrap) — Status: Integrated — Owner: Narrative
 
+Overview: Flow & Narrative
+
+First run flow: TME_INTRO (first visit only) → E1A Workshop (choose Gears or Music) → E1B Playroom Sorter → DONE →
+TME_OUTRO (first completion only).
+
+A short intro frames the playful escape. In E1A, the player picks a Workshop path: aligning gears with rotatable dials
+or tuning a music box with sliders—both keyboardable and readable via captions. E1B reveals Key Fragment 1 through a
+simple sorter, optionally with hints. The DONE screen recaps the run with a medal and items. The first time, the Outro
+invites replay: switch Workshop route, toggle hints, or begin again. Future episodes (E2 Office & Secret Stair, E3
+Apartment Mystery) follow the same rhythm with accessible puzzles and gentle copy.
+
 Story Template
 
 - ID/Name:

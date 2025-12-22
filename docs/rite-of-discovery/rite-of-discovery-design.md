@@ -22,6 +22,25 @@ magic. The ending frames it as a rite of passage.
   subsequent runs.
 - Outro scene `ROD_OUTRO` (post‑Epilogue wrap): provides recap and replay hooks including trying the other S3 branch,
   toggling Gentle Mode for next run, and an NG+ placeholder. Sets `outro.seen=true`.
+
+## Flow & Narrative Sequencing
+
+- First run: ROD_INTRO (first visit only) → S1 Night Before → S2 Tooth Tradition → S3 Proof Moment → Epilogue →
+  ROD_OUTRO (first completion only)
+- Flags of interest: `intro.seen`, `s1.askParent`, `s2.keepNote`, `s3.confrontNow | s3.path`, `ep.badgeHelper`,
+  `outro.seen`
+- Replay hooks: From Epilogue, open ROD_OUTRO to replay from S1, switch S3 branch, or toggle Gentle Mode for next run.
+  NG+ (Mentor Mini) is gated by the Helper Badge.
+
+### Narrated journey (MVP)
+
+A friendly title card sets the tone and invites the player to begin. In S1, a cozy living room scene turns into a small
+discovery: reassembling a torn gift tag hints at a familiar handwriting. In S2, comparing letters on two notes becomes a
+gentle pattern‑spotting moment, with soft hints when Gentle Mode is on. In S3, the player chooses how to learn the
+truth—by overhearing a plan or finding a receipt—framing family traditions as kindness made visible. The Epilogue
+celebrates this rite of discovery, offering warm words and a Helper Badge. The first time through, the Outro appears
+with simple options: replay from the start, try the other branch, or adjust Gentle Mode, keeping the experience calm,
+respectful, and replay‑friendly.
 - Save: localStorage key `rod:save:v1` persists `intro.seen`/`outro.seen` in addition to existing flags.
 
 ## Narrative Outline (MVP)

@@ -49,6 +49,18 @@ Index
 - [MM1‑R Mentor Mini — Reflection Variant (12+)](#mm1-r-mentor-mini-reflection-variant-12) — Status: Draft — Owner:
   Narrative
 
+Overview: Flow & Narrative
+
+First run flow: ROD_INTRO (first visit only) → S1 Night Before → S2 Tooth Tradition → S3 Proof Moment → Epilogue →
+ROD_OUTRO (first completion only).
+
+A gentle title card invites the player in. The first scene teaches interaction by reassembling a gift tag and noticing a
+familiar hand. The second celebrates close looking as the player toggles matching letters between two notes. The third
+offers a choice of how to confirm the truth—overhearing a plan or finding a receipt—always with kind framing. The
+Epilogue reframes the discovery as a rite of passage and awards a Helper Badge. The first time, the Outro presents calm
+replay options: try the other branch, toggle Gentle Mode, or replay from the start. Subsequent runs skip the intro/outro
+by default but keep them discoverable via links. Choices are saved as small flags to support NG+ (Mentor Mini) later.
+
 Story Template
 
 - ID/Name:

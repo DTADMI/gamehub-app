@@ -42,15 +42,18 @@ Index
   - [B2 Transit Rhythm](#b2-transit-rhythm) — Status: Draft — Owner: Narrative
   - [B3 Waste Sorting](#b3-waste-sorting) — Status: Draft — Owner: Narrative
   - [WRAP — Systems Scout](#wrap--systems-scout) — Status: Draft — Owner: Narrative
-  - [SD_OUTRO Wrap Hooks](#sd_outro-wrap-hooks) — Status: Integrated — Owner: Narrative
 - Space
+  - [SD_SPACE_INTRO Title Card](#sd_space_intro-title-card) — Status: Integrated — Owner: Narrative
   - [S1 Orbits & Periods](#s1-orbits--periods) — Status: Draft — Owner: Narrative
   - [S2 Light & Shadows](#s2-light--shadows) — Status: Draft — Owner: Narrative
   - [S3 Habitable Clues](#s3-habitable-clues) — Status: Draft — Owner: Narrative
+  - [SD_SPACE_OUTRO Wrap Hooks](#sd_space_outro-wrap-hooks) — Status: Integrated — Owner: Narrative
 - Ocean
+  - [SD_OCEAN_INTRO Title Card](#sd_ocean_intro-title-card) — Status: Integrated — Owner: Narrative
   - [O1 Layers of Light](#o1-layers-of-light) — Status: Draft — Owner: Narrative
   - [O2 Currents & Climate](#o2-currents--climate) — Status: Draft — Owner: Narrative
   - [O3 Deep Signals](#o3-deep-signals) — Status: Draft — Owner: Narrative
+  - [SD_OCEAN_OUTRO Wrap Hooks](#sd_ocean_outro-wrap-hooks) — Status: Integrated — Owner: Narrative
 - Body Systems (BOD)
   - [BB1 Respiratory Basics](#bb1-respiratory-basics) — Status: Draft — Owner: Narrative
   - [BB2 Cardiovascular Flow](#bb2-cardiovascular-flow) — Status: Draft — Owner: Narrative
@@ -67,6 +70,19 @@ Index
   - [BG1 Reproductive Basics](#bg1-reproductive-basics) — Status: Draft — Owner: Narrative
   - [BG2 Changes Over Time](#bg2-changes-over-time) — Status: Draft — Owner: Narrative
   - [BG3 Care Networks](#bg3-care-networks) — Status: Draft — Owner: Narrative
+
+  - [SD_OUTRO Wrap Hooks](#sd_outro-wrap-hooks) — Status: Integrated — Owner: Narrative
+
+Overview: Flow & Narrative
+
+On a first visit, Systems Discovery greets the player with a simple title card that frames the day’s journey. The Core
+pack flows gently from a home loop (Kitchen → Compost → Soil → Herbs) to a neighborhood route plan (Bus ↔ Bike), and
+concludes by sorting everyday waste with optional hints. After celebrating the Systems Scout badge, the outro offers
+friendly replay hooks to try an alternate route or hints setting. From there, the Space and Ocean packs each begin with
+a short intro card, guide the player through three themed scenes, and close with their own wrap/outro, keeping the
+experience skippable on replays. Body Systems sub‑packs follow the same rhythm with a Homeostasis Meter that responds to
+balanced choices. Throughout, choices are recorded as calm flags and captions emphasize curiosity, kindness, and science
+humility.
 
 ## SD_INTRO Title Card
 
@@ -338,18 +354,27 @@ Index
 - SPACE: Small Worlds; Signals from Space (spectra puzzle).
 - OCEAN: Reef Helpers; Seafloor Builders.
 
-## SD_BOD_GROW_INTRO Title Card
+## SD_OCEAN_INTRO Title Card
 
-- Pack: BOD‑GROW
-- Goal: Set gentle, age‑appropriate framing.
-- Flags: `flags.bod.grow.intro.seen = true`.
-- Copy keys: `sysdisc.bod.grow.intro.*`.
+- Pack: OCEAN
+- Goal: Set the tone for Ocean (depth, currents, signals) with a calm, curious framing.
+- Beats:
+  - Title card with two short lines; primary “Begin”, secondary “Skip intro”.
+  - On action, set `flags.ocean.intro.seen=true` and proceed to O1.
+- Flags: `flags.ocean.intro.seen = true` (persisted in `sysdisc:save:v1`).
+- Copy keys: `sysdisc.ocean.intro.*`.
+- Guardrails: Reduced motion; accessible heading and buttons.
 - Status: Integrated.
 
-## SD_BOD_GROW_OUTRO Wrap Hooks
+## SD_OCEAN_OUTRO Wrap Hooks
 
-- Pack: BOD‑GROW
-- Goal: Close the arc; suggest back to Core.
-- Flags: `flags.bod.grow.outro.seen = true`.
-- Copy keys: `sysdisc.bod.grow.outro.*`.
+- Pack: OCEAN
+- Goal: Provide closure for Ocean pack and offer replay/next steps.
+- Beats:
+  - Brief congratulations and recap; friendly suggestion of what to try next.
+  - Actions: Replay Ocean pack; toggle any helper/hints; proceed to a BOD sub‑pack (if available).
+  - Set `flags.ocean.outro.seen=true` first time; link-openable later from Ocean WRAP.
+- Flags: `flags.ocean.outro.seen = true`.
+- Copy keys: `sysdisc.ocean.outro.*`.
+- Guardrails: Accessible buttons (≥44px), visible focus, reduced motion.
 - Status: Integrated.

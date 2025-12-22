@@ -49,6 +49,24 @@ Stack & Architecture
 - Audio: ambient room loops; short SFX with captions and volume control.
 - i18n: EN strings first.
 
+## Flow & Narrative Sequencing (E1 → E2 → E3)
+
+- Episode 1 (E1): TME_INTRO (first visit only) → E1A Workshop (choose Gears or Music) → E1B Playroom Sorter → DONE →
+  TME_OUTRO (first completion only)
+- Episode 2 (E2): Office & Secret Stair — cipher/filing/shadow routes → DONE → E2 wrap (medal/codex)
+- Episode 3 (E3): Apartment Mystery — environmental locks and choices → DONE → E3 wrap (truth framing)
+- Medals & replay: medals computed per episode; from TME_OUTRO and DONE screens, offer Replay E1, Switch Workshop route,
+  and Toggle hints. Future episodes follow the same pattern.
+
+### Narrated journey (E1)
+
+A short title card frames the escape as a playful mystery. In the Workshop, the player chooses their path: align three
+gears by rotating simple dials, or tune a music box with three sliders. Either route unlocks a plate and teaches
+accessible controls. In the Playroom, selecting three colors (or shapes) reveals a hidden latch to Key Fragment 1. The
+DONE screen recaps the run with a medal. The first time, the Outro appears with gentle encouragement to replay: try the
+other Workshop route, switch hints, or begin again. The tone stays clever and cozy, never punishing, with captions and
+reduced‑motion support.
+
 Intro/Outro Beats (implemented)
 
 - Intro scene `TME_INTRO` (title card): sets `intro.seen=true` on first visit, then proceeds to `E1A`. Skipped on

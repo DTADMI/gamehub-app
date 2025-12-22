@@ -196,6 +196,11 @@ Cross‑Game Tasks (apply in this order: ROD → TME → SD)
 - [ ] Memory game UX — matched cards spin+fade then are removed from layout after animation; add tests
 - [ ] Assets & backgrounds — wire initial Kenney SFX and backgrounds; maintain public/credits.md
 - [ ] Documentation — keep README and guidelines updated with Admin/Launcher/Snake controls
+  - [x] Add “Flow & Narrative Sequencing” + “Narrated journey” sections to design docs and stories trackers:
+    - RoD: docs/rite-of-discovery/rite-of-discovery-design.md (§ Flow & Narrative Sequencing); stories.md (Overview)
+    - TME: docs/toymaker-escape/toymaker-escape-design.md (§ Flow & Narrative Sequencing); stories.md (Overview)
+    - SD: docs/systems-discovery/systems-discovery-design.md (§ Flow & Narrative Sequencing); stories.md (Overview;
+      Space/Ocean intros & outros added)
 - [ ] Add user profile and game statistics tracking
 - [ ] Implement leaderboard functionality
 - [ ] Implement game settings and preferences
