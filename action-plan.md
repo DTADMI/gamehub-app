@@ -25,6 +25,106 @@ frontend‑only and backend‑agnostic.
 
 - CI health: Monitor the next scheduled CI run on `main` and keep the pipeline green.
 - Tests: Maintain mobile Snake spec parity and Memory animation unit test stability.
+- Narrative engine fusion: keep canvas `core/*` as primary and integrate `EngineCtx`+`guards/effects`, puzzle primitives
+  and React a11y UI (DialogueBox, InventoryBar). Implement first keypad puzzle and wire TME E1.
+
+— — —
+
+## Execution Plan — Proceeding Now (per approval)
+
+Legend: ✅ Completed • 🟡 In Progress • 🔜 Next • 🗂️ Backlog
+
+1) Engine improvements (mobile‑first authoring)
+
+- ✅ Keep `libs/shared/src/pointclick/core/*` as primary runtime
+- ✅ Helpers: `EngineCtx`, `guards/effects`, save/load/migrate
+- ✅ Puzzle primitives shipped: `keypad`, `sequence`, `wires` (+ unit tests)
+- 🟡 Integrate `InputSequenceDetector` with `core/InputManager` gesture macros
+- 🔜 Scene services: timers, cutscene runner, per‑scene blackboard
+- 🔜 Versioned save migrations: `rod:save:v1`, `tme:save:v1`, `sysdisc:save:v1`
+
+2) New puzzle primitives & wrappers
+
+- 🟡 Gears ratio mesh (logic + UI wrapper, ≥44px targets)
+- 🔜 Pipes/Flow (network satisfaction)
+- 🔜 Sorter (tap/drag categories; reduced‑motion path)
+
+3) Game delivery
+
+- TME (Episode 1)
+  - ✅ Keypad gate integrated; inventory award, medal flag
+  - 🟡 Implement Gears mini and integrate into scene flow
+  - 🔜 Implement Sorter mini; add EN/FR copy polish; captions a11y sweep
+  - 🔜 Save migration and unit tests for guards/effects
+- ROD
+  - 🟡 Keypad + Wires gates; guarded choices, inventory (0–3)
+  - 🔜 EN/FR copy; captions; accessibility sweep
+  - 🔜 Local save + migration; progression tests
+- SD (Core + Body Systems: Breath, Fuel, Move, Signal, Grow)
+  - 🟡 Core + Breath playable with smokes (existing BOD Breath smoke retained)
+  - 🔜 Fuel/Move/Signal/Grow simple educational puzzles using primitives
+  - 🔜 Local saves, badges per pack
+
+4) Tests & CI
+
+- ✅ Unit: keypad/sequence/wires
+- 🟡 Add unit: gears; scene progression tests for TME/ROD/SD
+- 🟡 Playwright E2E smokes per title (desktop + mobile Pixel 5/iPhone 12)
+
+5) Docs & Assets
+
+- ✅ README: engine architecture + keypad/sequence/wires usage examples
+- 🟡 Add `/docs/narrative/scene-puzzles.md` (designer handoff briefs) and update per title
+- 🟡 Update `public/credits.md` as placeholder art/SFX are added
+
+Tracking note: I will mark each sub‑item above as completed as I land code, and keep this section at the top for quick
+status.
+
+---
+
+### 🟡 New — Execution Plan for this Issue (Engine improvements + Finish ROD, TME, SD)
+
+Legend: ✅ Completed • 🟡 In Progress • 🔜 Next • 🗂️ Backlog
+
+- ✅ Architecture decision: Use `libs/shared/src/pointclick/core/*` as the primary runtime; fuse declarative helpers from
+  `pointclick/engine.ts` (EngineCtx, guards/effects), React a11y UI, and puzzle primitives.
+- ✅ Implemented helpers/UI: `EngineCtx`, `guards/effects`, `DialogueBox`, `InventoryBar`.
+- ✅ Puzzle primitive shipped: `keypad` (+ unit test scaffold).
+- ✅ TME: integrated keypad gate in E1; local save `tme:save:v1`.
+
+- 🟡 Engine improvements to implement now (mobile‑first, complex puzzles):
+  - [x] InputSequenceDetector integration with `InputManager` for gesture macros (tap patterns, hold‑then‑drag). ✓
+  - [ ] Scene Services: timers, cutscene runner, and a tiny blackboard for puzzle state per scene (typed hooks).
+  - [ ] Additional puzzle primitives (pure logic + light UI wrappers):
+    - [ ] sequence/simon
+    - [ ] wires/connectors
+    - [ ] gears ratio mesh
+    - [ ] pipes/flow
+  - [ ] Persistence helpers: versioned save migrations for `rod:save:v1`, `tme:save:v1`, `sysdisc:save:v1`.
+
+- 🟡 Game implementation (parallel TME → ROD → SD):
+  - TME (Episode 1)
+    - [ ] Gears mesh mini + medals; inventory use on hotspot
+    - [ ] Sorter mini (tap/drag) with reduced‑motion path
+    - [ ] EN/FR final copy pass; captions and a11y review
+  - ROD
+    - [ ] Keypad door + wires/connectors puzzle; guarded choices with flags
+    - [ ] EN/FR strings, inventory 0–3, captions region, reduced‑motion
+  - SD (Core + Body Systems: Breath, Fuel, Move, Signal, Grow)
+    - [ ] Implement simple educational variants using primitives; EN/FR copy
+    - [ ] Local saves, badges per pack
+
+- 🟡 Tests & CI
+  - [ ] Unit tests for each puzzle primitive
+  - [ ] Scene graph/progression unit tests (guards/effects)
+  - [ ] Playwright E2E smokes per title path
+
+- 🟡 Docs & Assets
+  - [ ] README — engine overview and examples (expanded)
+  - [ ] docs/ — per‑game scene & puzzle briefs with steps/hints/assets
+  - [ ] public/credits.md — add placeholder asset credits as needed
+
+Notes: Frontend‑only MVPs; EN/FR localization; accessibility guardrails; mobile‑first ≥44px targets; local saves.
 
 ### 🔜 Next (Narrative Games — ROD, TME, SD)
 
@@ -80,11 +180,20 @@ frontend‑only and backend‑agnostic.
 
 - [ ] Shared point‑and‑click engine: scene graph, hotspot system, dialogue UI, inventory/flags, timers; exportable
   hooks. 🟡
+  - [x] Keep `core/*` runtime as primary; add `EngineCtx`, `guards`, `effects`, and migrations in helpers. ✓
+  - [x] Add React `DialogueBox` and `InventoryBar` for a11y/mobile. ✓
+  - [x] Puzzle primitives: `keypad` + unit tests. ✓
+  - [ ] Puzzle primitives: `sequence/simon`, `wires/connectors`, `gears` ratio mesh, `pipes/flow`. 🟡
 - [ ] i18n foundation: EN/FR namespaces per title, language switch in header with persistence. 🟡
 - [ ] Saves: localStorage with versioned keys `rod:save:v1`, `tme:save:v1`, `sysdisc:save:v1` + migration stubs. 🟡
 - [ ] TME MVP: implement Intro → E1 routes, gears mini, sorter puzzle, medals, wrap; a11y & mobile pass. 🟡
+  - [x] Intro → E1 keypad gate (2413) integrated; inventory gains `gear-key`. ✓
+  - [ ] Gears mesh mini (ratio engagement) with medal award. 🟡
+  - [ ] Sorter mini (tap/drag categories) with hints and reduced‑motion affordance.
 - [ ] ROD MVP: implement scenes, hotspots, dialogue per design docs; core puzzles; a11y & mobile pass. 🔜
+  - [ ] Keypad door + wires/connectors puzzle; guarded choices via `guards`.
 - [ ] SD MVP: Core + BOD packs (Breath, Fuel, Move, Signal, Grow) basic paths; badges; a11y & mobile pass. 🔜
+  - [ ] Add Fuel/Move/Signal/Grow simple educational puzzles; EN/FR strings.
 - [ ] Tests: E2E smokes per title + unit tests for scene graph and progression guards. 🟡
 - [ ] Default placeholder assets wired (images/SFX/music) and `public/credits.md` updated. 🟡
 

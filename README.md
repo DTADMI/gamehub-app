@@ -150,6 +150,154 @@ Mobile‑first game UX (important):
 - Canvases are high‑DPI aware and scale crisply on DPR 1/2/3; the CSS size fits the container width.
 - Breakout and Snake include a tap‑to‑start/pause overlay on mobile for smooth interaction.
 
+### Point‑and‑Click Engine (architecture & usage)
+
+The narrative games (ROD, TME, SD) share a lightweight, frontend‑only point‑and‑click engine designed for mobile‑first
+UX and accessibility. It is composed of a robust runtime under `libs/shared/src/pointclick/core/*` and ergonomic helpers
+under `libs/shared/src/pointclick/*`.
+
+Key parts
+
+- Core runtime (`core/*`):
+  - `Engine.ts`: main loop over canvas scenes with input/animation/asset/state managers and a plugin bus (dialogue,
+    inventory, achievements)
+  - `SceneManager.ts`: register/switch scenes, visit history, lifecycle hooks (`init`, `onEnter`, `onExit`, `update`,
+    `render`)
+  - `InputManager.ts`: pointer/touch/keyboard with gestures (tap, double‑tap, long‑press, swipe). Prevents page scroll
+    during interactions.
+  - `StateManager.ts`: observable key–value state with save/load/undo.
+  - `AnimationManager.ts`: tiny timeline/animation helpers.
+- Declarative helpers:
+  - `pointclick/engine.ts`: `EngineCtx` shape (`flags`, `inventory`, `vars`), `guards` (e.g., `hasItem`, `hasFlag`),
+    `effects` (e.g., `addItem`, `setFlag`), `nextScene`, `save/load`, and a tiny migration helper.
+  - React UI (`pointclick/react/*`): `DialogueBox`, `InventoryBar` for ≥44px touch targets and a11y roles/labels.
+  - Puzzles (`pointclick/puzzles/*`): pure logic modules you can render any way you like: `keypad`, `sequence` (Simon),
+    and `wires` (connectors). More primitives like gears/pipes can be added similarly.
+  - Gears (`pointclick/puzzles/gears`): ratio‑mesh evaluator (pure logic). Pair it with a simple UI to adjust teeth and
+    connections; solved when the path ratio `|speed_out/speed_in|` equals the target.
+
+Gesture macros (mobile‑first)
+
+`InputManager` now integrates an `InputSequenceDetector` so you can declare high‑level gestures as sequences of
+low‑level inputs: `'pointerdown' | 'longpress' | 'swipe' | 'doubletap' | 'pointerup' | 'keydown' | 'keyup'`.
+
+```ts
+import {GameEngine} from "@games/shared/pointclick/core/Engine";
+
+// After creating the engine
+const engine = new GameEngine({canvas: myCanvas});
+
+// Hold‑then‑drag macro (useful for drag handles guarded by a long‑press)
+engine.input.registerSequenceMacro('holdThenDrag', ['pointerdown', 'longpress', 'swipe'], () => {
+  engine.events.emit('puzzle:hint', {id: 'drag-started'});
+});
+
+// Listen to macro events anywhere
+engine.events.on('input:macro:holdThenDrag', ({name, sequence}) => {
+  console.log('Macro matched:', name, sequence);
+});
+```
+
+Minimal example
+
+```ts
+import {detectLang, nextScene, guards, effects, type Scene} from "@games/shared/pointclick/engine";
+
+const scenes: Record<string, Scene> = {
+  INTRO: {
+    id: "INTRO",
+    title: {en: "Intro", fr: "Intro"},
+    body: {en: "A quiet room.", fr: "Une pièce calme."},
+    choices: [
+      {
+        id: "open", text: {en: "Open desk", fr: "Ouvrir le bureau"}, target: "DESK",
+        effect: effects.addItem("desk-key")
+      },
+    ]
+  },
+  DESK: {
+    id: "DESK",
+    title: {en: "Locked Desk", fr: "Bureau verrouillé"},
+    body: {en: "You need a key.", fr: "Vous avez besoin d'une clé."},
+    choices: [
+      {
+        id: "unlock", text: {en: "Use key", fr: "Utiliser la clé"}, target: "OPEN",
+        guard: guards.hasItem("desk-key")
+      }
+    ]
+  },
+  OPEN: {id: "OPEN", title: {en: "Open!", fr: "Ouvert!"}, choices: []},
+};
+```
+
+React scaffolding
+
+```tsx
+import {DialogueBox, InventoryBar, detectLang} from "@games/shared";
+
+// Use DialogueBox to render choices accessibly and InventoryBar for item actions
+<DialogueBox scene={scene} lang={detectLang()} onChoose={(id) => {
+  const res = nextScene(sceneId, scenes, id, ctx);
+  setSceneId(res.sceneId);
+  setCtx(res.ctx);
+}}/>
+<InventoryBar items={ctx.inventory} onUse={(id) => {/* apply to hotspot */
+}}/>
+```
+
+Example — Sequence (Simon) puzzle
+
+```ts
+import {createSequenceState, pressSeq} from "@games/shared/pointclick/puzzles/sequence";
+
+let seq = createSequenceState(["R", "G", "B"], {lives: 3});
+seq = pressSeq(seq, "R");
+seq = pressSeq(seq, "G");
+seq = pressSeq(seq, "B");
+// seq.solved === true
+```
+
+Example — Wires/connectors puzzle
+
+```ts
+import {createWiresState, setConnection, hasCrossing} from "@games/shared/pointclick/puzzles/wires";
+
+const goal = {red: [{from: "A1", to: "B2"}], blue: [{from: "A2", to: "B1"}]};
+let wires = createWiresState(["A1", "A2"], ["B1", "B2"], goal);
+wires = setConnection(wires, "A2", "B1", "blue");
+wires = setConnection(wires, "A1", "B2", "red");
+// wires.solved === true; hasCrossing(wires) can be used to discourage crossed layouts in UI
+```
+
+Example — Gears ratio mini
+
+```ts
+import {createGearsState, setTeeth} from "@games/shared/pointclick/puzzles/gears";
+
+// Input → Output directly meshed; target ratio 1/2 (output is half the speed of input)
+let g = createGearsState(
+        [{id: "in", teeth: 20}, {id: "out", teeth: 40}],
+        [{a: "in", b: "out"}],
+        "in",
+        "out",
+        0.5,
+);
+g.solved; // true
+
+// Change teeth → no longer solved
+g = setTeeth(g, "out", 30);
+g.solved; // false
+```
+
+Why this split
+
+- Core `Engine` is great for canvas‑driven scenes (custom rendering, hotspot layouts) and plugin integrations.
+- Declarative helpers keep puzzle authoring simple, testable, and backend‑agnostic. You can use them with or without the
+  canvas runtime.
+
+See also: `libs/shared/src/pointclick/core/*`, `libs/shared/src/pointclick/engine.ts`,
+`libs/shared/src/pointclick/react/*`, and `libs/shared/src/pointclick/puzzles/*`.
+
 Layout and footer (UX updates):
 
 - The root layout uses a sticky footer and tighter vertical spacing so most pages fit within a single screen or require

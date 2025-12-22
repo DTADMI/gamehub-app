@@ -1,13 +1,12 @@
-// In utils/InputSequenceDetector.ts
+// In ui/InputSequenceDetector.ts
 import {Vector2} from "../types";
 
-type InputType = 'keydown' | 'keyup' | 'pointerdown' | 'pointerup' | 'swipe' | 'longpress' | 'doubletap';
+export type InputType = 'keydown' | 'keyup' | 'pointerdown' | 'pointerup' | 'swipe' | 'longpress' | 'doubletap';
 
-interface InputEvent {
+export interface InputSequenceEvent {
     type: InputType;
     key?: string;
     position?: Vector2;
-    // Add other relevant properties
 }
 
 export class InputSequenceDetector {
@@ -22,7 +21,7 @@ export class InputSequenceDetector {
         this.onSequenceMatched = onMatched;
     }
 
-    processInput(event: InputEvent): void {
+    processInput(event: InputSequenceEvent): void {
         // Add the new input to the sequence
         this.sequence.push(event.type);
 

@@ -1,4 +1,5 @@
 import {InputEvent, Vector2} from '../types';
+import {InputSequenceDetector, InputSequenceEvent, InputType} from "../ui/InputSequenceDetector";
 import {EventSystem} from '../utils/EventSystem';
 
 export class InputManager {
@@ -19,6 +20,9 @@ export class InputManager {
     private doubleTapThreshold: number = 300; // ms
     private lastTapPos: Vector2 = {x: 0, y: 0};
     private doubleTapDistanceThreshold: number = 10; // pixels
+
+    // Input sequence detectors (gesture macros)
+    private sequenceDetectors: Map<string, InputSequenceDetector> = new Map();
 
     constructor(canvas: HTMLCanvasElement, eventSystem: EventSystem) {
         this.canvas = canvas;
@@ -67,6 +71,27 @@ export class InputManager {
                 isDown: true
             });
         });
+    }
+
+    // Public API: register a gesture macro sequence
+    registerSequenceMacro(name: string, targetSequence: InputType[], onMatched?: (sequence: InputType[]) => void): () => void {
+        const detector = new InputSequenceDetector(targetSequence, (sequence) => {
+            // Emit a high-level macro event and call optional callback
+            this.eventSystem.emit(`input:macro:${name}` as string, {name, sequence});
+            onMatched?.(sequence);
+        });
+        this.sequenceDetectors.set(name, detector);
+        // Return unregister function
+        return () => {
+            this.sequenceDetectors.delete(name);
+        };
+    }
+
+    private feedSequence(event: InputSequenceEvent) {
+        // Push the input event type to all detectors
+        for (const det of this.sequenceDetectors.values()) {
+            det.processInput(event);
+        }
     }
 
     cleanup(): void {
@@ -134,9 +159,11 @@ export class InputManager {
                 position: this.pointerPosition,
                 duration: Date.now() - this.gestureStartTime
             });
+            this.feedSequence({type: 'longpress', position: this.pointerPosition});
         }, this.longPressDuration);
 
         this.emitInputEvent('pointerdown', this.pointerPosition, e);
+        this.feedSequence({type: 'pointerdown', position: this.pointerPosition});
     };
 
     private handlePointerMove = (e: MouseEvent): void => {
@@ -169,6 +196,7 @@ export class InputManager {
                     distance: distance,
                     duration: Date.now() - this.gestureStartTime
                 });
+                this.feedSequence({type: 'swipe'});
             }
         }
     };
@@ -198,6 +226,7 @@ export class InputManager {
             this.eventSystem.emit('input:doubletap', {
                 position: this.pointerPosition
             });
+            this.feedSequence({type: 'doubletap', position: this.pointerPosition});
         } else {
             // Single tap
             this.eventSystem.emit('input:singletap', {
@@ -209,6 +238,7 @@ export class InputManager {
         this.lastTapPos = {...this.pointerPosition};
 
         this.emitInputEvent('pointerup', this.pointerPosition, e);
+        this.feedSequence({type: 'pointerup', position: this.pointerPosition});
     };
 
     private handleTouchStart = (e: TouchEvent): void => {
@@ -242,11 +272,13 @@ export class InputManager {
         if (this.keys.has(e.code)) return;
         this.keys.add(e.code);
         this.emitInputEvent('keydown', undefined, e, undefined, e.code);
+        this.feedSequence({type: 'keydown', key: e.code});
     };
 
     private handleKeyUp = (e: KeyboardEvent): void => {
         this.keys.delete(e.code);
         this.emitInputEvent('keyup', undefined, e, undefined, e.code);
+        this.feedSequence({type: 'keyup', key: e.code});
     };
 
     private emitInputEvent(
