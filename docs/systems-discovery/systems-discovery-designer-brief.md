@@ -184,7 +184,6 @@ Formats, tailles, nommage, livraison
 - Overlays UI : SVG. `ui_<scope>_<nom>.svg`.
 - Badges/collectors : SVG + PNG 256×256 secours.
 - Boucles audio/visuelles (optionnel) : ≤ 200KB; statiques fournies.
-- Dossier : `public/games/systems-discovery/assets/{core|space|ocean|shared}/`.
 - Dossier : `public/games/systems-discovery/assets/{core|space|ocean|bod|shared}/`.
 - Budgets : ≤ 800KB par pack; ≤ 30KB/SVG; ≤ 200KB/boucle.
 

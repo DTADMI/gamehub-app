@@ -18,6 +18,14 @@ MVP Goals (Core Pack)
 - Replayable variations per scene (2 routes each) and a small Codex of discoveries.
 - Local save; i18n-ready (EN strings first).
 
+Flow & Narrative Sequencing
+
+- First visit: SD_INTRO (skippable after first run) → B1 → B2 → B3 → WRAP → SD_OUTRO (first completion only)
+- Packs: Space and Ocean mirror the Core cadence with short intro/outro title cards around three themed scenes.
+- Body Systems (BOD) sub‑packs follow the same rhythm with a persistent Homeostasis Meter across the three scenes and a
+  sub‑pack wrap that awards badges.
+- Replay hooks: SD_OUTRO offers friendly ways to replay a scene, try the alternate B2 plan, or toggle B3 hints.
+
 Narrative Outline — Core Pack
 
 - B1 Food Web at Home (Kitchen Garden)
@@ -84,6 +92,39 @@ Extensions (Replayable Content Packs)
       - Meter: 0–100 scale with calm, non‑alarmist feedback; never punishes, only teaches balance trade‑offs.
     - Accessibility
       - Clear, abstract visuals; alt text for diagrams; captions for SFX; reduced‑motion stills for any animation.
+    - Homeostasis Meter (UI & behavior)
+      - Purpose: visualize balance and trade‑offs; never alarmist. Calm 0–100 scale where 45–65 is the steady band.
+      - UI: `role="meter"` with `aria-valuemin=0`, `aria-valuemax=100`, `aria-valuenow=<value>` and a readable label.
+        The steady band is indicated with a subtle pattern to avoid relying on color alone (color‑blind safe).
+      - Reduced motion: scenes provide still alternatives; the meter itself is static fill (no flashing).
+      - Feedback wording: “Low / Steady / High” in an `aria-live` region; no anxiety framing.
+    - Data model (save v1; frontend‑only)
+      - Local key: `sysdisc:save:v1`
+      - Shape (additions shown):
+        ```ts
+        type SysDiscSaveV1 = {
+          scene: string;
+          flags: Record<string, unknown> & {
+            "bod.meter"?: number;           // default 60
+            "bod.toggles.deeper"?: boolean; // default false (age‑appropriate details)
+          };
+          inventory: string[];
+        }
+        ```
+      - Migration: no version bump required; defaults are injected at runtime for missing fields.
+    - Acceptance (Body Systems scaffolds)
+      - Five sub‑packs (Breath/Fuel/Move/Signal/Grow) playable as stubs: 3 scenes + wrap each; meter persists within a
+        sub‑pack; wrap awards “Care Ally” plus the sub‑pack badge.
+      - Designer brief updated (EN+FR) with BOD asset templates and delivery paths under
+        `public/games/systems-discovery/assets/{core|space|ocean|bod|shared}/`.
+      - Stories tracker includes entries for BB1–3, BF1–3, BM1–3, BSD1–3, BG1–3 with goals, hooks, beats, flags, and
+        guardrails.
+    - Tasks (scaffolds & docs)
+      - Implement Homeostasis Meter (ARIA, pattern band, reduced‑motion friendly) — component shipped.
+      - Register five BOD sub‑packs (intro → 3 scenes → wrap) in the scene registry — stubs shipped.
+      - Extend save model with `bod.meter` and `bod.toggles.deeper` defaults — wired.
+      - Award Care Ally + sub‑pack badge on wrap — wired.
+      - E2E: Playwright smoke completing one BOD sub‑pack with the meter remaining in the steady band — present.
     - Acceptance (Body Systems)
       - All five sub‑packs playable end‑to‑end with save/restore; meter persists within each sub‑pack; wrap awards
         badges.

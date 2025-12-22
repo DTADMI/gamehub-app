@@ -6,6 +6,7 @@ import {ThemeProvider} from "@/components/ThemeProvider";
 import {AuthProvider} from "@/contexts/AuthContext";
 import {SubscriptionProvider} from "@/contexts/SubscriptionContext";
 import {FlagsProvider} from "@/contexts/FlagsContext";
+import {ProfileProvider} from "@/contexts/ProfileContext";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   // In CI/E2E we want to avoid initializing Firebase/Auth and hitting the backend
@@ -20,9 +21,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
   if (disableExternalProviders) {
     return (
         <FlagsProvider>
-            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-                {children}
-            </ThemeProvider>
+            <ProfileProvider>
+                <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+                    {children}
+                </ThemeProvider>
+            </ProfileProvider>
         </FlagsProvider>
     );
   }
@@ -32,9 +35,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <AuthProvider>
         <SubscriptionProvider>
             <FlagsProvider>
-                <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-                    {children}
-                </ThemeProvider>
+                <ProfileProvider>
+                    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+                        {children}
+                    </ThemeProvider>
+                </ProfileProvider>
             </FlagsProvider>
         </SubscriptionProvider>
       </AuthProvider>

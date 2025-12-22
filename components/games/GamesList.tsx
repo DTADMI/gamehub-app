@@ -12,6 +12,7 @@ interface Game {
   image: string;
   tags: string[];
   featured?: boolean;
+  devPlayable?: boolean;
 }
 
 interface GamesListProps {
@@ -80,6 +81,12 @@ export default function GamesList({ games }: GamesListProps) {
                     {game.title}
                   </h3>
                   <div className="flex flex-wrap gap-1 justify-end">
+                    {game.devPlayable && (
+                        <span
+                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-purple-600 text-white">
+                        Dev‑Playable
+                      </span>
+                    )}
                     {game.tags.map((tag) => (
                       <span
                         key={tag}

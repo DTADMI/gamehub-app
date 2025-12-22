@@ -247,17 +247,35 @@ Routing and prerendering notes:
 
 ### Game controls (quick reference)
 
-- Snake: Arrows to move; Space to pause/resume; Space after Game Over to restart.
-- Breakout: Move with mouse or arrows; Space to pause/resume.
+- Snake: Swipe (default on touch), optional Joystick/D‑pad/Taps; Arrows on keyboard; Space to pause/resume; Space after
+  Game Over to restart. Swipe/touch events prevent page scroll during interaction.
+- Breakout: Move with Arrow keys by default; optional Mouse control via a toggle under the canvas. Space to
+  pause/resume.
 - Tetris: Arrows to move; Up to rotate; Space may drop/pause depending on variant.
 - Block‑Blast: Click a rack piece, then click a cell to place; clear rows/cols for points.
-- Memory: Click cards to match pairs.
+- Memory: Click/tap cards to match pairs. On match, cards spin+fade then become inert placeholders that preserve grid
+  layout (no layout jump), improving readability and predictability.
 - Checkers/Chess: Click a piece, then the target square; follow legal moves.
 - Platformer: WASD/Arrows to move; Space to jump.
 - Tower‑Defense: Click to place towers; defend the path.
 - Knitzy: Mouse interactions per puzzle; follow on‑screen hints.
 
 All games use a focusable application region and shared key capture so Space/Arrows never scroll the page.
+
+Settings and accessibility guardrails:
+
+- A Settings page is available at `/settings` with local‑only preferences: Music, Sound Effects, default Particles (
+  where supported), and Reduced Motion. Preferences persist in `localStorage` and never leave the device.
+- Particle effects are gated behind user preference and are off by default where not core to gameplay.
+- Touch targets are ≥ 44×44px where feasible. Overlays and HUD elements respect WCAG contrast targets (≥ 3:1 for large
+  text, ≥ 4.5:1 for normal text). Reduced Motion minimizes non‑essential animations.
+
+Dev-only utilities (point-and-click games only):
+
+- The developer clear‑data button and the in‑settings "Start new game" with consent are reserved for point‑and‑click
+  games (e.g., Rite of Discovery, Systems Discovery, Toymaker Escape) to speed up narrative iteration. Action games like
+  Snake, Breakout, and Memory already expose restart/reset affordances in their core UI and do not show these dev‑only
+  utilities.
 
 ### Feature flags (Explore examples)
 
@@ -272,6 +290,25 @@ NEXT_PUBLIC_FEATURE_EXPLORE_SHOW_PROJECTS_COMING_SOON=true
 ```
 
 Set a flag to `false` to hide that section or disable carousels (grids will be used instead).
+
+### Launcher — play Upcoming locally (dev)
+
+Enable playing cards marked Upcoming locally/dev without making them clickable in production:
+
+```
+NEXT_PUBLIC_ENABLE_UPCOMING_PLAY_LOCAL=true
+```
+
+Behavior:
+
+- Dev/local (or E2E): Upcoming cards remain unfeatured and display an additional tag “Dev‑Playable”, and clicking opens
+  the route for testing.
+- Production: Upcoming cards remain not clickable until they are enabled/featured by Admin/backend.
+
+Admin seam:
+
+- A local flags entry `ui.allowPlayUpcomingLocal` is persisted in `gh:flags:v1` allowing runtime toggling in dev (used
+  alongside the env var during local development).
 
 6. Deploy to Google Cloud Run (manual)
 
@@ -1075,9 +1112,10 @@ Boosters (player‑controlled speed burst):
 
 Particles:
 
-- Toggle in the game settings strip: `Particles` checkbox.
-- Style selector: `Sparks` or `Puff`. When enabled, brick hits/breaks emit the selected effect. When disabled, no brick
-  particles are drawn. Victory fireworks are independent and always show for a short time after clearing a level.
+- Toggle in the Breakout settings strip only.
+- Style selector: `Sparks` or `Puff`. When enabled, every brick hit/break emits the selected effect immediately. When
+  disabled, no brick particles are drawn. Victory fireworks are independent and always show for a short time after
+  clearing a level.
 - Rendering has been tuned for visibility across browsers and themes (dark/light) and uses pooled particles for
   performance.
 

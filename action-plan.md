@@ -1,9 +1,83 @@
 # GameHub Action Plan
 
+Legend: ✅ Completed • 🟡 In Progress • 🔜 Next • 🗂️ Backlog
+
 ## Project Overview
 
-GameHub is a Next.js 16 frontend application that serves as a platform for playing web games and browsing projects. It's
-designed to be backend-agnostic, communicating with a separate API service.
+GameHub is a Next.js 16 frontend application where users can play web games and browse projects. This repo is
+frontend‑only and backend‑agnostic.
+
+---
+
+## Sprint Plan — Dec 2025 (at‑a‑glance)
+
+### ✅ Completed
+
+- Snake: Swipe default with prevent‑scroll; optional Joystick/D‑pad and Taps; pause/resume overlay; HUD
+  spacing/typography and color/contrast improvements.
+- Memory: On match, cards spin+fade, then become inert placeholders to preserve grid; stable layout verified by E2E.
+- E2E: Breakout particles smoke; Systems Discovery BOD smoke; mobile coverage on Pixel 5 and iPhone 12 for Snake.
+- Settings/Profiles scaffolding: localStorage‑backed `ProfileProvider`; Settings page with Music/SFX/Particles/Reduced
+  Motion.
+- Docs: README controls quick‑ref and accessibility guardrails; credits file present with Kenney SFX attribution.
+
+### 🟡 In Progress
+
+- CI health: Monitor the next scheduled CI run on `main` and keep the pipeline green.
+- Tests: Maintain mobile Snake spec parity and Memory animation unit test stability.
+
+### 🔜 Next
+
+- Profiles/Avatars: expand avatar options (built‑in set + custom URL validation).
+- Stats surfaces: surface per‑game stats in UI (sessions, last/high score, best time where applicable).
+- Local leaderboard UI: aggregate and render simple local leaderboard per game (with clear “local‑only” badge) and wire
+  API seams for future sync.
+- Memory assets: add larger/diverse image sets and improve alt text coverage.
+
+### 🗂️ Backlog
+
+- Nightly Playwright job focused on mobile smokes.
+- Dependency upgrades and routine tooling bumps when safe.
+- Optional: remote‑module loading path for games (CDN + manifest) per README strategy.
+
+---
+
+## Plan — Actionable checklist (standardized)
+
+1. CI/E2E stability
+  - [ ] Monitor next scheduled CI run on `main` and capture outcome in this plan (link run ID). 🟡
+  - [ ] If any flaky spec recurs, isolate and mark with `[e2e:smoke]` label for triage. 🟡
+
+2. Profiles & Avatars
+  - [ ] Provide selectable built‑in avatar set (8–12 options). 🔜
+  - [ ] Support optional custom avatar URL with validation and preview. 🔜
+  - [ ] Persist avatar choice in `ProfileProvider` (localStorage). 🔜
+
+3. Per‑game stats surfaces
+  - [ ] Expose per‑game stats panel: high score, last score, sessions played, best time (if available). 🔜
+  - [ ] Integrate stats panel in Snake/Breakout/Memory pages non‑intrusively. 🔜
+
+4. Local Leaderboard aggregation
+  - [ ] Render simple local leaderboard per game (top 10) with “Local only” badge. 🔜
+  - [ ] Add API seams: `submitScore`/`fetchLeaderboard` no‑ops when providers disabled. 🔜
+
+5. Memory assets and accessibility
+  - [ ] Add larger/diverse image sets for cards (keep emoji as fallback). 🔜
+  - [ ] Improve alt text: descriptive labels for image‑based cards; ensure reduced‑motion stills. 🔜
+
+6. Documentation
+  - [ ] Update README with Profiles/Leaderboard/Settings v1 surfaces and Memory asset notes. 🔜
+  - [ ] Keep credits up‑to‑date when adding new assets (images/sounds). 🔜
+
+Notes
+
+- Unless otherwise noted, new features are frontend‑only with local persistence and backend seams for future wiring.
+
+---
+
+<!-- Archive notice: The detailed trackers below are retained for context. New work should be summarized in the plan above. -->
+
+## Current Sprint Status (Archive)
 
 ## Completed Tasks
 
@@ -181,11 +255,13 @@ Cross‑Game Tasks (apply in this order: ROD → TME → SD)
 - Engineering scaffolds
   - [x] Add Homeostasis Meter UI component (ARIA, reduced‑motion stills)
   - [x] Add five BOD sub‑packs to scene registry (stubs for BB/BF/BM/BSD/BG with wrap screens)
-  - [ ] Extend save model `sysdisc:save:v1` with `bod: { meter:number, toggles:{deeper:boolean} }`
-  - [ ] Medal rules: award “Care Ally”/BOD sub‑pack badges on wrap
+  - [x] Extend save model `sysdisc:save:v1` with `bod: { meter:number, toggles:{deeper:boolean} }`
+  - [x] Medal rules: award “Care Ally”/BOD sub‑pack badges on wrap
 - Accessibility & testing
   - [x] Alt text and captions for all new diagrams; colorblind‑safe patterns for O2/CO2 and flows
   - [x] Playwright smoke: complete one BOD sub‑pack (any 3 scenes + wrap) with meter staying green
+    - Note: BOD Breath deep-link smoke verified locally on 2025‑12‑22; CI runner config (ubuntu‑latest, Node 20+)
+      already compatible
 
 - [x] Backgrounds — visibility fix and verification (galaxy dark, star‑glow light); ensure `--app-bg` applied on all
   pages (tuned intensities, enhanced starfield/nebula; verified on home, catalog, and game pages)
@@ -196,6 +272,7 @@ Cross‑Game Tasks (apply in this order: ROD → TME → SD)
 - [ ] Memory game UX — matched cards spin+fade then are removed from layout after animation; add tests
 - [ ] Assets & backgrounds — wire initial Kenney SFX and backgrounds; maintain public/credits.md
 - [ ] Documentation — keep README and guidelines updated with Admin/Launcher/Snake controls
+  and Breakout/Memory controls
   - [x] Add “Flow & Narrative Sequencing” + “Narrated journey” sections to design docs and stories trackers:
     - RoD: docs/rite-of-discovery/rite-of-discovery-design.md (§ Flow & Narrative Sequencing); stories.md (Overview)
     - TME: docs/toymaker-escape/toymaker-escape-design.md (§ Flow & Narrative Sequencing); stories.md (Overview)
@@ -204,6 +281,78 @@ Cross‑Game Tasks (apply in this order: ROD → TME → SD)
 - [ ] Add user profile and game statistics tracking
 - [ ] Implement leaderboard functionality
 - [ ] Implement game settings and preferences
+
+#### Execution order (confirmed)
+
+- A) Breakout particles reliability + controllers on PC (Arrows default, optional mouse)
+- B) Snake mobile controllers (Swipe default, optional Joystick/D‑pad/Taps) + Make the game more ergonomical, pretty and
+  user-friendly
+- C) Memory game UX — remove matched cards post‑animation but keep spaces (preserve layout/flow); make images bigger;
+  diversify with more memorable, pretty, interesting sets
+- D) Assets & public/credits.md — wire Kenney SFX and backgrounds
+- E) Documentation updates — Admin/Launcher/Snake/Breakout/Memory + action‑plan update
+- F) Profiles & stats — frontend‑only localStorage stubs, plus backend connection seam
+- G) Leaderboard — frontend stub + backend seam
+- H) Game settings & preferences — frontend UI + local persistence; backend seam
+- I) Add user profile and game statistics tracking (frontend-first)
+- J) Implement leaderboard functionality (frontend-first)
+- K) Implement game settings and preferences (frontend-first)
+
+#### Mode & scope constraints (confirmed)
+
+- CI/E2E: Run Playwright in GitHub Actions on `ubuntu-latest`, Node 20+ (already configured in
+  `.github/workflows/ci-cd.yml`).
+- Scope: Frontend changes first. Profiles/stats/leaderboard/settings ship with localStorage stubs and clean seams for
+  backend integration when available.
+
+### Current session — Plan to finish up now
+
+Sorted by status
+
+- ✅ Completed
+  - A) Breakout — particles reliability and PC controllers (desktop):
+    - Reliability: normalized brick‑hit emissions; live switching between `Sparks` and `Puff` takes effect immediately
+      via shared settings; particle controls are gated to Breakout only.
+    - PC controllers: keyboard Arrows by default; added optional “Mouse control” toggle in the settings strip (off by
+      default, does not hijack keyboard).
+    - Tests: Playwright smoke for particle controls visibility and live switching; unit tests for settings persistence (
+      particles/effect/mode). HUD/boost and pause immobility E2E remain green.
+  - Launcher — Local/dev flag for Upcoming play:
+    - Implemented env var `NEXT_PUBLIC_ENABLE_UPCOMING_PLAY_LOCAL=true` and an Admin seam flag
+      `ui.allowPlayUpcomingLocal` (localStorage) to allow playing Upcoming cards only in dev/local/E2E.
+    - Catalog cards show an extra “Dev‑Playable” tag in dev only; production keeps Upcoming cards non‑clickable.
+    - Tests: Playwright spec asserts clickability in E2E/dev and non‑clickable in public mode; manifest selector covered
+      by unit tests.
+  - Systems Discovery BOD Breath deep‑link E2E smoke verified locally; config compatible with CI defaults.
+  - Docs updated for BOD packs and designer brief paths include `bod/`.
+  - Dev‑utilities scope fixed: reserved for point‑and‑click games only (RoD/SD/TME). Removed Snake‑specific Start New
+    Game and dev clear‑data UI; README updated.
+
+- 🟡 In Progress
+  - E2E monitoring: ensure CI stays green on `main` with updated Breakout and BOD smoke; watch next scheduled run.
+
+- 🔜 Planned (next actionable steps)
+  - B) Snake:
+    - Controls: Swipe default; optional Joystick/D‑pad and Taps; prevent page scroll while interacting. (No dev‑only
+      clear‑data or Start New Game — those are for point‑and‑click.)
+    - UX polish: improve HUD spacing/typography; ensure color/contrast per accessibility best practices; pause overlay
+      affordances.
+    - Tests: mobile E2E for swipe and one optional controller (Pixel 5 + iPhone 12 profiles).
+  - C) Memory:
+    - UX: matched cards spin+fade, then remove from DOM while keeping grid placeholders (stable layout/flow).
+    - Assets: larger images; diversify sets; improve alt text.
+    - Tests: E2E asserts matched pair removal and stable grid; unit test animation completion callback.
+  - D) Assets & credits:
+    - Wire initial Kenney SFX/backgrounds; update `public/credits.md`.
+  - E) Documentation:
+    - README/guidelines: Admin/Launcher/Snake/Breakout/Memory controls and settings; reflect particle gating and
+      color/contrast guardrails.
+  - F–H) Profiles/Leaderboard/Settings (frontend‑first):
+    - Implement localStorage‑backed profile store (nickname/avatar), per‑game stats, a simple leaderboard view, and a
+      unified settings panel with persistence; add API seams for later backend wiring. Backend connection points are
+      prepared but remain stubbed.
+
+Note: README and this action plan will be kept in sync after each milestone; CI lint/test/deploy must stay green.
 
 ### MVP Playables Track (completed)
 

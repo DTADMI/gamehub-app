@@ -343,7 +343,16 @@ export const MemoryGame: React.FC = () => {
               </button>
           )}
           {cards.map((card, index) =>
-              removedIds.has(card.id) ? null : (
+              removedIds.has(card.id) ? (
+                  // Render an inert placeholder to preserve grid layout/flow
+                  <div
+                      key={`ph-${card.id}`}
+                      data-testid="memory-card-placeholder"
+                      className="aspect-square rounded-xl opacity-0 pointer-events-none"
+                      aria-hidden
+                      role="presentation"
+                  />
+              ) : (
                   <div
                       key={card.id}
                       data-testid="memory-card"

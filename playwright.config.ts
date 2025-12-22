@@ -33,6 +33,8 @@ export default defineConfig({
       NEXT_PUBLIC_DISABLE_PROVIDERS: "true",
       // Expose an explicit E2E flag to the client for deterministic behaviors during tests
       NEXT_PUBLIC_E2E: "true",
+      // Allow upcoming games to be playable locally during E2E
+      NEXT_PUBLIC_ENABLE_UPCOMING_PLAY_LOCAL: "true",
       PORT: "3000",
     },
   },

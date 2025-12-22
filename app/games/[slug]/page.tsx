@@ -15,7 +15,12 @@ export default function GameLauncherPage({params}: PageProps) {
     if (!entry) {
         return notFound();
     }
-    if (entry.upcoming) {
+    // Allow dev/local play for upcoming when explicitly enabled via env or Admin seam
+    const isNonProd = typeof window !== "undefined" && (process.env.NODE_ENV !== "production" || process.env.NEXT_PUBLIC_E2E === "true");
+    const allowUpcomingLocal =
+        typeof window !== "undefined" && process.env.NEXT_PUBLIC_ENABLE_UPCOMING_PLAY_LOCAL === "true" && isNonProd;
+
+    if (entry.upcoming && !allowUpcomingLocal) {
         return (
             <div className="container mx-auto px-4 py-8">
                 <h1 className="text-2xl font-bold mb-2">{entry.title}</h1>

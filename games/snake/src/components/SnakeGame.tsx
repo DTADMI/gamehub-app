@@ -949,6 +949,8 @@ export const SnakeGame: React.FC = () => {
       showParticleControls={false}
     >
       <div className="p-4">
+        {/* Dev-only utilities and explicit Start New Game are intentionally reserved for point-and-click games.
+            Snake already exposes restart via overlay/UI. */}
         {/* Mobile control mode selector: Swipe vs Joystick vs Taps */}
         <div className="mb-3 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
           <span className="text-sm text-gray-600 dark:text-gray-300">

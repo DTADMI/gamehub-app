@@ -1,6 +1,7 @@
 "use client";
 
 import {GameContainer, ParticlePool, soundManager, useGameSettings,} from "@games/shared";
+import {getBreakoutSettings, saveBreakoutSettings} from "../settings";
 import React, {useCallback, useEffect, useRef, useState} from "react";
 
 import {submitScore} from "@/lib/graphql/queries";
@@ -544,6 +545,15 @@ export default function BreakoutGame() {
     };
   }, [gameStarted, startGame, advanceToNextLevel, activateBoost]);
 
+  // Optional mouse control (off by default on desktop); touch always enabled
+  const [mouseControl, setMouseControl] = useState<boolean>(() => getBreakoutSettings().mouseControl);
+  const mouseControlRef = useRef<boolean>(false);
+  useEffect(() => {
+    mouseControlRef.current = mouseControl;
+    // persist per-game setting
+    saveBreakoutSettings({mouseControl});
+  }, [mouseControl]);
+
   // Pointer/touch input
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -561,6 +571,9 @@ export default function BreakoutGame() {
     const onMouseMove = (e: MouseEvent) => {
       if (isPausedRef.current) {
         return;
+      }
+      if (!mouseControlRef.current) {
+        return; // ignore mouse when toggle is off
       }
       moveTo(e.clientX);
     };
@@ -588,7 +601,10 @@ export default function BreakoutGame() {
         moveTo(e.touches[0].clientX);
       }
     };
-    canvas.addEventListener("mousemove", onMouseMove as any);
+    // Bind mouse only when enabled
+    if (mouseControlRef.current) {
+      canvas.addEventListener("mousemove", onMouseMove as any);
+    }
     canvas.addEventListener(
         "touchmove",
         onTouchMove as any,
@@ -604,7 +620,7 @@ export default function BreakoutGame() {
       canvas.removeEventListener("touchmove", onTouchMove as any);
       canvas.removeEventListener("touchstart", onTouchStart as any);
     };
-  }, [isPaused, paddle.width, activateBoost]);
+  }, [isPaused, paddle.width, activateBoost, mouseControl]);
 
   // Keep refs in sync with state (so RAF loop can read fresh values)
   useEffect(() => {
@@ -2142,6 +2158,19 @@ export default function BreakoutGame() {
                 🚀 Boost{boosters > 0 ? ` (${boosters})` : ""}
               </button>
           )}
+          {/* Controls: optional mouse (desktop) and debug */}
+          <div className="mt-2 mx-auto w-full max-w-[960px] flex items-center justify-center gap-4">
+            <label className="inline-flex items-center gap-2 text-xs text-gray-700 dark:text-gray-200">
+              <input
+                  type="checkbox"
+                  className="h-3.5 w-3.5 accent-blue-600"
+                  checked={mouseControl}
+                  onChange={(e) => setMouseControl(e.currentTarget.checked)}
+              />
+              Mouse control (optional)
+            </label>
+          </div>
+
           {/* Debug accordion for particles visibility */}
           <details className="mt-2 mx-auto w-full max-w-[960px] text-left opacity-70">
             <summary className="cursor-pointer text-xs text-gray-500 dark:text-gray-400">

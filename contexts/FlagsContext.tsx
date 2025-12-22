@@ -9,6 +9,10 @@ type Flags = {
     sdBodMove: boolean;
     sdBodSignal: boolean;
     sdBodGrow: boolean;
+  // Admin/UI seam: allow Upcoming games to be playable locally without rebuilds
+  ui?: {
+    allowPlayUpcomingLocal?: boolean;
+  };
 };
 
 const DEFAULT_FLAGS: Flags = {
@@ -18,6 +22,7 @@ const DEFAULT_FLAGS: Flags = {
     sdBodMove: true,
     sdBodSignal: true,
     sdBodGrow: true,
+  ui: {allowPlayUpcomingLocal: false},
 };
 
 const STORAGE_KEY = "gh:flags:v1";
