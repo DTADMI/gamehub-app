@@ -70,6 +70,7 @@ appear.
       highlight only.
     - Wires/connectors: map pairs without crossings (poster in Entry hints “No crossings”).
     - Hidden latch: requires `long‑press → drag` gesture on scuffed area to reveal.
+  - Canvas macro: a minimal canvas registers the `holdThenDrag` macro and checks a small scuff hotspot rectangle.
 - Diegetic clues:
     - Hissing audio near a misaligned elbow; dampness decal nearby.
     - Poster icon (from Entry) reiterates non‑crossing mapping.
@@ -80,6 +81,13 @@ appear.
     - Decals: damp stain; tiny scuff; poster icon. Files: `tme_e1_damp_decal_v1.png`, `tme_e1_scuff_small_v1.png`,
       `tme_e1_icon_no_cross_v1.png`
     - SFX: short hiss loop localized; latch click. Files: `sfx_hiss_loop_v1.ogg`, `sfx_latch_click_v1.ogg`
+
+#### Macro hotspot specs (canvas)
+
+- Hotspot logical bounds on a 480×160 panel: `x=24, y=112, w=96, h=24` (bottom‑left strip). Scales with canvas size.
+- Gesture: `['pointerdown','longpress','swipe']` in this order. A DOM fallback button remains for a11y and tests.
+- Visual: dashed border rectangle over muted strip; final art should render a subtle scuff decal instead (
+  `tme_e1_scuff_small_v1.png`).
 
 ---
 

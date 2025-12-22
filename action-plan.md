@@ -160,14 +160,16 @@ wires, pipes, and gesture macros. Maintain a11y parity and reduced-motion.
 ### Implementation tasks
 
 - [ ] Update TME E1 scene data to remove overt keypad hint and add decor-based clues.
-- [ ] Implement wires/connectors logic integration in TME E1 scene.
-- [ ] Implement pipes/flow logic and minimal UI wrapper; add reduced-motion path.
+- [x] Implement wires/connectors logic integration in TME E1 scene. ✓
+- [x] Implement pipes/flow logic and minimal UI wrapper; add reduced-motion path (static highlight/text). ✓
 - [ ] Extend gears mini with tolerance + decor hint states.
-- [ ] Register input macro `holdThenDrag` to reveal hidden latch hotspot; update blackboard flags.
-- [ ] Persist discovered clues/solves in `tme:save:v1`.
-- [ ] Unit tests: sequence, wires, gears, pipes; scene progression for TME E1.
-- [ ] Playwright smoke (desktop + Pixel 5) golden path solving at least one optional hint.
-- [ ] Docs: README section "Designing clever puzzles" and `docs/narrative/scene-puzzles.md` with TME E1 briefs.
+- [x] Extend gears mini with tolerance + decor hint states. ✓
+- [x] Register input macro `holdThenDrag` to reveal hidden latch hotspot; update blackboard flags. ✓
+- [x] Persist discovered clues/solves in `tme:save:v1`. ✓
+- [x] Unit tests: sequence, wires, gears, pipes; scene progression for TME E1 (logic units added for pipes; others
+  present). ✓
+- [x] Playwright smoke (desktop + Pixel 5) golden path solving at least one optional hint. ✓
+- [x] Docs: README section "Designing clever puzzles" and `docs/narrative/scene-puzzles.md` with TME E1 briefs. ✓
 
 ### Designer brief — assets & scene description (summary)
 
@@ -803,6 +805,10 @@ Shipped (already available via manifest and listed under Completed):
   and
   planned tasks under
   Planned Features → Games; scope includes gentle mode, i18n-ready strings, local save, and E2E coverage.
+- 2025-12-22: TME E1 — localized panel/latch/medal UI (EN/FR) and updated E2E to assert medal surfacing after latch
+  reveal; wires/pipes panel strings moved to i18n.
+- 2025-12-22: TME E1 — added minimal canvas wrapper registering `holdThenDrag` macro; revealing the latch over the
+  scuff hotspot now works via canvas or DOM fallback; README updated with E1 Golden Path details.
 - 2025-12-21: Post‑MVP roadmap approved for Rite of Discovery (episodes A–D, systems v2, collectibles/journal) and
   designer asset specs appended. Added 12+ “Thinking Tools” extension plan (rationality & biases) with replayable
   vignettes and mastery.

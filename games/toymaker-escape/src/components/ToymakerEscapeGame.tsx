@@ -1,17 +1,8 @@
 "use client";
 
 import React, {useEffect, useMemo, useState} from "react";
-import {DialogueBox, GameContainer, InventoryBar} from "@games/shared";
-import {
-    detectLang,
-    effects,
-    ensureCtx,
-    type Lang,
-    load,
-    nextScene,
-    save,
-    type Scene,
-} from "@games/shared/pointclick/engine";
+import {DialogueBox, GameContainer, InventoryBar, versionedLoad, versionedSave} from "@games/shared";
+import {detectLang, effects, ensureCtx, type Lang, nextScene, type Scene,} from "@games/shared/pointclick/engine";
 import {clearKeypad, createKeypadState, pressKey, submitKeypad,} from "@games/shared/pointclick/puzzles/keypad";
 import {
     createGearsState,
@@ -20,8 +11,40 @@ import {
     setGearsTeeth as setGearTeeth,
 } from "@games/shared/pointclick/puzzles/gears";
 import {t} from "@/lib/i18n";
+import {
+    createWiresState,
+    hasWiresCrossing,
+    setWiresConnection,
+    type WiresState
+} from "@games/shared/pointclick/puzzles/wires";
+import {
+    createPipesState,
+    evaluatePipes,
+    type PipesState,
+    setTileRotation,
+    type Tile,
+    toggleValve
+} from "@games/shared/pointclick/puzzles/pipes";
+import {E1CabinetCanvas} from "./E1CabinetCanvas";
 
 const SAVE_KEY = "tme:save:v1";
+
+type TmeSaveV1 = {
+    sceneId: string;
+    flags: {
+        keypad?: { solved?: boolean };
+        gears?: { solved?: boolean };
+        wires?: { solved?: boolean };
+        pipes?: { solved?: boolean };
+        latch?: { revealed?: boolean };
+        seen?: {
+            posterOrder?: boolean;
+            ratioPlate?: boolean;
+            scuff?: boolean;
+        };
+    };
+    inventory: string[];
+};
 
 export const ToymakerEscapeGame: React.FC = () => {
     const lang = useMemo<Lang>(() => detectLang(), []);
@@ -72,8 +95,37 @@ export const ToymakerEscapeGame: React.FC = () => {
         [],
     );
 
-    const [sceneId, setSceneId] = useState<string>(() => load(SAVE_KEY)?.sceneId || "INTRO");
-    const [ctx, setCtx] = useState(() => ensureCtx(load(SAVE_KEY)?.ctx || {}));
+    // Load v1 save (frontend-only). Fallback to minimal defaults.
+    const initialSave = (() => {
+        try {
+            const payload = versionedLoad<TmeSaveV1>(SAVE_KEY);
+            return payload?.data ?? null;
+        } catch {
+            return null;
+        }
+    })();
+
+    const [sceneId, setSceneId] = useState<string>(() => initialSave?.sceneId || "INTRO");
+    const [ctx, setCtx] = useState(() => ensureCtx({
+        inventory: initialSave?.inventory ?? [],
+        flags: initialSave?.flags ?? {},
+    }));
+
+    // Wires mini state (simple 2×2 example for stub UI)
+    const [wires, setWires] = useState<WiresState>(() =>
+        createWiresState(["A1", "A2"], ["B1", "B2"], {
+            red: [{from: "A1", to: "B2"}],
+            blue: [{from: "A2", to: "B1"}],
+        })
+    );
+
+    // Pipes mini state — small 3×1 with a valve in middle
+    const initialTiles: Tile[] = [
+        {type: "straight", rotation: 0, source: true},
+        {type: "valve", rotation: 0, open: false},
+        {type: "straight", rotation: 0, sink: true},
+    ];
+    const [pipes, setPipes] = useState<PipesState>(() => createPipesState(3, 1, initialTiles));
     const [keypad, setKeypad] = useState(() => createKeypadState());
     // Simple gears mini: input → idler → output, with a target ratio of 1/3
     const [gears, setGears] = useState<GearsState>(() =>
@@ -94,8 +146,25 @@ export const ToymakerEscapeGame: React.FC = () => {
     );
 
     useEffect(() => {
-        save(SAVE_KEY, {v: 1, sceneId, ctx});
+        const data: TmeSaveV1 = {
+            sceneId,
+            flags: ctx.flags || {},
+            inventory: ctx.inventory || [],
+        } as any;
+        versionedSave<TmeSaveV1>(SAVE_KEY, 1, data);
     }, [sceneId, ctx]);
+
+    // Auto-award a simple medal for E1 once a gate is solved and the latch is revealed.
+    useEffect(() => {
+        const flags: any = (ctx as any).flags || {};
+        const gateSolved = !!(flags["gears.solved"] || flags["wires.solved"] || flags["pipes.solved"]);
+        const latch = !!flags["latch.revealed"];
+        const existing = flags?.medals?.e1;
+        if (!gateSolved || !latch || existing) return;
+        const hintsUsed = [flags?.["seen.posterOrder"], flags?.["seen.ratioPlate"]].filter(Boolean).length;
+        const level = hintsUsed === 0 ? 'gold' : hintsUsed === 1 ? 'silver' : 'bronze';
+        setCtx((c) => effects.setFlag(`medals.e1`, level)(ensureCtx(c)));
+    }, [ctx]);
 
     const scene = scenes[sceneId];
 
@@ -143,7 +212,7 @@ export const ToymakerEscapeGame: React.FC = () => {
                                         const next = submitKeypad(s, {code: "2413"});
                                         if (next.solved) {
                                             const updated = effects.addItem("gear-key")(ctx);
-                                            setCtx(updated);
+                                            setCtx(effects.setFlag("keypad.solved", true)(ensureCtx(updated)));
                                         }
                                         return next;
                                     });
@@ -208,13 +277,118 @@ export const ToymakerEscapeGame: React.FC = () => {
                                         className="self-start mt-1 px-4 py-2 rounded bg-emerald-600 text-white"
                                         onClick={() => {
                                             // Mark mini solved and allow wrap progression
-                                            setCtx((c) => ({...c, gearSolved: true}));
+                                            setCtx((c) => effects.setFlag("gears.solved", true)(ensureCtx(c)));
                                         }}
                                     >
                                         {lang === "fr" ? "Valider l'engrenage" : "Confirm gears"}
                                     </button>
                                 )}
                             </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Cabinet panel — minimal Wires and Pipes stubs for E1 */}
+                {sceneId === "E1_GEAR" && (
+                    <div className="mb-4 rounded-md border p-3">
+                        <h3 className="font-semibold mb-2">{t('tme.e1.panel.title')}</h3>
+
+                        {/* Observation buttons to set seen.* flags (diegetic clues) */}
+                        <div className="flex flex-wrap gap-2 mb-3">
+                            <button
+                                className="px-3 py-2 rounded bg-muted"
+                                onClick={() => setCtx(c => effects.setFlag("seen.posterOrder", true)(ensureCtx(c)))}
+                            >{lang === 'fr' ? 'Regarder l’affiche (ordre des jouets)' : 'Examine poster (toys order)'}</button>
+                            <button
+                                className="px-3 py-2 rounded bg-muted"
+                                onClick={() => setCtx(c => effects.setFlag("seen.ratioPlate", true)(ensureCtx(c)))}
+                            >{lang === 'fr' ? 'Observer la plaque 3:1' : 'Inspect 3:1 plate'}</button>
+                        </div>
+
+                        {/* Wires stub */}
+                        <div className="mb-3">
+                            <p className="text-sm mb-2">{t('tme.e1.panel.wiresHint')}</p>
+                            <div className="flex items-center gap-2 mb-2">
+                                <select aria-label="Left terminal"
+                                        onChange={(e) => (e.currentTarget.dataset.v = e.target.value)} data-v="A1"
+                                        data-testid="wires-left">
+                                    {wires.terminalsLeft.map(id => <option key={id} value={id}>{id}</option>)}
+                                </select>
+                                <span>→</span>
+                                <select aria-label="Right terminal"
+                                        onChange={(e) => (e.currentTarget.dataset.v = e.target.value)} data-v="B1"
+                                        data-testid="wires-right">
+                                    {wires.terminalsRight.map(id => <option key={id} value={id}>{id}</option>)}
+                                </select>
+                                <select aria-label="Color" defaultValue="red" data-testid="wires-color">
+                                    {Object.keys(wires.goal).map(c => <option key={c} value={c}>{c}</option>)}
+                                </select>
+                                <button className="px-3 py-2 rounded bg-muted" onClick={(e) => {
+                                    const leftSel = (e.currentTarget.parentElement?.querySelector('[data-testid="wires-left"]') as HTMLSelectElement);
+                                    const rightSel = (e.currentTarget.parentElement?.querySelector('[data-testid="wires-right"]') as HTMLSelectElement);
+                                    const colorSel = (e.currentTarget.parentElement?.querySelector('[data-testid="wires-color"]') as HTMLSelectElement);
+                                    const next = setWiresConnection(wires, (leftSel?.value) || 'A1', (rightSel?.value) || 'B1', (colorSel?.value) || 'red');
+                                    setWires(next);
+                                    if (next.solved) setCtx(c => effects.setFlag("wires.solved", true)(ensureCtx(c)));
+                                }}>{lang === 'fr' ? 'Connecter' : 'Connect'}</button>
+                            </div>
+                            {hasWiresCrossing(wires) && (
+                                <div className="text-amber-600 text-sm"
+                                     role="status">{t('tme.e1.panel.wiresAvoid')}</div>
+                            )}
+                            {wires.solved && <div className="text-emerald-600 text-sm"
+                                                  role="status">{t('tme.e1.panel.wiresSolved')}</div>}
+                        </div>
+
+                        {/* Pipes stub */}
+                        <div>
+                            <p className="text-sm mb-2">{t('tme.e1.panel.pipesHint')}</p>
+                            <div className="flex items-center gap-2 mb-2">
+                                <button className="px-3 py-2 rounded bg-muted"
+                                        onClick={() => setPipes(s => evaluatePipes(setTileRotation(s, 0, 0, (s.grid[0]?.rotation || 0) + 1)))}>{t('tme.e1.panel.rotate00')}</button>
+                                <button className="px-3 py-2 rounded bg-muted"
+                                        onClick={() => setPipes(s => evaluatePipes(setTileRotation(s, 2, 0, (s.grid[2]?.rotation || 0) + 1)))}>{t('tme.e1.panel.rotate20')}</button>
+                                <button className="px-3 py-2 rounded bg-muted"
+                                        onClick={() => setPipes(s => evaluatePipes(toggleValve(s, 1, 0, true)))}>{t('tme.e1.panel.openValve')}</button>
+                            </div>
+                            <div className="text-sm" role="status">
+                                {pipes.solved ? t('tme.e1.panel.pipesSolved') : t('tme.e1.panel.pipesNotSolved')}
+                            </div>
+                            {pipes.errors && pipes.errors.length > 0 && (
+                                <ul className="text-amber-600 text-sm mt-1 list-disc pl-5">
+                                    {pipes.errors.map((e, i) => <li key={i}>{e}</li>)}
+                                </ul>
+                            )}
+                            {pipes.solved && (
+                                <button className="mt-2 px-3 py-2 rounded bg-emerald-600 text-white"
+                                        onClick={() => setCtx(c => effects.setFlag("pipes.solved", true)(ensureCtx(c)))}>
+                                    {lang === 'fr' ? 'Valider les tuyaux' : 'Confirm pipes'}
+                                </button>
+                            )}
+                        </div>
+
+                        {/* Hidden latch — long-press then drag over scuff area (macro mimic) */}
+                        <div className="mt-4">
+                            <p className="text-sm mb-2">{t('tme.e1.latch.hint')}</p>
+                            {/* Canvas macro version (registers holdThenDrag) with DOM fallback for accessibility */}
+                            <div className="flex items-center gap-4 flex-wrap">
+                                <E1CabinetCanvas
+                                    onLatchReveal={() => setCtx(c => effects.setFlag("latch.revealed", true)(ensureCtx(c)))}
+                                />
+                                <div
+                                    className="text-sm text-muted-foreground">{lang === 'fr' ? 'Astuce: appui long puis glisser sur la rayure.' : 'Tip: long‑press then drag over the scuff.'}</div>
+                            </div>
+                            <ScuffLatch
+                                onRevealed={() => setCtx(c => effects.setFlag("latch.revealed", true)(ensureCtx(c)))}
+                                onSeen={() => setCtx(c => effects.setFlag("seen.scuff", true)(ensureCtx(c)))}/>
+                            {((ctx as any).flags?.["latch.revealed"]) && (
+                                <div className="mt-2 text-emerald-600" role="status">{t('tme.e1.latch.revealed')}</div>
+                            )}
+                            {((ctx as any).flags?.medals?.e1) && (
+                                <div className="mt-1 text-sm" role="status" data-testid="medal-line">
+                                    {`${t('tme.e1.medal.label')} ${t('tme.e1.medal.' + (ctx as any).flags.medals.e1)}`}
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}
@@ -241,3 +415,49 @@ export const ToymakerEscapeGame: React.FC = () => {
 };
 
 export default ToymakerEscapeGame;
+
+// --- Internal helper: scuff latch interaction (long-press then drag) ---
+function ScuffLatch({onRevealed, onSeen}: { onRevealed: () => void; onSeen: () => void }) {
+    const [pressStart, setPressStart] = React.useState<number | null>(null);
+    const [longPressed, setLongPressed] = React.useState(false);
+    const timeoutRef = React.useRef<number | null>(null);
+
+    const onPointerDown = () => {
+        onSeen();
+        setLongPressed(false);
+        const start = Date.now();
+        setPressStart(start);
+        timeoutRef.current = window.setTimeout(() => {
+            setLongPressed(true);
+        }, 800); // match long-press duration from InputManager default
+    };
+    const onPointerUp = () => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+        setPressStart(null);
+        setLongPressed(false);
+    };
+    const onPointerMove = () => {
+        // Consider this a drag following a successful long-press
+        if (longPressed) {
+            onRevealed();
+        }
+    };
+    return (
+        <div
+            role="button"
+            aria-label="Scuffed area"
+            tabIndex={0}
+            onPointerDown={onPointerDown}
+            onPointerUp={onPointerUp}
+            onPointerMove={onPointerMove}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') onRevealed();
+            }}
+            className="w-24 h-10 rounded border border-dashed border-muted-foreground/60 bg-muted/50 select-none flex items-center justify-center"
+            data-testid="scuff-area"
+        >
+            <span className="text-xs text-muted-foreground">{"// scuff"}</span>
+        </div>
+    );
+}

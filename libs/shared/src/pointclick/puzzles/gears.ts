@@ -13,6 +13,7 @@ export type GearsState = {
     inputId: string;
     outputId: string;
     targetRatio: number; // expected |speed_out/speed_in|, e.g., 0.5 means output is half the input speed
+    tolerance?: number; // acceptable absolute tolerance for ratio match (default 1e-6)
     solved: boolean;
 };
 
@@ -22,6 +23,7 @@ export function createGearsState(
     inputId: string,
     outputId: string,
     targetRatio: number,
+    tolerance: number = 1e-3,
 ): GearsState {
     const base: GearsState = {
         gears: [...gears],
@@ -29,6 +31,7 @@ export function createGearsState(
         inputId,
         outputId,
         targetRatio,
+        tolerance,
         solved: false,
     };
     return evaluateGears(base);
@@ -61,7 +64,8 @@ export function evaluateGears(state: GearsState): GearsState {
         const b = gearMap.get(path[i + 1])!;
         ratio *= a.teeth / b.teeth;
     }
-    const solved = nearlyEqual(Math.abs(ratio), Math.abs(state.targetRatio), 1e-6);
+    const eps = state.tolerance ?? 1e-6;
+    const solved = nearlyEqual(Math.abs(ratio), Math.abs(state.targetRatio), eps);
     return {...state, solved};
 }
 

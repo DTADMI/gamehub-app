@@ -347,7 +347,7 @@ wires = setConnection(wires, "A1", "B2", "red");
 // wires.solved === true; hasCrossing(wires) can be used to discourage crossed layouts in UI
 ```
 
-Example — Gears ratio mini
+Example — Gears ratio mini (with tolerance)
 
 ```ts
 import {createGearsState, setTeeth} from "@games/shared/pointclick/puzzles/gears";
@@ -359,6 +359,7 @@ let g = createGearsState(
         "in",
         "out",
         0.5,
+        1e-3, // optional tolerance (defaults to 1e-3 in our engine)
 );
 g.solved; // true
 
@@ -366,6 +367,19 @@ g.solved; // true
 g = setTeeth(g, "out", 30);
 g.solved; // false
 ```
+
+E2E golden path example (Toymaker Escape E1)
+
+- A Playwright smoke covers a minimal “golden path” for E1: it opens the pipes valve to solve the gate, then performs a
+  long‑press→drag on the scuff area to reveal the latch. See `tests-e2e/tme-e1-golden.spec.ts`.
+
+#### E1 Golden Path (details)
+
+- The E1 cabinet wall now includes a tiny canvas scene that registers the `holdThenDrag` macro on the shared
+  InputManager. Performing a long‑press then drag over the scuff hotspot reveals the latch and persists
+  `flags.latch.revealed` in `tme:save:v1`.
+- An accessible DOM fallback remains available (`ScuffLatch` control) for keyboard/screen‑reader users and
+  reduced‑motion contexts.
 
 Why this split
 

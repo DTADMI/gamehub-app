@@ -12,6 +12,28 @@
       },
       "gears": {
         "instruction": "Réglez les engrenages pour obtenir un rapport 1:3 (sortie = 1/3 de la vitesse d'entrée)."
+      },
+      "panel": {
+        "title": "Panneau (fils & tuyaux)",
+        "wiresHint": "Reliez sans croisements.",
+        "wiresSolved": "Fils : Résolu",
+        "wiresAvoid": "Évitez les croisements.",
+        "pipesHint": "Faites pivoter les tuiles ; la vanne doit être ouverte.",
+        "pipesSolved": "Tuyaux : Résolu",
+        "pipesNotSolved": "Tuyaux : Non résolu",
+        "rotate00": "Pivoter (0,0)",
+        "rotate20": "Pivoter (2,0)",
+        "openValve": "Ouvrir la vanne"
+      },
+      "latch": {
+        "hint": "Astuce : appui long puis glisser sur la rayure pour révéler un loquet.",
+        "revealed": "Loquet révélé."
+      },
+      "medal": {
+        "label": "Médaille :",
+        "gold": "or",
+        "silver": "argent",
+        "bronze": "bronze"
       }
     }
   }

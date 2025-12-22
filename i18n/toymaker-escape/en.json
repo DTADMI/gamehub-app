@@ -12,6 +12,28 @@
       },
       "gears": {
         "instruction": "Adjust the gears to achieve a 1:3 ratio (output = 1/3 of input speed)."
+      },
+      "panel": {
+        "title": "Panel (wires & pipes)",
+        "wiresHint": "Connect without crossings.",
+        "wiresSolved": "Wires: Solved",
+        "wiresAvoid": "Avoid crossings.",
+        "pipesHint": "Rotate tiles; valve must be open.",
+        "pipesSolved": "Pipes: Solved",
+        "pipesNotSolved": "Pipes: Not solved",
+        "rotate00": "Rotate (0,0)",
+        "rotate20": "Rotate (2,0)",
+        "openValve": "Open valve"
+      },
+      "latch": {
+        "hint": "Hint: long‑press then drag on the scuff to reveal a latch.",
+        "revealed": "Latch revealed."
+      },
+      "medal": {
+        "label": "Medal:",
+        "gold": "gold",
+        "silver": "silver",
+        "bronze": "bronze"
       }
     }
   }
