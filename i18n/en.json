@@ -215,6 +215,12 @@
       }
     },
     "bod": {
+      "common": {
+        "continue": "Continue",
+        "reveal": "Reveal",
+        "replay": "Replay",
+        "home": "Back to catalog"
+      },
       "breath": {
         "intro": {
           "title": "Body Systems — Breath",
@@ -222,6 +228,18 @@
           "p2": "You’ll order steps and match flows, meter stays calm.",
           "cta": "Begin",
           "skip": "Skip intro"
+        },
+        "bb1": {
+          "title": "BB1 — Respiratory Basics",
+          "prompt": "Order the pathway cards; match O2/CO2 flow."
+        },
+        "bb2": {
+          "title": "BB2 — Cardiovascular Flow",
+          "prompt": "Place chambers and indicate flow direction."
+        },
+        "bb3": {
+          "title": "BB3 — Coupling at the Exchange",
+          "prompt": "Keep balance steady while adjusting simple choices."
         },
         "outro": {
           "title": "Wrap — Breath",
@@ -240,6 +258,18 @@
           "cta": "Begin",
           "skip": "Skip intro"
         },
+        "bf1": {
+          "title": "BF1 — Digestive Journey",
+          "prompt": "Match foods to enzyme cards; simple, gentle pairs."
+        },
+        "bf2": {
+          "title": "BF2 — Absorption & Transport",
+          "prompt": "Place nutrients into villi, then to blood—keep balance calm."
+        },
+        "bf3": {
+          "title": "BF3 — Waste & Balance",
+          "prompt": "Choose hydration balance; meter should stay steady."
+        },
         "outro": {
           "title": "Wrap — Fuel",
           "p1": "Good work keeping balance.",
@@ -256,6 +286,18 @@
           "p2": "Place and adjust with care; watch balance gently.",
           "cta": "Begin",
           "skip": "Skip intro"
+        },
+        "bm1": {
+          "title": "BM1 — Skeletal Support",
+          "prompt": "Choose safe leverage; nudge toward steady balance."
+        },
+        "bm2": {
+          "title": "BM2 — Muscular Action",
+          "prompt": "Pick a calm action; watch the meter."
+        },
+        "bm3": {
+          "title": "BM3 — Coordination",
+          "prompt": "Small adjustments keep signals smooth."
         },
         "outro": {
           "title": "Wrap — Move",
@@ -274,6 +316,18 @@
           "cta": "Begin",
           "skip": "Skip intro"
         },
+        "bsd1": {
+          "title": "BSD1 — Nervous & Senses",
+          "prompt": "Pick two senses; gentle path keeps balance."
+        },
+        "bsd2": {
+          "title": "BSD2 — Endocrine Messages",
+          "prompt": "Place messages to goals; meter nudges softly."
+        },
+        "bsd3": {
+          "title": "BSD3 — Immune & Barriers",
+          "prompt": "Match threats to responses without rush."
+        },
         "outro": {
           "title": "Wrap — Signal & Defend",
           "p1": "Good signals, steady care.",
@@ -290,6 +344,18 @@
           "p2": "Order and match ideas gently.",
           "cta": "Begin",
           "skip": "Skip intro"
+        },
+        "bg1": {
+          "title": "BG1 — Reproductive Basics",
+          "prompt": "Order the growth story cards with care."
+        },
+        "bg2": {
+          "title": "BG2 — Changes Over Time",
+          "prompt": "Choose kind supports; steady is good."
+        },
+        "bg3": {
+          "title": "BG3 — Care Networks",
+          "prompt": "Connect helpers to needs; balance stays calm."
         },
         "outro": {
           "title": "Wrap — Grow",

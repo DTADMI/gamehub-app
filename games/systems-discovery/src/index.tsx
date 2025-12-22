@@ -2,6 +2,7 @@
 import {Scene, SceneController} from "@games/_engine";
 import React from "react";
 import {t} from "@/lib/i18n";
+import HomeostasisMeter from "@/components/sysdisc/HomeostasisMeter";
 
 const scenes: Scene[] = [
     {
@@ -161,6 +162,22 @@ const scenes: Scene[] = [
                         <button className="min-h-[44px] px-4 py-2 rounded bg-secondary text-secondary-foreground"
                                 onClick={() => go("SD_OUTRO")}>View outro
                         </button>
+                        {/* Temporary discoverability link for BOD scaffolds (safe to remove once catalog exposes packs) */}
+                        <button className="min-h-[44px] px-3 py-2 rounded border ml-2"
+                                onClick={() => go("SD_BOD_BREATH_INTRO")}>Try Body Systems (Breath)
+                        </button>
+                        <button className="min-h-[44px] px-3 py-2 rounded border ml-2"
+                                onClick={() => go("SD_BOD_FUEL_INTRO")}>Try Body Systems (Fuel)
+                        </button>
+                        <button className="min-h-[44px] px-3 py-2 rounded border ml-2"
+                                onClick={() => go("SD_BOD_MOVE_INTRO")}>Try Body Systems (Move)
+                        </button>
+                        <button className="min-h-[44px] px-3 py-2 rounded border ml-2"
+                                onClick={() => go("SD_BOD_SIGNAL_INTRO")}>Try Body Systems (Signal)
+                        </button>
+                        <button className="min-h-[44px] px-3 py-2 rounded border ml-2"
+                                onClick={() => go("SD_BOD_GROW_INTRO")}>Try Body Systems (Grow)
+                        </button>
                     </div>
                 </div>
             );
@@ -198,6 +215,615 @@ const scenes: Scene[] = [
                 </div>
             </div>
         ),
+    },
+    // --- Body Systems (BOD) scaffolds: Breath sub-pack ---
+    {
+        id: "SD_BOD_BREATH_INTRO",
+        title: t("sysdisc.bod.breath.intro.title"),
+        render: ({go, setFlag}) => (
+            <div>
+                <p className="mb-2">{t("sysdisc.bod.breath.intro.p1")}</p>
+                <div className="flex gap-2">
+                    <button className="min-h-[44px] px-4 py-2 rounded bg-primary text-primary-foreground"
+                            onClick={() => {
+                                setFlag("bod.breath.intro.seen", true);
+                                go("BB1");
+                            }}>{t("sysdisc.bod.breath.intro.cta")}</button>
+                    <button className="min-h-[44px] px-3 py-2 rounded border"
+                            onClick={() => {
+                                setFlag("bod.breath.intro.seen", true);
+                                go("BB1");
+                            }}>{t("sysdisc.bod.breath.intro.skip")}</button>
+                </div>
+            </div>
+        ),
+    },
+    {
+        id: "BB1",
+        title: t("sysdisc.bod.breath.bb1.title"),
+        render: ({go, state}) => {
+            const meter = Number(state.flags["bod.meter"] ?? 60);
+            return (
+                <div>
+                    <p className="mb-2">{t("sysdisc.bod.breath.bb1.prompt")}</p>
+                    <HomeostasisMeter value={meter}/>
+                    <div className="mt-3">
+                        <button className="min-h-[44px] px-4 py-2 rounded bg-primary text-primary-foreground"
+                                onClick={() => go("BB2")}>{t("sysdisc.bod.common.continue")}</button>
+                    </div>
+                </div>
+            );
+        },
+    },
+    {
+        id: "BB2",
+        title: t("sysdisc.bod.breath.bb2.title"),
+        render: ({go, state}) => {
+            const meter = Number(state.flags["bod.meter"] ?? 60);
+            return (
+                <div>
+                    <p className="mb-2">{t("sysdisc.bod.breath.bb2.prompt")}</p>
+                    <HomeostasisMeter value={meter}/>
+                    <div className="mt-3">
+                        <button className="min-h-[44px] px-4 py-2 rounded bg-primary text-primary-foreground"
+                                onClick={() => go("BB3")}>{t("sysdisc.bod.common.continue")}</button>
+                    </div>
+                </div>
+            );
+        },
+    },
+    {
+        id: "BB3",
+        title: t("sysdisc.bod.breath.bb3.title"),
+        render: ({go, state}) => {
+            const meter = Number(state.flags["bod.meter"] ?? 60);
+            return (
+                <div>
+                    <p className="mb-2">{t("sysdisc.bod.breath.bb3.prompt")}</p>
+                    <HomeostasisMeter value={meter}/>
+                    <div className="mt-3">
+                        <button className="min-h-[44px] px-4 py-2 rounded bg-primary text-primary-foreground"
+                                onClick={() => go("BOD_BREATH_WRAP")}>{t("sysdisc.bod.common.reveal")}</button>
+                    </div>
+                </div>
+            );
+        },
+    },
+    {
+        id: "BOD_BREATH_WRAP",
+        title: t("sysdisc.bod.breath.outro.title"),
+        render: ({state, setFlag, go}) => {
+            if (!state.flags["bod.badges.careAlly"]) {
+                setFlag("bod.badges.careAlly", true);
+                setFlag("bod.badges.breath", true);
+            }
+            return (
+                <div>
+                    <p className="mb-2">{t("sysdisc.bod.breath.outro.p1")}</p>
+                    <div className="mb-2">
+                        <HomeostasisMeter value={Number(state.flags["bod.meter"] ?? 60)}/>
+                    </div>
+                    <ul className="list-disc ml-6 mb-3">
+                        <li>Care Ally badge: {String(state.flags["bod.badges.careAlly"])}</li>
+                        <li>Breath badge: {String(state.flags["bod.badges.breath"])}</li>
+                    </ul>
+                    <div className="flex gap-2">
+                        <button className="min-h-[44px] px-3 py-2 rounded border"
+                                onClick={() => {
+                                    setFlag("bod.breath.outro.seen", true);
+                                    go("BB1");
+                                }}>{t("sysdisc.bod.common.replay")}</button>
+                        <button className="min-h-[44px] px-3 py-2 rounded border"
+                                onClick={() => go("WRAP")}>{t("sysdisc.bod.common.home")}</button>
+                    </div>
+                </div>
+            );
+        },
+    },
+    // --- Body Systems (BOD) scaffolds: Fuel sub-pack ---
+    {
+        id: "SD_BOD_FUEL_INTRO",
+        title: t("sysdisc.bod.fuel.intro.title"),
+        render: ({go, setFlag}) => (
+            <div>
+                <p className="mb-2">{t("sysdisc.bod.fuel.intro.p1")}</p>
+                <div className="flex gap-2">
+                    <button className="min-h-[44px] px-4 py-2 rounded bg-primary text-primary-foreground"
+                            onClick={() => {
+                                setFlag("bod.fuel.intro.seen", true);
+                                go("BF1");
+                            }}>{t("sysdisc.bod.fuel.intro.cta")}</button>
+                    <button className="min-h-[44px] px-3 py-2 rounded border"
+                            onClick={() => {
+                                setFlag("bod.fuel.intro.seen", true);
+                                go("BF1");
+                            }}>{t("sysdisc.bod.fuel.intro.skip")}</button>
+                </div>
+            </div>
+        ),
+    },
+    {
+        id: "BF1",
+        title: t("sysdisc.bod.fuel.bf1.title"),
+        render: ({go, setFlag, state}) => {
+            const meter = Number(state.flags["bod.meter"] ?? 60);
+            const clamp = (v: number) => Math.max(0, Math.min(100, v));
+            return (
+                <div>
+                    <p className="mb-2">{t("sysdisc.bod.fuel.bf1.prompt")}</p>
+                    <HomeostasisMeter value={meter}/>
+                    <div className="mt-2 flex gap-2">
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter + 2))}>Nudge +
+                        </button>
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter - 2))}>Nudge -
+                        </button>
+                    </div>
+                    <div className="mt-3">
+                        <button className="min-h-[44px] px-4 py-2 rounded bg-primary text-primary-foreground"
+                                onClick={() => go("BF2")}>{t("sysdisc.bod.common.continue")}</button>
+                    </div>
+                </div>
+            );
+        },
+    },
+    {
+        id: "BF2",
+        title: t("sysdisc.bod.fuel.bf2.title"),
+        render: ({go, setFlag, state}) => {
+            const meter = Number(state.flags["bod.meter"] ?? 60);
+            const clamp = (v: number) => Math.max(0, Math.min(100, v));
+            return (
+                <div>
+                    <p className="mb-2">{t("sysdisc.bod.fuel.bf2.prompt")}</p>
+                    <HomeostasisMeter value={meter}/>
+                    <div className="mt-2 flex gap-2">
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter + 2))}>Nudge +
+                        </button>
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter - 2))}>Nudge -
+                        </button>
+                    </div>
+                    <div className="mt-3">
+                        <button className="min-h-[44px] px-4 py-2 rounded bg-primary text-primary-foreground"
+                                onClick={() => go("BF3")}>{t("sysdisc.bod.common.continue")}</button>
+                    </div>
+                </div>
+            );
+        },
+    },
+    {
+        id: "BF3",
+        title: t("sysdisc.bod.fuel.bf3.title"),
+        render: ({go, setFlag, state}) => {
+            const meter = Number(state.flags["bod.meter"] ?? 60);
+            const clamp = (v: number) => Math.max(0, Math.min(100, v));
+            return (
+                <div>
+                    <p className="mb-2">{t("sysdisc.bod.fuel.bf3.prompt")}</p>
+                    <HomeostasisMeter value={meter}/>
+                    <div className="mt-2 flex gap-2">
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter + 2))}>Nudge +
+                        </button>
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter - 2))}>Nudge -
+                        </button>
+                    </div>
+                    <div className="mt-3">
+                        <button className="min-h-[44px] px-4 py-2 rounded bg-primary text-primary-foreground"
+                                onClick={() => go("BOD_FUEL_WRAP")}>{t("sysdisc.bod.common.reveal")}</button>
+                    </div>
+                </div>
+            );
+        },
+    },
+    {
+        id: "BOD_FUEL_WRAP",
+        title: t("sysdisc.bod.fuel.outro.title"),
+        render: ({state, setFlag, go}) => {
+            if (!state.flags["bod.badges.careAlly"]) {
+                setFlag("bod.badges.careAlly", true);
+            }
+            if (!state.flags["bod.badges.fuel"]) {
+                setFlag("bod.badges.fuel", true);
+            }
+            return (
+                <div>
+                    <p className="mb-2">{t("sysdisc.bod.fuel.outro.p1")}</p>
+                    <div className="mb-2"><HomeostasisMeter value={Number(state.flags["bod.meter"] ?? 60)}/></div>
+                    <ul className="list-disc ml-6 mb-3">
+                        <li>Care Ally badge: {String(state.flags["bod.badges.careAlly"])}</li>
+                        <li>Fuel badge: {String(state.flags["bod.badges.fuel"])}</li>
+                    </ul>
+                    <div className="flex gap-2">
+                        <button className="min-h-[44px] px-3 py-2 rounded border" onClick={() => {
+                            setFlag("bod.fuel.outro.seen", true);
+                            go("BF1");
+                        }}>{t("sysdisc.bod.common.replay")}</button>
+                        <button className="min-h-[44px] px-3 py-2 rounded border"
+                                onClick={() => go("WRAP")}>{t("sysdisc.bod.common.home")}</button>
+                    </div>
+                </div>
+            );
+        },
+    },
+    // --- Move sub-pack ---
+    {
+        id: "SD_BOD_MOVE_INTRO",
+        title: t("sysdisc.bod.move.intro.title"),
+        render: ({go, setFlag}) => (
+            <div>
+                <p className="mb-2">{t("sysdisc.bod.move.intro.p1")}</p>
+                <div className="flex gap-2">
+                    <button className="min-h-[44px] px-4 py-2 rounded bg-primary text-primary-foreground"
+                            onClick={() => {
+                                setFlag("bod.move.intro.seen", true);
+                                go("BM1");
+                            }}>{t("sysdisc.bod.move.intro.cta")}</button>
+                    <button className="min-h-[44px] px-3 py-2 rounded border" onClick={() => {
+                        setFlag("bod.move.intro.seen", true);
+                        go("BM1");
+                    }}>{t("sysdisc.bod.move.intro.skip")}</button>
+                </div>
+            </div>
+        ),
+    },
+    {
+        id: "BM1",
+        title: t("sysdisc.bod.move.bm1.title"),
+        render: ({go, setFlag, state}) => {
+            const meter = Number(state.flags["bod.meter"] ?? 60);
+            const clamp = (v: number) => Math.max(0, Math.min(100, v));
+            return (
+                <div>
+                    <p className="mb-2">{t("sysdisc.bod.move.bm1.prompt")}</p>
+                    <HomeostasisMeter value={meter}/>
+                    <div className="mt-2 flex gap-2">
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter + 2))}>Nudge +
+                        </button>
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter - 2))}>Nudge -
+                        </button>
+                    </div>
+                    <div className="mt-3">
+                        <button className="min-h-[44px] px-4 py-2 rounded bg-primary text-primary-foreground"
+                                onClick={() => go("BM2")}>{t("sysdisc.bod.common.continue")}</button>
+                    </div>
+                </div>
+            );
+        },
+    },
+    {
+        id: "BM2",
+        title: t("sysdisc.bod.move.bm2.title"),
+        render: ({go, setFlag, state}) => {
+            const meter = Number(state.flags["bod.meter"] ?? 60);
+            const clamp = (v: number) => Math.max(0, Math.min(100, v));
+            return (
+                <div>
+                    <p className="mb-2">{t("sysdisc.bod.move.bm2.prompt")}</p>
+                    <HomeostasisMeter value={meter}/>
+                    <div className="mt-2 flex gap-2">
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter + 2))}>Nudge +
+                        </button>
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter - 2))}>Nudge -
+                        </button>
+                    </div>
+                    <div className="mt-3">
+                        <button className="min-h-[44px] px-4 py-2 rounded bg-primary text-primary-foreground"
+                                onClick={() => go("BM3")}>{t("sysdisc.bod.common.continue")}</button>
+                    </div>
+                </div>
+            );
+        },
+    },
+    {
+        id: "BM3",
+        title: t("sysdisc.bod.move.bm3.title"),
+        render: ({go, setFlag, state}) => {
+            const meter = Number(state.flags["bod.meter"] ?? 60);
+            const clamp = (v: number) => Math.max(0, Math.min(100, v));
+            return (
+                <div>
+                    <p className="mb-2">{t("sysdisc.bod.move.bm3.prompt")}</p>
+                    <HomeostasisMeter value={meter}/>
+                    <div className="mt-2 flex gap-2">
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter + 2))}>Nudge +
+                        </button>
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter - 2))}>Nudge -
+                        </button>
+                    </div>
+                    <div className="mt-3">
+                        <button className="min-h-[44px] px-4 py-2 rounded bg-primary text-primary-foreground"
+                                onClick={() => go("BOD_MOVE_WRAP")}>{t("sysdisc.bod.common.reveal")}</button>
+                    </div>
+                </div>
+            );
+        },
+    },
+    {
+        id: "BOD_MOVE_WRAP",
+        title: t("sysdisc.bod.move.outro.title"),
+        render: ({state, setFlag, go}) => {
+            if (!state.flags["bod.badges.careAlly"]) setFlag("bod.badges.careAlly", true);
+            if (!state.flags["bod.badges.move"]) setFlag("bod.badges.move", true);
+            return (
+                <div>
+                    <p className="mb-2">{t("sysdisc.bod.move.outro.p1")}</p>
+                    <div className="mb-2"><HomeostasisMeter value={Number(state.flags["bod.meter"] ?? 60)}/></div>
+                    <ul className="list-disc ml-6 mb-3">
+                        <li>Care Ally badge: {String(state.flags["bod.badges.careAlly"])}</li>
+                        <li>Move badge: {String(state.flags["bod.badges.move"])}</li>
+                    </ul>
+                    <div className="flex gap-2">
+                        <button className="min-h-[44px] px-3 py-2 rounded border" onClick={() => {
+                            setFlag("bod.move.outro.seen", true);
+                            go("BM1");
+                        }}>{t("sysdisc.bod.common.replay")}</button>
+                        <button className="min-h-[44px] px-3 py-2 rounded border"
+                                onClick={() => go("WRAP")}>{t("sysdisc.bod.common.home")}</button>
+                    </div>
+                </div>
+            );
+        },
+    },
+    // --- Signal sub-pack ---
+    {
+        id: "SD_BOD_SIGNAL_INTRO",
+        title: t("sysdisc.bod.signal.intro.title"),
+        render: ({go, setFlag}) => (
+            <div>
+                <p className="mb-2">{t("sysdisc.bod.signal.intro.p1")}</p>
+                <div className="flex gap-2">
+                    <button className="min-h-[44px] px-4 py-2 rounded bg-primary text-primary-foreground"
+                            onClick={() => {
+                                setFlag("bod.signal.intro.seen", true);
+                                go("BSD1");
+                            }}>{t("sysdisc.bod.signal.intro.cta")}</button>
+                    <button className="min-h-[44px] px-3 py-2 rounded border" onClick={() => {
+                        setFlag("bod.signal.intro.seen", true);
+                        go("BSD1");
+                    }}>{t("sysdisc.bod.signal.intro.skip")}</button>
+                </div>
+            </div>
+        ),
+    },
+    {
+        id: "BSD1",
+        title: t("sysdisc.bod.signal.bsd1.title"),
+        render: ({go, setFlag, state}) => {
+            const meter = Number(state.flags["bod.meter"] ?? 60);
+            const clamp = (v: number) => Math.max(0, Math.min(100, v));
+            return (
+                <div>
+                    <p className="mb-2">{t("sysdisc.bod.signal.bsd1.prompt")}</p>
+                    <HomeostasisMeter value={meter}/>
+                    <div className="mt-2 flex gap-2">
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter + 2))}>Nudge +
+                        </button>
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter - 2))}>Nudge -
+                        </button>
+                    </div>
+                    <div className="mt-3">
+                        <button className="min-h-[44px] px-4 py-2 rounded bg-primary text-primary-foreground"
+                                onClick={() => go("BSD2")}>{t("sysdisc.bod.common.continue")}</button>
+                    </div>
+                </div>
+            );
+        },
+    },
+    {
+        id: "BSD2",
+        title: t("sysdisc.bod.signal.bsd2.title"),
+        render: ({go, setFlag, state}) => {
+            const meter = Number(state.flags["bod.meter"] ?? 60);
+            const clamp = (v: number) => Math.max(0, Math.min(100, v));
+            return (
+                <div>
+                    <p className="mb-2">{t("sysdisc.bod.signal.bsd2.prompt")}</p>
+                    <HomeostasisMeter value={meter}/>
+                    <div className="mt-2 flex gap-2">
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter + 2))}>Nudge +
+                        </button>
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter - 2))}>Nudge -
+                        </button>
+                    </div>
+                    <div className="mt-3">
+                        <button className="min-h-[44px] px-4 py-2 rounded bg-primary text-primary-foreground"
+                                onClick={() => go("BSD3")}>{t("sysdisc.bod.common.continue")}</button>
+                    </div>
+                </div>
+            );
+        },
+    },
+    {
+        id: "BSD3",
+        title: t("sysdisc.bod.signal.bsd3.title"),
+        render: ({go, setFlag, state}) => {
+            const meter = Number(state.flags["bod.meter"] ?? 60);
+            const clamp = (v: number) => Math.max(0, Math.min(100, v));
+            return (
+                <div>
+                    <p className="mb-2">{t("sysdisc.bod.signal.bsd3.prompt")}</p>
+                    <HomeostasisMeter value={meter}/>
+                    <div className="mt-2 flex gap-2">
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter + 2))}>Nudge +
+                        </button>
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter - 2))}>Nudge -
+                        </button>
+                    </div>
+                    <div className="mt-3">
+                        <button className="min-h-[44px] px-4 py-2 rounded bg-primary text-primary-foreground"
+                                onClick={() => go("BOD_SIGNAL_WRAP")}>{t("sysdisc.bod.common.reveal")}</button>
+                    </div>
+                </div>
+            );
+        },
+    },
+    {
+        id: "BOD_SIGNAL_WRAP",
+        title: t("sysdisc.bod.signal.outro.title"),
+        render: ({state, setFlag, go}) => {
+            if (!state.flags["bod.badges.careAlly"]) setFlag("bod.badges.careAlly", true);
+            if (!state.flags["bod.badges.signal"]) setFlag("bod.badges.signal", true);
+            return (
+                <div>
+                    <p className="mb-2">{t("sysdisc.bod.signal.outro.p1")}</p>
+                    <div className="mb-2"><HomeostasisMeter value={Number(state.flags["bod.meter"] ?? 60)}/></div>
+                    <ul className="list-disc ml-6 mb-3">
+                        <li>Care Ally badge: {String(state.flags["bod.badges.careAlly"])}</li>
+                        <li>Signal & Defend badge: {String(state.flags["bod.badges.signal"])}</li>
+                    </ul>
+                    <div className="flex gap-2">
+                        <button className="min-h-[44px] px-3 py-2 rounded border" onClick={() => {
+                            setFlag("bod.signal.outro.seen", true);
+                            go("BSD1");
+                        }}>{t("sysdisc.bod.common.replay")}</button>
+                        <button className="min-h-[44px] px-3 py-2 rounded border"
+                                onClick={() => go("WRAP")}>{t("sysdisc.bod.common.home")}</button>
+                    </div>
+                </div>
+            );
+        },
+    },
+    // --- Grow sub-pack ---
+    {
+        id: "SD_BOD_GROW_INTRO",
+        title: t("sysdisc.bod.grow.intro.title"),
+        render: ({go, setFlag}) => (
+            <div>
+                <p className="mb-2">{t("sysdisc.bod.grow.intro.p1")}</p>
+                <div className="flex gap-2">
+                    <button className="min-h-[44px] px-4 py-2 rounded bg-primary text-primary-foreground"
+                            onClick={() => {
+                                setFlag("bod.grow.intro.seen", true);
+                                go("BG1");
+                            }}>{t("sysdisc.bod.grow.intro.cta")}</button>
+                    <button className="min-h-[44px] px-3 py-2 rounded border" onClick={() => {
+                        setFlag("bod.grow.intro.seen", true);
+                        go("BG1");
+                    }}>{t("sysdisc.bod.grow.intro.skip")}</button>
+                </div>
+            </div>
+        ),
+    },
+    {
+        id: "BG1",
+        title: t("sysdisc.bod.grow.bg1.title"),
+        render: ({go, setFlag, state}) => {
+            const meter = Number(state.flags["bod.meter"] ?? 60);
+            const clamp = (v: number) => Math.max(0, Math.min(100, v));
+            return (
+                <div>
+                    <p className="mb-2">{t("sysdisc.bod.grow.bg1.prompt")}</p>
+                    <HomeostasisMeter value={meter}/>
+                    <div className="mt-2 flex gap-2">
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter + 2))}>Nudge +
+                        </button>
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter - 2))}>Nudge -
+                        </button>
+                    </div>
+                    <div className="mt-3">
+                        <button className="min-h-[44px] px-4 py-2 rounded bg-primary text-primary-foreground"
+                                onClick={() => go("BG2")}>{t("sysdisc.bod.common.continue")}</button>
+                    </div>
+                </div>
+            );
+        },
+    },
+    {
+        id: "BG2",
+        title: t("sysdisc.bod.grow.bg2.title"),
+        render: ({go, setFlag, state}) => {
+            const meter = Number(state.flags["bod.meter"] ?? 60);
+            const clamp = (v: number) => Math.max(0, Math.min(100, v));
+            return (
+                <div>
+                    <p className="mb-2">{t("sysdisc.bod.grow.bg2.prompt")}</p>
+                    <HomeostasisMeter value={meter}/>
+                    <div className="mt-2 flex gap-2">
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter + 2))}>Nudge +
+                        </button>
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter - 2))}>Nudge -
+                        </button>
+                    </div>
+                    <div className="mt-3">
+                        <button className="min-h-[44px] px-4 py-2 rounded bg-primary text-primary-foreground"
+                                onClick={() => go("BG3")}>{t("sysdisc.bod.common.continue")}</button>
+                    </div>
+                </div>
+            );
+        },
+    },
+    {
+        id: "BG3",
+        title: t("sysdisc.bod.grow.bg3.title"),
+        render: ({go, setFlag, state}) => {
+            const meter = Number(state.flags["bod.meter"] ?? 60);
+            const clamp = (v: number) => Math.max(0, Math.min(100, v));
+            return (
+                <div>
+                    <p className="mb-2">{t("sysdisc.bod.grow.bg3.prompt")}</p>
+                    <HomeostasisMeter value={meter}/>
+                    <div className="mt-2 flex gap-2">
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter + 2))}>Nudge +
+                        </button>
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter - 2))}>Nudge -
+                        </button>
+                    </div>
+                    <div className="mt-3">
+                        <button className="min-h-[44px] px-4 py-2 rounded bg-primary text-primary-foreground"
+                                onClick={() => go("BOD_GROW_WRAP")}>{t("sysdisc.bod.common.reveal")}</button>
+                    </div>
+                </div>
+            );
+        },
+    },
+    {
+        id: "BOD_GROW_WRAP",
+        title: t("sysdisc.bod.grow.outro.title"),
+        render: ({state, setFlag, go}) => {
+            if (!state.flags["bod.badges.careAlly"]) setFlag("bod.badges.careAlly", true);
+            if (!state.flags["bod.badges.grow"]) setFlag("bod.badges.grow", true);
+            return (
+                <div>
+                    <p className="mb-2">{t("sysdisc.bod.grow.outro.p1")}</p>
+                    <div className="mb-2"><HomeostasisMeter value={Number(state.flags["bod.meter"] ?? 60)}/></div>
+                    <ul className="list-disc ml-6 mb-3">
+                        <li>Care Ally badge: {String(state.flags["bod.badges.careAlly"])}</li>
+                        <li>Grow badge: {String(state.flags["bod.badges.grow"])}</li>
+                    </ul>
+                    <div className="flex gap-2">
+                        <button className="min-h-[44px] px-3 py-2 rounded border" onClick={() => {
+                            setFlag("bod.grow.outro.seen", true);
+                            go("BG1");
+                        }}>{t("sysdisc.bod.common.replay")}</button>
+                        <button className="min-h-[44px] px-3 py-2 rounded border"
+                                onClick={() => go("WRAP")}>{t("sysdisc.bod.common.home")}</button>
+                    </div>
+                </div>
+            );
+        },
     },
 ];
 

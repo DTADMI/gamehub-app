@@ -1,7 +1,7 @@
 # GameHub — Next.js Frontend
 
 GameHub is a Next.js 16 frontend where you can play my web games and browse my other projects. This repository is the
-frontend only (not a monorepo). It is backend‑agnostic and talks to a separate API via a single environment variable.
+frontend only (not a monorepo). It is backend‑agnostic and talks to a separate API.
 
 This guide helps a newcomer run the frontend locally, test it, and deploy it to Google Cloud Run both manually and via
 GitHub Actions. It also documents the technological choices and trade‑offs made for this project.
