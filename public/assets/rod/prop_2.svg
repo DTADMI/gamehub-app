@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Lamp prop placeholder">
+    <circle cx="32" cy="22" r="12" fill="#f59e0b"/>
+    <rect x="30" y="34" width="4" height="20" fill="#6b7280"/>
+    <rect x="24" y="54" width="16" height="4" rx="2" fill="#9ca3af"/>
+    <title>Prop 2</title>
+</svg>

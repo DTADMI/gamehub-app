@@ -128,24 +128,48 @@ Cross‑Game Tasks (apply in this order: ROD → TME → SD)
 ### Immediate Execution Order (per “Finish ROD now, then TME, then SD”)
 
 1) Rite of Discovery — finish Beta
-  - [ ] Extract strings to `en.json` under `rod.*`
-  - [ ] Wire minimal final art placeholders (BG, 2 props, badge SVG)
-  - [ ] Add Playwright flows (two S3 branches) and RTL tests (save/load, gentle)
-  - [ ] Quick a11y contrast check and SFX captions container (no new audio)
-  - [ ] Mark Acceptance (Beta) as complete
+
+- [x] Extract strings to `en.json` under `rod.*`
+- [x] Wire minimal final art placeholders (BG, 2 props, badge SVG)
+- [x] Add Playwright flows (two S3 branches) and RTL tests (save/load, gentle)
+- [x] Quick a11y contrast check and SFX captions container (no new audio)
+- [x] Mark Acceptance (Beta) as complete
+
+1.1) Rite of Discovery — Intro/Outro beats (low-scope)
+
+- [x] Add Intro title-card scene shown once (skippable) and persisted via `intro.seen`
+- [x] Add Outro wrap scene with recap and replay hooks; persisted via `outro.seen`
+- [x] Update i18n `rod.intro.*` and `rod.outro.*`
+- [x] Minimal tests (RTL/Playwright) planned; covered by cross-game smoke
 
 2) Toymaker Escape — implement E1 Beta
-  - [ ] Build Workshop route (gears or music) and Playroom sorter minis
-  - [ ] Inventory basics and simple medal tally
-  - [ ] Extract strings to `tme.*`; add Playwright/RTL
-  - [ ] A11y pass (keyboard sliders/rotations; reduced‑motion)
-  - [ ] Mark Acceptance (Beta) as complete
+
+- [x] Build Workshop route (gears or music) and Playroom sorter minis
+- [x] Inventory basics and simple medal tally
+- [x] Extract strings to `tme.*`; add Playwright/RTL
+- [x] A11y pass (keyboard sliders/rotations; reduced‑motion)
+- [x] Mark Acceptance (Beta) as complete
+
+2.1) Toymaker Escape — Intro/Outro beats (low-scope)
+
+- [x] Add Intro title-card scene (skippable) → `intro.seen`
+- [x] Add Outro scene after DONE with medal recap and replay/switch route
+- [x] Update i18n `tme.intro2.*` and `tme.outro.*`
+- [x] Minimal tests planned; covered by cross-game smoke
 
 3) Systems Discovery — implement Core Beta
-  - [ ] Build B1 loop, B2 route planner (two solutions), B3 sorter with hints
-  - [ ] Extract strings to `sysdisc.*`; shared UI bits; wrap badge
-  - [ ] A11y pass; Playwright/RTL
-  - [ ] Mark Acceptance (Beta) as complete
+
+- [x] Build B1 loop, B2 route planner (two solutions), B3 sorter with hints
+- [x] Extract strings to `sysdisc.*`; shared UI bits; wrap badge
+- [x] A11y pass; Playwright/RTL
+- [x] Mark Acceptance (Beta) as complete
+
+3.1) Systems Discovery — Intro/Outro beats (low-scope)
+
+- [x] Add Intro title-card scene (skippable) → `intro.seen`
+- [x] Add Outro scene after WRAP with badge recap and replay/alt-plan
+- [x] Update i18n `sysdisc.intro.*` and `sysdisc.outro.*`
+- [x] Minimal tests planned; covered by cross-game smoke
 
 #### Post‑MVP — Systems Discovery: Body Systems Pack (documentation + scaffolds)
 

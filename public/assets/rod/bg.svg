@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200" role="img" aria-label="Background placeholder">
+    <defs>
+        <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#e5e7eb"/>
+            <stop offset="100%" stop-color="#cbd5e1"/>
+        </linearGradient>
+    </defs>
+    <rect width="600" height="200" fill="url(#g)"/>
+    <rect x="0" y="150" width="600" height="50" fill="#a8a29e"/>
+    <circle cx="520" cy="40" r="6" fill="#94a3b8"/>
+    <circle cx="540" cy="48" r="4" fill="#94a3b8"/>
+    <circle cx="500" cy="46" r="5" fill="#94a3b8"/>
+    <title>Room background placeholder</title>
+</svg>

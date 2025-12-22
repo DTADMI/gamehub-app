@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Table prop placeholder">
+    <rect x="6" y="30" width="52" height="10" rx="2" fill="#9ca3af"/>
+    <rect x="12" y="40" width="6" height="16" fill="#6b7280"/>
+    <rect x="46" y="40" width="6" height="16" fill="#6b7280"/>
+    <title>Prop 1</title>
+</svg>
