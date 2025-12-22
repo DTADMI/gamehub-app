@@ -182,6 +182,19 @@ Acceptance additions (Core)
   thereafter on demand.
 - Flags persisted in save: `intro.seen`, `outro.seen`, plus existing `b1.*`, `b2.plan`, `b3.*`.
 
+Launcher exposure & flags (Body Systems)
+
+- Frontend-only flags (stored under `gh:flags:v1`) control whether Body Systems appears in the `/games` catalog as a
+  dedicated card.
+- Deep-links allow starting a sub‑pack directly: `/games/systems-discovery?pack=breath|fuel|move|signal|grow`. The game
+  reads the `pack` query parameter and starts at the corresponding `SD_BOD_<SUB>_INTRO` scene.
+- Core WRAP no longer includes temporary BOD entry buttons to keep the wrap uncluttered.
+
+Accessibility notes (BOD diagrams & meter)
+
+- Use descriptive `alt` text for diagrams and labels/patterns in addition to color. The shared Homeostasis Meter exposes
+  ARIA `role="meter"` with `aria-valuemin/max/now` and a readable label.
+
 Data Model (sketch)
 
 - `PackId = CORE | SPACE | OCEAN | BOD_BREATH | BOD_FUEL | BOD_MOVE | BOD_SIGNAL | BOD_GROW`

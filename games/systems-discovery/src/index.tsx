@@ -162,22 +162,6 @@ const scenes: Scene[] = [
                         <button className="min-h-[44px] px-4 py-2 rounded bg-secondary text-secondary-foreground"
                                 onClick={() => go("SD_OUTRO")}>View outro
                         </button>
-                        {/* Temporary discoverability link for BOD scaffolds (safe to remove once catalog exposes packs) */}
-                        <button className="min-h-[44px] px-3 py-2 rounded border ml-2"
-                                onClick={() => go("SD_BOD_BREATH_INTRO")}>Try Body Systems (Breath)
-                        </button>
-                        <button className="min-h-[44px] px-3 py-2 rounded border ml-2"
-                                onClick={() => go("SD_BOD_FUEL_INTRO")}>Try Body Systems (Fuel)
-                        </button>
-                        <button className="min-h-[44px] px-3 py-2 rounded border ml-2"
-                                onClick={() => go("SD_BOD_MOVE_INTRO")}>Try Body Systems (Move)
-                        </button>
-                        <button className="min-h-[44px] px-3 py-2 rounded border ml-2"
-                                onClick={() => go("SD_BOD_SIGNAL_INTRO")}>Try Body Systems (Signal)
-                        </button>
-                        <button className="min-h-[44px] px-3 py-2 rounded border ml-2"
-                                onClick={() => go("SD_BOD_GROW_INTRO")}>Try Body Systems (Grow)
-                        </button>
                     </div>
                 </div>
             );
@@ -241,12 +225,21 @@ const scenes: Scene[] = [
     {
         id: "BB1",
         title: t("sysdisc.bod.breath.bb1.title"),
-        render: ({go, state}) => {
+        render: ({go, setFlag, state}) => {
             const meter = Number(state.flags["bod.meter"] ?? 60);
+            const clamp = (v: number) => Math.max(0, Math.min(100, v));
             return (
                 <div>
                     <p className="mb-2">{t("sysdisc.bod.breath.bb1.prompt")}</p>
                     <HomeostasisMeter value={meter}/>
+                    <div className="mt-2 flex gap-2" role="group" aria-label="Balance nudges">
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter + 2))}>Nudge +
+                        </button>
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter - 2))}>Nudge -
+                        </button>
+                    </div>
                     <div className="mt-3">
                         <button className="min-h-[44px] px-4 py-2 rounded bg-primary text-primary-foreground"
                                 onClick={() => go("BB2")}>{t("sysdisc.bod.common.continue")}</button>
@@ -258,12 +251,21 @@ const scenes: Scene[] = [
     {
         id: "BB2",
         title: t("sysdisc.bod.breath.bb2.title"),
-        render: ({go, state}) => {
+        render: ({go, setFlag, state}) => {
             const meter = Number(state.flags["bod.meter"] ?? 60);
+            const clamp = (v: number) => Math.max(0, Math.min(100, v));
             return (
                 <div>
                     <p className="mb-2">{t("sysdisc.bod.breath.bb2.prompt")}</p>
                     <HomeostasisMeter value={meter}/>
+                    <div className="mt-2 flex gap-2" role="group" aria-label="Balance nudges">
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter + 2))}>Nudge +
+                        </button>
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter - 2))}>Nudge -
+                        </button>
+                    </div>
                     <div className="mt-3">
                         <button className="min-h-[44px] px-4 py-2 rounded bg-primary text-primary-foreground"
                                 onClick={() => go("BB3")}>{t("sysdisc.bod.common.continue")}</button>
@@ -275,12 +277,21 @@ const scenes: Scene[] = [
     {
         id: "BB3",
         title: t("sysdisc.bod.breath.bb3.title"),
-        render: ({go, state}) => {
+        render: ({go, setFlag, state}) => {
             const meter = Number(state.flags["bod.meter"] ?? 60);
+            const clamp = (v: number) => Math.max(0, Math.min(100, v));
             return (
                 <div>
                     <p className="mb-2">{t("sysdisc.bod.breath.bb3.prompt")}</p>
                     <HomeostasisMeter value={meter}/>
+                    <div className="mt-2 flex gap-2" role="group" aria-label="Balance nudges">
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter + 2))}>Nudge +
+                        </button>
+                        <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
+                                onClick={() => setFlag("bod.meter", clamp(meter - 2))}>Nudge -
+                        </button>
+                    </div>
                     <div className="mt-3">
                         <button className="min-h-[44px] px-4 py-2 rounded bg-primary text-primary-foreground"
                                 onClick={() => go("BOD_BREATH_WRAP")}>{t("sysdisc.bod.common.reveal")}</button>
@@ -828,9 +839,40 @@ const scenes: Scene[] = [
 ];
 
 export function SystemsDiscoveryGame() {
+    // Extend initial save model with BOD defaults; existing saves remain compatible
+    // Support deep-links from catalog: /games/systems-discovery?pack=<sub>
+    let initialScene: string = "SD_INTRO";
+    if (typeof window !== "undefined") {
+        const params = new URLSearchParams(window.location.search);
+        const pack = params.get("pack");
+        switch (pack) {
+            case "breath":
+                initialScene = "SD_BOD_BREATH_INTRO";
+                break;
+            case "fuel":
+                initialScene = "SD_BOD_FUEL_INTRO";
+                break;
+            case "move":
+                initialScene = "SD_BOD_MOVE_INTRO";
+                break;
+            case "signal":
+                initialScene = "SD_BOD_SIGNAL_INTRO";
+                break;
+            case "grow":
+                initialScene = "SD_BOD_GROW_INTRO";
+                break;
+        }
+    }
+    const initial = {
+        scene: initialScene,
+        flags: {
+            "bod.meter": 60,
+            "bod.toggles.deeper": false,
+        },
+        inventory: [] as string[],
+    };
     return (
-        <SceneController scenes={scenes} initial={{scene: "SD_INTRO", flags: {}, inventory: []}}
-                         saveKey="sysdisc:save:v1"/>
+        <SceneController scenes={scenes} initial={initial} saveKey="sysdisc:save:v1"/>
     );
 }
 

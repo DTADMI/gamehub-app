@@ -184,12 +184,12 @@ Cross‑Game Tasks (apply in this order: ROD → TME → SD)
   - [ ] Extend save model `sysdisc:save:v1` with `bod: { meter:number, toggles:{deeper:boolean} }`
   - [ ] Medal rules: award “Care Ally”/BOD sub‑pack badges on wrap
 - Accessibility & testing
-  - [ ] Alt text and captions for all new diagrams; colorblind‑safe patterns for O2/CO2 and flows
+  - [x] Alt text and captions for all new diagrams; colorblind‑safe patterns for O2/CO2 and flows
   - [x] Playwright smoke: complete one BOD sub‑pack (any 3 scenes + wrap) with meter staying green
 
 - [x] Backgrounds — visibility fix and verification (galaxy dark, star‑glow light); ensure `--app-bg` applied on all
   pages (tuned intensities, enhanced starfield/nebula; verified on home, catalog, and game pages)
-- [ ] Game Launcher — Phase 2: flags‑driven gating via frontend‑only flags provider (localStorage) with unit/E2E checks
+- [x] Game Launcher — Phase 2: flags‑driven gating via frontend‑only flags provider (localStorage) with unit/E2E checks
 - [ ] Breakout particles reliability — ensure normal brick‑hit emissions and live effect switching; hide particle
   controls in non‑particle games
 - [ ] Snake mobile controllers — Swipe (default), optional Joystick/D‑pad and Taps; non‑blocking scroll; mobile E2E

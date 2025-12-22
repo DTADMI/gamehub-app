@@ -1144,6 +1144,26 @@ Accessibility targets
 - Body text aims for ≥ 4.5:1; large headings/UI chrome ≥ 3:1.
 - Focus rings are driven by `--ring` and remain visible in both themes.
 
+13. Launcher flags (frontend‑only) — exposing Systems Discovery packs
+
+Body Systems sub‑packs for Systems Discovery can be exposed in the catalog via a lightweight frontend flags provider. By
+default, these flags are enabled locally.
+
+- Flags provider stores to `localStorage` under key `gh:flags:v1` with defaults:
+  `{ sdBodEnabled: true, sdBodBreath: true, sdBodFuel: true, sdBodMove: true, sdBodSignal: true, sdBodGrow: true }`.
+- When `sdBodEnabled` is true, the `/games` catalog shows a “Systems Discovery — Body Systems” card that deep‑links into
+  the chosen sub‑pack via querystring.
+- Deep‑link routes:
+  - `/games/systems-discovery?pack=breath|fuel|move|signal|grow`
+- The game reads the `pack` query parameter and starts at the corresponding intro scene (e.g., `SD_BOD_BREATH_INTRO`).
+- Temporary WRAP deep‑links inside the Core pack have been removed to keep Core uncluttered.
+
+Accessibility notes (BOD):
+
+- The Homeostasis Meter component uses `role="meter"` with `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, and a
+  readable label. Scenes group related controls using `role="group"` and accessible labels. Diagrams should include
+  descriptive `alt` text and avoid reliance on color alone (patterns/labels used where relevant).
+
 ## Upcoming Projects
 
 - Quest Hunt — Mobile-first social geocaching: create, participate in, and share location-based treasure hunts.
