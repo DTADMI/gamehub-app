@@ -1,0 +1,18 @@
+{
+  "tme": {
+    "e1": {
+      "title": "Toymaker Escape — Épisode 1",
+      "body": "Un atelier silencieux. Les indices se cachent à vue d'œil.",
+      "keypad": {
+        "hint": "Un indice dans la pièce semble suggérer l'ordre... observez les jouets sur l'étagère.",
+        "clear": "Effacer",
+        "submit": "Valider",
+        "input": "Entrée :",
+        "unlocked": "Déverrouillé"
+      },
+      "gears": {
+        "instruction": "Réglez les engrenages pour obtenir un rapport 1:3 (sortie = 1/3 de la vitesse d'entrée)."
+      }
+    }
+  }
+}

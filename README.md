@@ -205,7 +205,7 @@ import {detectLang, nextScene, guards, effects, type Scene} from "@games/shared/
 
 const scenes: Record<string, Scene> = {
   INTRO: {
-    id: "INTRO",
+    en: merge({}, tme_en, rod_en, sys_en), id: "INTRO",
     title: {en: "Intro", fr: "Intro"},
     body: {en: "A quiet room.", fr: "Une pièce calme."},
     choices: [
@@ -245,6 +245,43 @@ import {DialogueBox, InventoryBar, detectLang} from "@games/shared";
 }}/>
 ```
 
+### Localization (i18n) — EN/FR per title
+
+This app uses a tiny client-side i18n helper with per-title flat JSON bundles under `i18n/<title>/{en.json,fr.json}`.
+The language is detected from `localStorage.getItem('lang')` or `navigator.language` and can be changed at runtime.
+
+Usage:
+
+```ts
+import {t, initI18n, setLocale, detectLang} from "@/lib/i18n";
+
+// Initialize as early as possible (e.g., in _app or root component)
+initI18n(); // sets from localStorage or navigator
+
+// Read strings
+const title = t("tme.e1.title");
+
+// Switch language and persist
+setLocale("fr"); // stores 'fr' in localStorage
+```
+
+Bundle structure example:
+
+```
+i18n/
+  toymaker-escape/
+    en.json  // keys starting with tme.*
+    fr.json
+  rite-of-discovery/
+    en.json  // keys starting with rod.*
+    fr.json
+  systems-discovery/
+    en.json  // keys starting with sysdisc.*
+    fr.json
+```
+
+When adding new scenes or UI labels, add keys to the relevant title namespace and reference them via `t()`.
+
 Example — Sequence (Simon) puzzle
 
 ```ts
@@ -256,6 +293,38 @@ seq = pressSeq(seq, "G");
 seq = pressSeq(seq, "B");
 // seq.solved === true
 ```
+
+### Designing clever puzzles (environmental clues, observation, mechanics)
+
+Goal: Make puzzles rely less on overt UI hints and more on diegetic/environmental clues that reward observation and
+light reasoning, while preserving accessibility and mobile‑first UX.
+
+Patterns
+
+- Diegetic hints: Place codes/ratios as props in the environment (posters, shelves, plaques, light/shadow shapes, sound
+  rhythms).
+- Layered clues: Split a hint across two scenes or objects; require combining them.
+- Mechanics usage: Make the environment teach constraints (e.g., a “No crossings” poster for wires; a faded “3:1” plate
+  for gears).
+- Observation gates: Small scuffs/handles suggest long‑press then drag; alignment patterns hint an order.
+- A11y parity: Provide alt text captions that encode the same clues; honor reduced‑motion by using static highlights.
+
+Applying to primitives
+
+- Keypad: Remove inline codes from UI. Place the order/clue in decor. Keep keypad logic unchanged.
+- Gears: Use evaluator to verify target ratio with a tolerance (e.g., ±0.1%). Clues like “3:1” plate or a slow music box
+  suggest output slower than input.
+- Wires: Enforce no‑crossing constraint; pairings hinted via a poster. Provide negative cases for feedback.
+- Pipes: Grid of tiles must reach sinks without open ends or closed valves; subtle hissing/decals hint a leak.
+- Gestures: Register macros like `['pointerdown','longpress','swipe']` to reveal hidden latches after reading
+  environmental scuffs.
+
+Accessibility & reduced motion
+
+- Replace animated flows with static highlights when `prefers-reduced-motion` is on.
+- Ensure captions/alt text describe the clue adequately (EN/FR). Use Inventory/Dialogue UI for keyboard access.
+
+See `docs/narrative/scene-puzzles.md` for per‑scene briefs, assets, and a11y annotations.
 
 Example — Wires/connectors puzzle
 

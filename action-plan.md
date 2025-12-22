@@ -123,11 +123,13 @@ Legend: ✅ Completed • 🟡 In Progress • 🔜 Next • 🗂️ Backlog
 
 - 🟡 Docs & Assets
   - [ ] README — engine overview and examples (expand with Scene Services + primitives usage). *
-  - [ ] docs/ — per‑game scene & puzzle briefs with steps/hints/assets
+  - [x] docs/ — per‑game scene & puzzle briefs with steps/hints/assets (TME E1 updated with filenames). ✓
+  - [x] Narrative puzzle cleverness pass (observation, environmental clues) — focus TME E1 first ✓ plan approved ✓
+  - [x] Add designer briefs for TME E1 (scenes, objects, props, audio, VFX) with asset lists + filenames (EN/FR). ✓
   - [ ] public/credits.md — add placeholder asset credits as needed
 
 - 🟡 Localization & Settings
-  - [ ] EN/FR flat JSON per title; language toggle persisted in localStorage. *
+  - [x] EN/FR flat JSON per title; tiny i18n helper with persistence in localStorage. ✓
 
 Notes: Frontend‑only MVPs; EN/FR localization; accessibility guardrails; mobile‑first ≥44px targets; local saves.
 
@@ -137,6 +139,45 @@ Notes: Frontend‑only MVPs; EN/FR localization; accessibility guardrails; mobil
   local saves.
 - Shared engine/i18n/assets: extract common point-and-click primitives, localization scaffolding, and placeholder
   assets.
+
+---
+
+## TME Episode 1 — Clever Puzzles Plan (approved)
+
+Scope: Apply environmental/diegetic clues and multi-step reasoning to Toymaker Escape E1, leveraging keypad, gears,
+wires, pipes, and gesture macros. Maintain a11y parity and reduced-motion.
+
+### Targets
+
+- Keypad: remove inline code from UI; move clues into decor and captions.
+- Gears: ratio inferred via environment; tolerate small error; confirm via subtle SFX.
+- Wires: enforce no-crossing; pairing hinted via poster and lighting order.
+- Pipes: fix leaks; diegetic hissing/decals guide; reduced-motion highlight.
+- Hidden latch: require long-press→drag macro.
+- Persistence: persist clues and solves in `tme:save:v1`.
+
+### Implementation tasks
+
+- [ ] Update TME E1 scene data to remove overt keypad hint and add decor-based clues.
+- [ ] Implement wires/connectors logic integration in TME E1 scene.
+- [ ] Implement pipes/flow logic and minimal UI wrapper; add reduced-motion path.
+- [ ] Extend gears mini with tolerance + decor hint states.
+- [ ] Register input macro `holdThenDrag` to reveal hidden latch hotspot; update blackboard flags.
+- [ ] Persist discovered clues/solves in `tme:save:v1`.
+- [ ] Unit tests: sequence, wires, gears, pipes; scene progression for TME E1.
+- [ ] Playwright smoke (desktop + Pixel 5) golden path solving at least one optional hint.
+- [ ] Docs: README section "Designing clever puzzles" and `docs/narrative/scene-puzzles.md` with TME E1 briefs.
+
+### Designer brief — assets & scene description (summary)
+
+- Rooms: Workshop (entry), Shelf Nook, Workbench, Cabinet Wall.
+- Key props: Toy shelf (4 sizes/colors), faded ratio plate ("3:1"), wiring board with colored jacks, pipe grid panel
+  with valve, scuffed cabinet edge.
+- UI labels: EN/FR for posters, captions for alt-hints.
+- Audio: faint hiss near leak, soft music box loop varying on solve, subtle latch click.
+- VFX (optional): light flicker cue, gentle highlight pulses (reduced-motion replaced by static outline).
+
+Deliverables tracked under Docs & Assets and committed in `docs/narrative/scene-puzzles.md`.
 
 ### 🔜 Next
 

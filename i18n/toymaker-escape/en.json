@@ -1,0 +1,18 @@
+{
+  "tme": {
+    "e1": {
+      "title": "Toymaker Escape — Episode 1",
+      "body": "A quiet workshop. Clues hide in plain sight.",
+      "keypad": {
+        "hint": "A clue in the room seems to suggest the order... study the toys on the shelf.",
+        "clear": "Clear",
+        "submit": "Submit",
+        "input": "Input:",
+        "unlocked": "Unlocked"
+      },
+      "gears": {
+        "instruction": "Adjust the gears to achieve a 1:3 ratio (output = 1/3 of input speed)."
+      }
+    }
+  }
+}

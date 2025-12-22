@@ -19,6 +19,7 @@ import {
     type GearsState,
     setGearsTeeth as setGearTeeth,
 } from "@games/shared/pointclick/puzzles/gears";
+import {t} from "@/lib/i18n";
 
 const SAVE_KEY = "tme:save:v1";
 
@@ -107,16 +108,18 @@ export const ToymakerEscapeGame: React.FC = () => {
         >
             <div role="application" aria-label="Toymaker Escape" className="p-4">
                 <h2 className="text-2xl font-bold mb-2" aria-live="polite">
-                    {scene?.title[lang]}
+                    {scene?.title?.[lang] ?? t('tme.e1.title')}
                 </h2>
-                {scene?.body && (
+                {scene?.body ? (
                     <p className="mb-4 text-muted-foreground">{scene.body[lang]}</p>
+                ) : (
+                    <p className="mb-4 text-muted-foreground">{t('tme.e1.body')}</p>
                 )}
 
                 {/* Episode 1 keypad mini (simple mobile-friendly UI) */}
                 {sceneId === "E1_GEAR" && (
                     <div className="mb-4 rounded-md border p-3">
-                        <p className="mb-2 text-sm">{lang === "fr" ? "Entrez le code pour déverrouiller (2413)" : "Enter the code to unlock (2413)"}</p>
+                        <p className="mb-2 text-sm">{t('tme.e1.keypad.hint')}</p>
                         <div className="grid grid-cols-3 gap-2 max-w-xs">
                             {["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"].map((d) => (
                                 <button
@@ -131,7 +134,7 @@ export const ToymakerEscapeGame: React.FC = () => {
                                 className="col-span-2 min-h-11 px-4 py-2 rounded bg-gray-200 dark:bg-gray-700"
                                 onClick={() => setKeypad((s) => clearKeypad(s))}
                             >
-                                {lang === "fr" ? "Effacer" : "Clear"}
+                                {t('tme.e1.keypad.clear')}
                             </button>
                             <button
                                 className="min-h-11 px-4 py-2 rounded bg-primary text-primary-foreground"
@@ -146,21 +149,17 @@ export const ToymakerEscapeGame: React.FC = () => {
                                     });
                                 }}
                             >
-                                {lang === "fr" ? "Valider" : "Submit"}
+                                {t('tme.e1.keypad.submit')}
                             </button>
                         </div>
                         <div className="mt-2 text-sm">
-                            {lang === "fr" ? "Entrée:" : "Input:"} <b>{keypad.input}</b>{" "}
+                            {t('tme.e1.keypad.input')} <b>{keypad.input}</b>{" "}
                             {keypad.solved &&
-                                <span className="text-green-600">{lang === "fr" ? "Déverrouillé" : "Unlocked"}</span>}
+                                <span className="text-green-600">{t('tme.e1.keypad.unlocked')}</span>}
                         </div>
                         {/* Gears mini (ratio 1/3) — adjust teeth to achieve target */}
                         <div className="mt-4">
-                            <p className="mb-2 text-sm">
-                                {lang === "fr"
-                                    ? "Réglez les engrenages pour obtenir un rapport 1:3 (sortie = 1/3 de la vitesse d'entrée)."
-                                    : "Adjust the gears to achieve a 1:3 ratio (output = 1/3 of input speed)."}
-                            </p>
+                            <p className="mb-2 text-sm">{t('tme.e1.gears.instruction')}</p>
                             <div className="flex flex-col gap-2 max-w-md">
                                 {["in", "idle", "out"].map((id) => (
                                     <div key={id} className="flex items-center gap-2">
