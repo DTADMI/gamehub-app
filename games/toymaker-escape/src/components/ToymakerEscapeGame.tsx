@@ -17,7 +17,7 @@ import {
     createGearsState,
     evaluateGears,
     type GearsState,
-    setTeeth as setGearTeeth,
+    setGearsTeeth as setGearTeeth,
 } from "@games/shared/pointclick/puzzles/gears";
 
 const SAVE_KEY = "tme:save:v1";

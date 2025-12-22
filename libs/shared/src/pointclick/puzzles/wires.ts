@@ -35,7 +35,7 @@ export function createWiresState(
     };
 }
 
-export function setConnection(
+export function setWiresConnection(
     state: WiresState,
     from: TerminalId,
     to: TerminalId,
@@ -62,7 +62,7 @@ export function removeConnection(
     });
 }
 
-export function clearConnections(state: WiresState): WiresState {
+export function clearWiresConnections(state: WiresState): WiresState {
     return {...state, connections: [], solved: false};
 }
 
@@ -81,7 +81,7 @@ export function evaluateSolved(state: WiresState): WiresState {
     return {...state, solved: true};
 }
 
-export function hasCrossing(state: WiresState): boolean {
+export function hasWiresCrossing(state: WiresState): boolean {
     // Optional helper: check if any two connections cross assuming ordered banks
     // We map left terminals to an index and right terminals to an index, then detect inversions.
     const leftIndex = new Map<string, number>();

@@ -94,13 +94,15 @@ Legend: ✅ Completed • 🟡 In Progress • 🔜 Next • 🗂️ Backlog
 
 - 🟡 Engine improvements to implement now (mobile‑first, complex puzzles):
   - [x] InputSequenceDetector integration with `InputManager` for gesture macros (tap patterns, hold‑then‑drag). ✓
-  - [ ] Scene Services: timers, cutscene runner, and a tiny blackboard for puzzle state per scene (typed hooks).
-  - [ ] Additional puzzle primitives (pure logic + light UI wrappers):
-    - [ ] sequence/simon
-    - [ ] wires/connectors
-    - [ ] gears ratio mesh
-    - [ ] pipes/flow
-  - [ ] Persistence helpers: versioned save migrations for `rod:save:v1`, `tme:save:v1`, `sysdisc:save:v1`.
+  - [ ] Scene Services (API + unit tests): timers (pausable), cutscene runner, and a tiny per‑scene blackboard with
+    typed hooks. *
+  - [ ] Additional puzzle primitives (pure logic + light UI wrappers): *
+    - [ ] sequence/simon (logic, hint playback, strict mode) *
+    - [ ] wires/connectors (no crossings, target mapping, helpers) *
+    - [ ] gears ratio mesh (ratio evaluator, target match, tolerances)
+    - [ ] pipes/flow (grid pathing, leaks, goal constraints)
+  - [ ] Persistence helpers: versioned save helpers + migration stubs for `rod:save:v1`, `tme:save:v1`,
+    `sysdisc:save:v1`. *
 
 - 🟡 Game implementation (parallel TME → ROD → SD):
   - TME (Episode 1)
@@ -115,14 +117,17 @@ Legend: ✅ Completed • 🟡 In Progress • 🔜 Next • 🗂️ Backlog
     - [ ] Local saves, badges per pack
 
 - 🟡 Tests & CI
-  - [ ] Unit tests for each puzzle primitive
-  - [ ] Scene graph/progression unit tests (guards/effects)
-  - [ ] Playwright E2E smokes per title path
+  - [ ] Unit tests for each puzzle primitive (keypad, sequence, wires, gears, pipes). *
+  - [ ] Scene graph/progression unit tests (guards/effects) and Scene Services tests (timers/cutscene/blackboard). *
+  - [ ] Playwright E2E smokes per title path (one golden path each: ROD, TME, SD). *
 
 - 🟡 Docs & Assets
-  - [ ] README — engine overview and examples (expanded)
+  - [ ] README — engine overview and examples (expand with Scene Services + primitives usage). *
   - [ ] docs/ — per‑game scene & puzzle briefs with steps/hints/assets
   - [ ] public/credits.md — add placeholder asset credits as needed
+
+- 🟡 Localization & Settings
+  - [ ] EN/FR flat JSON per title; language toggle persisted in localStorage. *
 
 Notes: Frontend‑only MVPs; EN/FR localization; accessibility guardrails; mobile‑first ≥44px targets; local saves.
 

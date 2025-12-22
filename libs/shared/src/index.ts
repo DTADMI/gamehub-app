@@ -12,6 +12,8 @@ export * from "./pointclick/puzzles/keypad";
 export * from "./pointclick/puzzles/sequence";
 export * from "./pointclick/puzzles/wires";
 export * from "./pointclick/puzzles/gears";
+export * from "./pointclick/core/SceneServices";
+export * from "./pointclick/core/Persistence";
 export {DialogueBox} from "./pointclick/react/DialogueBox";
 export {InventoryBar} from "./pointclick/react/InventoryBar";
 export * from "./pointclick/ui/InputSequenceDetector";
