@@ -26,6 +26,13 @@ frontend‑only and backend‑agnostic.
 - CI health: Monitor the next scheduled CI run on `main` and keep the pipeline green.
 - Tests: Maintain mobile Snake spec parity and Memory animation unit test stability.
 
+### 🔜 Next (Narrative Games — ROD, TME, SD)
+
+- TME, ROD, SD (frontend-only MVPs): finalize scenes, hotspots, dialogue, puzzles; EN/FR; accessibility + mobile UX;
+  local saves.
+- Shared engine/i18n/assets: extract common point-and-click primitives, localization scaffolding, and placeholder
+  assets.
+
 ### 🔜 Next
 
 - Profiles/Avatars: expand avatar options (built‑in set + custom URL validation).
@@ -69,9 +76,80 @@ frontend‑only and backend‑agnostic.
   - [ ] Update README with Profiles/Leaderboard/Settings v1 surfaces and Memory asset notes. 🔜
   - [ ] Keep credits up‑to‑date when adding new assets (images/sounds). 🔜
 
+7. Narrative Games (ROD, TME, SD) — per your approval to proceed now
+
+- [ ] Shared point‑and‑click engine: scene graph, hotspot system, dialogue UI, inventory/flags, timers; exportable
+  hooks. 🟡
+- [ ] i18n foundation: EN/FR namespaces per title, language switch in header with persistence. 🟡
+- [ ] Saves: localStorage with versioned keys `rod:save:v1`, `tme:save:v1`, `sysdisc:save:v1` + migration stubs. 🟡
+- [ ] TME MVP: implement Intro → E1 routes, gears mini, sorter puzzle, medals, wrap; a11y & mobile pass. 🟡
+- [ ] ROD MVP: implement scenes, hotspots, dialogue per design docs; core puzzles; a11y & mobile pass. 🔜
+- [ ] SD MVP: Core + BOD packs (Breath, Fuel, Move, Signal, Grow) basic paths; badges; a11y & mobile pass. 🔜
+- [ ] Tests: E2E smokes per title + unit tests for scene graph and progression guards. 🟡
+- [ ] Default placeholder assets wired (images/SFX/music) and `public/credits.md` updated. 🟡
+
 Notes
 
 - Unless otherwise noted, new features are frontend‑only with local persistence and backend seams for future wiring.
+
+---
+
+## Plan — Narrative Games Delivery (ROD, TME, SD)
+
+Legend: ✅ Completed • 🟡 In Progress • 🔜 Next • 🗂️ Backlog
+
+Scope: Frontend‑only playable MVPs using the shared point‑and‑click engine; EN/FR localization; accessibility (keyboard
+focus order, captions, ARIA), mobile UX (≥44px targets, overlays, reduced motion), local saves (`rod:save:v1`,
+`tme:save:v1`, `sysdisc:save:v1`). Backend auth/cloud‑saves/remote leaderboards are planned later.
+
+1) Shared Engine & i18n foundation
+
+- [ ] Audit shared scene/room engine and hotspot/dialog components; add missing hooks for puzzle state, timers,
+  inventory, and flags. 🟡
+- [ ] Introduce per‑game i18n namespaces with EN/FR JSON; language switcher in header with persistence. 🟡
+- [ ] Save/load versioning and migration stubs for `rod:save:v1`, `tme:save:v1`, `sysdisc:save:v1`. 🟡
+
+2) Toymaker Escape (TME) — MVP
+
+- [ ] Scenes & graph: Intro → E1 routes; implement gears mini and sorter puzzle; medals logic and wrap. 🟡
+- [ ] Dialogue/choices and hints; keyboard and touch interactions (≥44px targets). 🟡
+- [ ] Localization EN/FR (strings, captions region). 🟡
+- [ ] Autosave on transitions; Restart/Clear saves affordances. 🟡
+- [ ] Accessibility pass: focus order, roles/labels, reduced‑motion. 🟡
+- [ ] Tests: E2E smoke path to medal; unit tests for gears, sorter, and scene progression. 🟡
+
+3) Rite of Discovery (ROD) — MVP
+
+- [ ] Implement scenes, hotspots, dialogue per design doc; core puzzles and feedback loops. 🔜
+- [ ] EN/FR localization; autosave/restore; Restart. 🔜
+- [ ] Accessibility & mobile pass. 🔜
+- [ ] Tests: E2E smoke across critical path; unit tests for guards and choice outcomes. 🔜
+
+4) Systems Discovery (SD) — Core + Body Systems Packs
+
+- [ ] Core pack: ordered loop, route planner (two solutions), waste sorter with hints. 🔜
+- [ ] Body Systems: Breath, Fuel, Move, Signal, Grow — Intro → BB1 → BB2 → BB3 → Wrap with badges. 🔜
+- [ ] EN/FR localization; autosave; Restart. 🔜
+- [ ] Accessibility & mobile pass. 🔜
+- [ ] Tests: E2E smokes for Core and each BOD sub‑pack; unit tests for planner/loop guards. 🔜
+
+5) Assets & Credits
+
+- [ ] Wire placeholder visuals and SFX/music (license‑safe); update `public/credits.md`. 🟡
+
+6) Documentation & CI
+
+- [ ] README: routes, controls/UX, i18n usage, saves for ROD/TME/SD. 🟡
+- [ ] CI: add Playwright smokes for ROD/TME/SD (desktop + mobile). 🟡
+
+Dependencies and sequencing
+
+- Prefer parallelization; initial focus: TME → ROD → SD, while shared engine/i18n/assets proceed in parallel.
+
+Acceptance criteria
+
+- Playable end‑to‑end paths per design docs, EN/FR parity, keyboard/touch accessible, consistent mobile overlays,
+  deterministic local saves, green E2E + unit tests.
 
 ---
 

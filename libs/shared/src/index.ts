@@ -7,3 +7,4 @@ export * from "./contexts/SoundContext";
 export * from "./lib/input";
 export * from "./lib/particles";
 export * from "./lib/sound";
+export * from "./pointclick/engine";
