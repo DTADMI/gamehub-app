@@ -1434,3 +1434,21 @@ Accessibility notes (BOD):
   - Repo: https://github.com/DTADMI/quest-hunt
   - Stack highlights: Next.js 14, TypeScript, Tailwind (shadcn/ui), MapLibre (OpenStreetMap), Supabase (Postgres +
     PostGIS, Auth, Storage, Realtime), Drizzle ORM, REST + WebSockets, Vercel, GitHub Actions, Sentry.
+
+Example — Pipes/flow puzzle (logic only)
+
+```ts
+import {createPipesState, setTileRotation, toggleValve, type Tile} from "@games/shared/pointclick/puzzles/pipes";
+
+// 3x1 straight line with a valve in the middle
+const grid: Tile[] = [
+  {type: "straight", rotation: 0, source: true},
+  {type: "valve", rotation: 0, open: false},
+  {type: "straight", rotation: 0, sink: true},
+];
+let pipes = createPipesState(3, 1, grid);
+// Not solved until valve is open
+pipes.solved; // false
+pipes = toggleValve(pipes, 1, 0, true);
+pipes.solved; // true
+```
