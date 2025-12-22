@@ -130,6 +130,7 @@ Legend: ✅ Completed • 🟡 In Progress • 🔜 Next • 🗂️ Backlog
 
 - 🟡 Localization & Settings
   - [x] EN/FR flat JSON per title; tiny i18n helper with persistence in localStorage. ✓
+  - [x] Language switch in header with persistence; in-game header toggle; E2E smoke added. ✓
 
 Notes: Frontend‑only MVPs; EN/FR localization; accessibility guardrails; mobile‑first ≥44px targets; local saves.
 
@@ -230,7 +231,7 @@ Deliverables tracked under Docs & Assets and committed in `docs/narrative/scene-
   - [x] Add React `DialogueBox` and `InventoryBar` for a11y/mobile. ✓
   - [x] Puzzle primitives: `keypad` + unit tests. ✓
   - [ ] Puzzle primitives: `sequence/simon`, `wires/connectors`, `gears` ratio mesh, `pipes/flow`. 🟡
-- [ ] i18n foundation: EN/FR namespaces per title, language switch in header with persistence. 🟡
+- [x] i18n foundation: EN/FR namespaces per title, language switch in header with persistence. ✓
 - [ ] Saves: localStorage with versioned keys `rod:save:v1`, `tme:save:v1`, `sysdisc:save:v1` + migration stubs. 🟡
 - [ ] TME MVP: implement Intro → E1 routes, gears mini, sorter puzzle, medals, wrap; a11y & mobile pass. 🟡
   - [x] Intro → E1 keypad gate (2413) integrated; inventory gains `gear-key`. ✓

@@ -7,6 +7,7 @@ import {Geist, Geist_Mono} from "next/font/google";
 import {Footer} from "@/components/Footer";
 import {Header} from "@/components/Header";
 import {Providers} from "@/components/Providers";
+import {I18nInitializer} from "@/components/I18nInitializer";
 
 const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
@@ -29,6 +30,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
     <body className={`font-sans antialiased min-h-[100svh] flex flex-col`}>
         <Providers>
+          <I18nInitializer/>
           <Header />
           <main className="flex-1 min-h-0">{children}</main>
           <Footer />

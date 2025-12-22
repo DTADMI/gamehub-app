@@ -7,6 +7,7 @@ import Link from "next/link";
 
 import {Button} from "@/components/ui/button";
 import {useGame} from "@/contexts/GameContext";
+import {LanguageToggle} from "@/components/LanguageToggle";
 
 import {GameProgress} from "./GameProgress";
 
@@ -60,6 +61,8 @@ export function GameHeader() {
               onChange={(e) => setVolume(parseFloat(e.target.value))}
               className="w-24"
             />
+
+            <LanguageToggle/>
           </div>
         </div>
       </div>

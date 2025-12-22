@@ -282,6 +282,15 @@ i18n/
 
 When adding new scenes or UI labels, add keys to the relevant title namespace and reference them via `t()`.
 
+Header language toggle
+
+- A small EN/FR toggle is present in the site header and in-game header. It uses the lightweight `lib/i18n` helper to
+  persist the selected language in `localStorage` and triggers a soft refresh so components reading `t()` re-render.
+  - Component: `components/LanguageToggle.tsx`
+  - Initialization: `components/I18nInitializer.tsx` is included in `app/layout.tsx` to apply the stored language on
+    first paint (reducing flicker).
+  - E2E: `tests-e2e/i18n-lang-toggle.spec.ts` asserts that toggling updates Toymaker Escape E1 strings.
+
 Example — Sequence (Simon) puzzle
 
 ```ts

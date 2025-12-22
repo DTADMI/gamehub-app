@@ -6,6 +6,7 @@ import Link from "next/link";
 import {ModeToggle} from "@/components/ModeToggle";
 import {Button} from "@/components/ui/button";
 import {useFeature} from "@/lib/flags";
+import {LanguageToggle} from "@/components/LanguageToggle";
 
 export function Header() {
   const showAdmin = useFeature("ADMIN", false);
@@ -44,6 +45,7 @@ export function Header() {
 
         <div className="flex items-center gap-2">
           <ModeToggle />
+          <LanguageToggle/>
           <Button asChild size="sm" variant="ghost">
             <Link href="/login" className="flex items-center gap-2">
               <LogIn className="h-4 w-4" />
