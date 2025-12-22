@@ -36,6 +36,11 @@ Definition of Done (DoD)
 
 Episode E1 — Workshop & Playroom (asset templates)
 
+- Intro/Outro (title cards)
+-
+  - No new illustration assets required for `TME_INTRO`/`TME_OUTRO` (text‑first title cards). Reuse existing UI styles;
+    ensure readable headings and buttons with visible focus. Copy keys live under `tme.intro2.*` and `tme.outro.*`.
+
 - Workshop BG: `e1_workshop_bg.avif`; Playroom BG: `e1_playroom_bg.avif`.
 - Props (Workshop): `e1_workshop_gears_[1..6].svg`, `e1_workshop_crank.svg`, `e1_workshop_musicbox.svg`,
   `e1_workshop_plate.svg` (gear mount).

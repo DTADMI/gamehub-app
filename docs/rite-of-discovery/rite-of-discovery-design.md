@@ -16,6 +16,14 @@ magic. The ending frames it as a rite of passage.
 - Local save; i18n-ready strings (English only)
 - Extensible scenes/chapters
 
+### Intro/Outro Beats (implemented)
+
+- Intro scene `ROD_INTRO` (title card): shown once on first entry; sets `intro.seen=true` and proceeds to S1. Skipped on
+  subsequent runs.
+- Outro scene `ROD_OUTRO` (post‑Epilogue wrap): provides recap and replay hooks including trying the other S3 branch,
+  toggling Gentle Mode for next run, and an NG+ placeholder. Sets `outro.seen=true`.
+- Save: localStorage key `rod:save:v1` persists `intro.seen`/`outro.seen` in addition to existing flags.
+
 ## Narrative Outline (MVP)
 
 - Scene 1 — Night Before (Living Room)
@@ -38,6 +46,8 @@ magic. The ending frames it as a rite of passage.
     - Parents invite conversation; frame it as a rite of passage where kids eventually outsmart the grown-ups
     - Player choices reflect in tone: proud/celebratory vs. cozy/affirming
     - Unlock a small ‘Helper Badge’ and optional credits page
+  - Link: “View outro” opens `ROD_OUTRO` (wrap hooks: replay from start, try other branch, toggle Gentle Mode). NG+ gate
+    placeholder surfaced here.
 
 ### New Game+ — Mentor Mini (Sibling Helper)
 
@@ -66,6 +76,7 @@ magic. The ending frames it as a rite of passage.
 - 2–3 dialogue options; no fail states
 - Tiny inventory (0–3 items)
 - Save in localStorage; restore on reload
+- Flags: `intro.seen` and `outro.seen` added to persist onboarding/offboarding beats.
 - Accessibility: captions, readable text, visible focus, reduced motion support
 
 ## Stack & Architecture
@@ -77,7 +88,8 @@ magic. The ending frames it as a rite of passage.
 - State: React Context + reducer (scene, flags, inventory, choices, gentle), seam for XState later
 - i18n: i18next (client) or tiny t() util with structured message keys; English bundle en.json
 - Audio: reuse soundManager (ambient loop per scene + click/creak SFX)
-- Persistence: localStorage via save(versionedState)/loadOrInit(); storage key rod:save:v1
+- Persistence: localStorage via save(versionedState)/loadOrInit(); storage key rod:save:v1 (stores `intro.seen`/
+  `outro.seen`).
 - Testing: Playwright E2E (scene progression, gentle toggle), RTL for reducers and hotspot logic
 
 ## Technical Choices & Alternatives (pros/cons)

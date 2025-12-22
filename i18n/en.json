@@ -179,6 +179,127 @@
       "toggleHints": "Toggle hints for next run",
       "bodTeaser": "Body Systems Pack — coming soon",
       "home": "Back to catalog"
+    },
+    "space": {
+      "intro": {
+        "title": "Systems Discovery — Space",
+        "p1": "Explore simple patterns in our solar system.",
+        "p2": "Arrange, compare, and notice how orbits and light connect.",
+        "cta": "Begin",
+        "skip": "Skip intro"
+      },
+      "outro": {
+        "title": "Wrap — Space Pack",
+        "p1": "Well done. Ready to replay or visit another pack?",
+        "recap": "Your Space results",
+        "replay": "Replay Space pack",
+        "home": "Back to catalog",
+        "next": "Go to Ocean pack"
+      }
+    },
+    "ocean": {
+      "intro": {
+        "title": "Systems Discovery — Ocean",
+        "p1": "Dive into layers of light, currents, and deep signals.",
+        "p2": "Order, connect, and match clues with care.",
+        "cta": "Begin",
+        "skip": "Skip intro"
+      },
+      "outro": {
+        "title": "Wrap — Ocean Pack",
+        "p1": "Great work beneath the waves.",
+        "recap": "Your Ocean results",
+        "replay": "Replay Ocean pack",
+        "home": "Back to catalog",
+        "next": "Go to Body Systems"
+      }
+    },
+    "bod": {
+      "breath": {
+        "intro": {
+          "title": "Body Systems — Breath",
+          "p1": "Air in, energy on. Air out, balance stays.",
+          "p2": "You’ll order steps and match flows, meter stays calm.",
+          "cta": "Begin",
+          "skip": "Skip intro"
+        },
+        "outro": {
+          "title": "Wrap — Breath",
+          "p1": "Nice balance. Want to replay or continue?",
+          "recap": "Your Breath results",
+          "replay": "Replay Breath",
+          "home": "Back to catalog",
+          "next": "Next: Fuel"
+        }
+      },
+      "fuel": {
+        "intro": {
+          "title": "Body Systems — Fuel",
+          "p1": "Turn foods into building blocks.",
+          "p2": "Match and order without hurry; keep the meter steady.",
+          "cta": "Begin",
+          "skip": "Skip intro"
+        },
+        "outro": {
+          "title": "Wrap — Fuel",
+          "p1": "Good work keeping balance.",
+          "recap": "Your Fuel results",
+          "replay": "Replay Fuel",
+          "home": "Back to catalog",
+          "next": "Next: Move"
+        }
+      },
+      "move": {
+        "intro": {
+          "title": "Body Systems — Move",
+          "p1": "Bones as levers, muscles as pairs.",
+          "p2": "Place and adjust with care; watch balance gently.",
+          "cta": "Begin",
+          "skip": "Skip intro"
+        },
+        "outro": {
+          "title": "Wrap — Move",
+          "p1": "Steady and kind.",
+          "recap": "Your Move results",
+          "replay": "Replay Move",
+          "home": "Back to catalog",
+          "next": "Next: Signal & Defend"
+        }
+      },
+      "signal": {
+        "intro": {
+          "title": "Body Systems — Signal & Defend",
+          "p1": "Messages and protection working together.",
+          "p2": "Match signals and responses; keep feedback calm.",
+          "cta": "Begin",
+          "skip": "Skip intro"
+        },
+        "outro": {
+          "title": "Wrap — Signal & Defend",
+          "p1": "Good signals, steady care.",
+          "recap": "Your Signal & Defend results",
+          "replay": "Replay Signal & Defend",
+          "home": "Back to catalog",
+          "next": "Next: Grow"
+        }
+      },
+      "grow": {
+        "intro": {
+          "title": "Body Systems — Grow",
+          "p1": "Changes over time with care and consent.",
+          "p2": "Order and match ideas gently.",
+          "cta": "Begin",
+          "skip": "Skip intro"
+        },
+        "outro": {
+          "title": "Wrap — Grow",
+          "p1": "Kind learning grows over time.",
+          "recap": "Your Grow results",
+          "replay": "Replay Grow",
+          "home": "Back to catalog",
+          "next": "Back to Core"
+        }
+      }
     }
   }
 }

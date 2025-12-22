@@ -110,6 +110,49 @@ Stack & Architecture
 - i18n: minimal `t()` util with EN JSON.
   - 15+ toggles: `showDeeperScience` flag gates additional captions/tooltips.
 
+Intro/Outro Beats (implemented)
+
+- Intro scene `SD_INTRO` (title card): sets `intro.seen=true` on first visit, then proceeds to `B1`. Skipped on
+  subsequent runs.
+- Outro scene `SD_OUTRO` (wrap after WRAP): shows recap and replay hooks; sets `outro.seen=true`. Can be opened from
+  WRAP via a link.
+- Replay hooks (low-scope): quick restart of Core pack, alternate B2 plan quick-start, toggle hints for next run.
+
+Extensions — Intro/Outro Beats (now documented)
+
+- Space pack
+  - Intro scene `SD_SPACE_INTRO` (title card): first visit only; sets `flags.space.intro.seen=true`; proceeds to Space
+    S1. Keys: `sysdisc.space.intro.*`.
+  - Outro scene `SD_SPACE_OUTRO` (after Space wrap): recap + replay; sets `flags.space.outro.seen=true`. Keys:
+    `sysdisc.space.outro.*`.
+- Ocean pack
+  - Intro scene `SD_OCEAN_INTRO`: sets `flags.ocean.intro.seen=true`; proceeds to Ocean O1. Keys:
+    `sysdisc.ocean.intro.*`.
+  - Outro scene `SD_OCEAN_OUTRO`: sets `flags.ocean.outro.seen=true`. Keys: `sysdisc.ocean.outro.*`.
+- Body Systems (BOD) sub‑packs
+  - Each sub‑pack has its own intro/outro scenes (title cards, low‑scope, text‑first):
+    - Breath: `SD_BOD_BREATH_INTRO` / `SD_BOD_BREATH_OUTRO`; flags `flags.bod.breath.intro.seen`,
+      `flags.bod.breath.outro.seen`; keys `sysdisc.bod.breath.*`.
+    - Fuel: `SD_BOD_FUEL_INTRO` / `SD_BOD_FUEL_OUTRO`; flags `flags.bod.fuel.intro.seen`, `flags.bod.fuel.outro.seen`;
+      keys `sysdisc.bod.fuel.*`.
+    - Move: `SD_BOD_MOVE_INTRO` / `SD_BOD_MOVE_OUTRO`; flags `flags.bod.move.intro.seen`, `flags.bod.move.outro.seen`;
+      keys `sysdisc.bod.move.*`.
+    - Signal & Defend: `SD_BOD_SIGNAL_INTRO` / `SD_BOD_SIGNAL_OUTRO`; flags `flags.bod.signal.intro.seen`,
+      `flags.bod.signal.outro.seen`; keys `sysdisc.bod.signal.*`.
+    - Grow: `SD_BOD_GROW_INTRO` / `SD_BOD_GROW_OUTRO`; flags `flags.bod.grow.intro.seen`, `flags.bod.grow.outro.seen`;
+      keys `sysdisc.bod.grow.*`.
+
+Notes
+
+- All extension intros/outros follow the same accessibility and reduced‑motion guidance as Core title cards. They are
+  skippable and discoverable via links on wrap screens.
+
+Acceptance additions (Core)
+
+- First run shows `SD_INTRO`; subsequent runs skip intro automatically. WRAP exposes link to view `SD_OUTRO` once and
+  thereafter on demand.
+- Flags persisted in save: `intro.seen`, `outro.seen`, plus existing `b1.*`, `b2.plan`, `b3.*`.
+
 Data Model (sketch)
 
 - `PackId = CORE | SPACE | OCEAN | BOD_BREATH | BOD_FUEL | BOD_MOVE | BOD_SIGNAL | BOD_GROW`

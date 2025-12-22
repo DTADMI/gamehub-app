@@ -17,11 +17,13 @@ Status key
 Index
 
 - Episodes
+  - [TME_INTRO Title Card](#tme_intro-title-card) — Status: Integrated — Owner: Narrative
     - [E1 House, Part 1 — Workshop & Playroom](#e1-house-part-1--workshop--playroom) — Status: Draft — Owner: Narrative
     - [E2 House, Part 2 — Office & Secret Stair](#e2-house-part-2--office--secret-stair) — Status: Draft — Owner:
       Narrative
     - [E3 Apartment Mystery — The Commissioner Is… You](#e3-apartment-mystery--the-commissioner-is-you) — Status:
       Draft — Owner: Narrative
+  - [TME_OUTRO Medal Wrap](#tme_outro-medal-wrap) — Status: Integrated — Owner: Narrative
 
 Story Template
 
@@ -38,6 +40,17 @@ Story Template
 - Open questions:
 - Fact‑check notes:
 - Review checklist: Content ✓ / Kindness ✓ / Accessibility ✓ / Art Ready ✓ / Integrated ✓
+
+## TME_INTRO Title Card
+
+- Goal: Briefly frame Workshop choice and medals; orient before E1A.
+- Beats:
+  - Title card with two lines; primary “Begin”, secondary “Skip intro”.
+  - On click, set `intro.seen=true` and proceed to `E1A`.
+- Flags: `intro.seen = true` (persisted in `tme:save:v1`).
+- Copy keys: `tme.intro2.*`.
+- Guardrails: Reduced motion; accessible heading and buttons.
+- Status: Integrated.
 
 ## E1 House, Part 1 — Workshop & Playroom
 
@@ -56,6 +69,18 @@ Story Template
 - Assets: see brief E1.
 - Copy notes: “Puzzles are kinder when we try things together.”
 - Fact‑check: Neutral iconography; avoid brand shapes.
+
+## TME_OUTRO Medal Wrap
+
+- Goal: Provide closure and encourage replay routes/medal goals.
+- Beats:
+  - Show medal and items recap; hint on improving medal.
+  - Actions: Replay Episode 1; switch Workshop route; toggle hints for next run.
+  - Set `outro.seen=true` first time; accessible via link on DONE.
+- Flags: `outro.seen = true`; medals stored under `medals.e1`.
+- Copy keys: `tme.outro.*`.
+- Guardrails: ≥44px controls, visible focus, reduced motion.
+- Status: Integrated.
 
 ## E2 House, Part 2 — Office & Secret Stair
 

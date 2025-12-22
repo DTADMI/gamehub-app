@@ -26,11 +26,13 @@ Status key
 Index
 
 - MVP (ages 7–9)
+  - [ROD_INTRO Title Card](#rod_intro-title-card) — Status: Integrated — Owner: Narrative
     - [S1 Night Before](#s1-night-before) — Status: Ready for Art — Owner: Narrative
     - [S2 Tooth Tradition](#s2-tooth-tradition) — Status: Ready for Art — Owner: Narrative
     - [S3 Proof Moment](#s3-proof-moment) — Status: Ready for Art — Owner: Narrative
     - [Epilogue — Rite of Passage](#epilogue-rite-of-passage) — Status: Draft — Owner: Narrative
     - [MM1 Mentor Mini — Sibling Helper](#mm1-mentor-mini-sibling-helper) — Status: Draft — Owner: Narrative
+  - [ROD_OUTRO Wrap & Replay Hooks](#rod_outro-wrap--replay-hooks) — Status: Integrated — Owner: Narrative
 - 12+ “Thinking Tools” (replayable cases)
     - [C1 The Mystery Coupon](#c1-the-mystery-coupon) — Status: Draft — Owner: Narrative
     - [C2 The Echo Thread](#c2-the-echo-thread) — Status: Draft — Owner: Narrative
@@ -62,6 +64,18 @@ Story Template
 - Fact‑check notes (sources, real‑world parallels, or “avoid mentioning brand X”):
 - Review checklist status: Content ✓ / Kindness ✓ / Accessibility ✓ / Art Ready ✓ / Integrated ✓
 
+## ROD_INTRO Title Card
+
+- Audience/Tone: MVP 7–9 (Gentle/Standard)
+- Goal: Orient the player with a friendly premise before S1; reduce cold start.
+- Beats:
+  - Title, 2 short lines of premise; primary “Begin”, secondary “Skip intro”.
+  - On action, set `intro.seen=true` and proceed to S1.
+- Choices & flags: `intro.seen = true` (persisted in `rod:save:v1`).
+- Guardrails: Reduced motion; clear heading; accessible buttons (≥44px); visible focus.
+- Copy keys: `rod.intro.*` in `i18n/en.json`.
+- Status: Integrated.
+
 S1 Night Before
 
 - ID/Name: S1 — Night Before (Living Room)
@@ -87,6 +101,19 @@ S1 Night Before
 - Fact‑check notes:
     - Avoid brand names on wrapping; generic ornament patterns only.
 - Review checklist: Content ✓ Kindness ✓ Accessibility ✓ Art Ready ✓ Integrated —
+
+## ROD_OUTRO Wrap & Replay Hooks
+
+- Audience/Tone: MVP 7–9 (Gentle/Standard)
+- Goal: Provide closure and clear next steps (replay/branch/NG+ gate) without forcing repetition.
+- Beats:
+  - Congratulatory line; recap of branch/items; Helper Badge reminder.
+  - Actions: Replay from S1; try the other S3 branch; toggle Gentle Mode for next run; NG+ (Mentor Mini) placeholder.
+  - Sets `outro.seen=true` on first view; remains available via link from Epilogue.
+- Choices & flags: `outro.seen = true`; existing `ep.badgeHelper = true` is awarded on Epilogue.
+- Guardrails: Accessible buttons (≥44px), visible focus, reduced motion.
+- Copy keys: `rod.outro.*`.
+- Status: Integrated.
 
 S2 Tooth Tradition
 

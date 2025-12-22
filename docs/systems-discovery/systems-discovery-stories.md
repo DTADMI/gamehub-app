@@ -2,49 +2,22 @@
 
 Purpose
 
-- Track all stories/scenarios across the Core Pack and extensions (Space, Ocean). Be novice‑friendly and reviewable by
-  subject experts. Fact‑check notes and moral guardrails included.
+- Single source to describe, review, and iterate all Systems Discovery stories/puzzles. Newcomer‑friendly, with clear
+  guardrails.
 
 Related docs
 
 - Design: docs/systems-discovery/systems-discovery-design.md
-- Designer brief: docs/systems-discovery/systems-discovery-designer-brief.md
+- Designer/Animator Brief: docs/systems-discovery/systems-discovery-designer-brief.md
 
 Status key
 
 - Idea → Draft → Ready for Art → Integrated → Polished
 
-Index
+How to use this document
 
-- Core Pack
-    - [B1 Food Web at Home](#b1-food-web-at-home) — Status: Draft — Owner: Narrative
-    - [B2 Transit Rhythm](#b2-transit-rhythm) — Status: Draft — Owner: Narrative
-    - [B3 Waste Sorting](#b3-waste-sorting) — Status: Draft — Owner: Narrative
-    - [Wrap Little Systems, Big Picture](#wrap-little-systems-big-picture) — Status: Draft — Owner: Narrative
-- Space Pack
-    - [S1 Orbits & Periods](#s1-orbits--periods) — Status: Draft — Owner: Narrative
-    - [S2 Light & Shadows](#s2-light--shadows) — Status: Draft — Owner: Narrative
-    - [S3 Habitable Clues](#s3-habitable-clues) — Status: Draft — Owner: Narrative
-- Ocean Pack
-    - [O1 Layers of Light](#o1-layers-of-light) — Status: Draft — Owner: Narrative
-    - [O2 Currents & Climate](#o2-currents--climate) — Status: Draft — Owner: Narrative
-    - [O3 Deep Signals](#o3-deep-signals) — Status: Draft — Owner: Narrative
-- Body Systems — BOD (with Homeostasis Meter)
-    - [BB1 Respiratory Basics](#bb1-respiratory-basics) — Status: Draft — Owner: Narrative
-    - [BB2 Cardiovascular Flow](#bb2-cardiovascular-flow) — Status: Draft — Owner: Narrative
-    - [BB3 Coupling at the Exchange](#bb3-coupling-at-the-exchange) — Status: Draft — Owner: Narrative
-    - [BF1 Digestive Journey](#bf1-digestive-journey) — Status: Draft — Owner: Narrative
-    - [BF2 Absorption & Transport](#bf2-absorption--transport) — Status: Draft — Owner: Narrative
-    - [BF3 Waste & Balance (Urinary)](#bf3-waste--balance-urinary) — Status: Draft — Owner: Narrative
-    - [BM1 Skeletal Support](#bm1-skeletal-support) — Status: Draft — Owner: Narrative
-    - [BM2 Muscular Action](#bm2-muscular-action) — Status: Draft — Owner: Narrative
-    - [BM3 Coordination (Motor Signals)](#bm3-coordination-motor-signals) — Status: Draft — Owner: Narrative
-    - [BSD1 Nervous & Senses](#bsd1-nervous--senses) — Status: Draft — Owner: Narrative
-    - [BSD2 Endocrine Messages](#bsd2-endocrine-messages) — Status: Draft — Owner: Narrative
-    - [BSD3 Immune, Lymphatic & Integumentary](#bsd3-immune-lymphatic--integumentary) — Status: Draft — Owner: Narrative
-    - [BG1 Reproductive Basics](#bg1-reproductive-basics) — Status: Draft — Owner: Narrative
-    - [BG2 Changes Over Time](#bg2-changes-over-time) — Status: Draft — Owner: Narrative
-    - [BG3 Care Networks](#bg3-care-networks) — Status: Draft — Owner: Narrative
+- Start with the Index to see status at a glance; each item links to a detailed entry.
+- When creating/updating a story, copy the Story Template and fill it out with concise, kind wording.
 
 Story Template
 
@@ -61,52 +34,100 @@ Story Template
 - Fact‑check notes:
 - Review checklist: Content ✓ / Kindness ✓ / Accessibility ✓ / Art Ready ✓ / Integrated ✓
 
+Index
+
+- Core
+  - [SD_INTRO Title Card](#sd_intro-title-card) — Status: Integrated — Owner: Narrative
+  - [B1 Food Web at Home](#b1-food-web-at-home) — Status: Draft — Owner: Narrative
+  - [B2 Transit Rhythm](#b2-transit-rhythm) — Status: Draft — Owner: Narrative
+  - [B3 Waste Sorting](#b3-waste-sorting) — Status: Draft — Owner: Narrative
+  - [WRAP — Systems Scout](#wrap--systems-scout) — Status: Draft — Owner: Narrative
+  - [SD_OUTRO Wrap Hooks](#sd_outro-wrap-hooks) — Status: Integrated — Owner: Narrative
+- Space
+  - [S1 Orbits & Periods](#s1-orbits--periods) — Status: Draft — Owner: Narrative
+  - [S2 Light & Shadows](#s2-light--shadows) — Status: Draft — Owner: Narrative
+  - [S3 Habitable Clues](#s3-habitable-clues) — Status: Draft — Owner: Narrative
+- Ocean
+  - [O1 Layers of Light](#o1-layers-of-light) — Status: Draft — Owner: Narrative
+  - [O2 Currents & Climate](#o2-currents--climate) — Status: Draft — Owner: Narrative
+  - [O3 Deep Signals](#o3-deep-signals) — Status: Draft — Owner: Narrative
+- Body Systems (BOD)
+  - [BB1 Respiratory Basics](#bb1-respiratory-basics) — Status: Draft — Owner: Narrative
+  - [BB2 Cardiovascular Flow](#bb2-cardiovascular-flow) — Status: Draft — Owner: Narrative
+  - [BB3 Coupling at the Exchange](#bb3-coupling-at-the-exchange) — Status: Draft — Owner: Narrative
+  - [BF1 Digestive Journey](#bf1-digestive-journey) — Status: Draft — Owner: Narrative
+  - [BF2 Absorption & Transport](#bf2-absorption--transport) — Status: Draft — Owner: Narrative
+  - [BF3 Waste & Balance (Urinary)](#bf3-waste--balance-urinary) — Status: Draft — Owner: Narrative
+  - [BM1 Skeletal Support](#bm1-skeletal-support) — Status: Draft — Owner: Narrative
+  - [BM2 Muscular Action](#bm2-muscular-action) — Status: Draft — Owner: Narrative
+  - [BM3 Coordination (Motor Signals)](#bm3-coordination-motor-signals) — Status: Draft — Owner: Narrative
+  - [BSD1 Nervous & Senses](#bsd1-nervous--senses) — Status: Draft — Owner: Narrative
+  - [BSD2 Endocrine Messages](#bsd2-endocrine-messages) — Status: Draft — Owner: Narrative
+  - [BSD3 Immune, Lymphatic & Integumentary](#bsd3-immune-lymphatic--integumentary) — Status: Draft — Owner: Narrative
+  - [BG1 Reproductive Basics](#bg1-reproductive-basics) — Status: Draft — Owner: Narrative
+  - [BG2 Changes Over Time](#bg2-changes-over-time) — Status: Draft — Owner: Narrative
+  - [BG3 Care Networks](#bg3-care-networks) — Status: Draft — Owner: Narrative
+
+## SD_INTRO Title Card
+
+- Pack: CORE
+- Goal: Orient the player with a friendly premise before B1; reduce cold start.
+- Beats:
+  - Title card with two brief lines; primary “Begin”, secondary “Skip intro”.
+  - On action, set `intro.seen=true` and proceed to `B1`.
+- Choices & flags: `intro.seen = true` (persisted in `sysdisc:save:v1`).
+- Copy keys: `sysdisc.intro.*`.
+- Guardrails: Reduced motion; clear heading; accessible buttons (≥44px); visible focus.
+- Status: Integrated.
+
 ## B1 Food Web at Home
 
 - Pack: CORE
-- Goal: Connect kitchen → compost → soil → herbs → kitchen loop.
-- Hooks: herb pot by window; small compost bin; rain jar.
+- Goal: Show flows (kitchen → compost → soil → herbs) and feedback loops.
+- Hooks: sink, compost bin, herb planter, rain jar; loop arrows.
 - Core beats:
-    - Drag arrows to complete the loop; each step reveals a friendly tip.
-    - Optionally place a “save water” sticker on the sink to unlock a codex note.
-- Choices & flags: `b1.focus = water|herbs` influences copy in Wrap.
-- Guardrails: Positive stewardship; no guilt; large targets; readable text.
-- Assets: BG `core_b1_bg.avif`; props arrows, sink, compost, herb pot; UI loop slots.
-- Copy notes: “Little loops make big differences.”
-- Open questions: How many arrows (3–5) is best for clarity?
-- Fact‑check: Keep advice generic; avoid specific product claims.
-- Review: Content ✓ Kindness ✓ Accessibility ✓ Art Ready — Integrated —
+  - Select steps in order: Kitchen → Compost → Soil → Herbs.
+  - Gentle hint shows sequence when enabled.
+- Choices & flags: `b1.route = loop-ok` once solved.
+- Guardrails: High contrast; large click targets; reduced‑motion stills.
+- Assets: BG `core_b1_bg.avif`; props arrows/sink/compost/herb/rain; UI `ui_loop_slots.svg`.
+- Status: Draft.
 
 ## B2 Transit Rhythm
 
 - Pack: CORE
-- Goal: Plan a safe trip across a neighborhood using alternative routes.
-- Hooks: map with pins; bus and bike icons; crosswalk signal.
-- Core beats: choose route A (bus-first) or B (bike-first); sequence 3 steps; see bottleneck tip.
-- Flags: `b2.route = bus|bike`.
-- Guardrails: Safety-first; empathy for different mobility needs.
-- Assets: BG `core_b2_bg.avif`; props bus, bike, crosswalk, pins; UI route steps.
-- Copy: “There’s more than one good way to go.”
-- Fact‑check: Generic signage; avoid real transit branding.
+- Goal: Plan an efficient route with two valid sequences.
+- Hooks: neighborhood map; bus stop; bike lane; crosswalk signals.
+- Core beats:
+  - Pick a route plan: Bus then Bike, or Bike then Bus.
+  - Optional: record time/cost flags for future secret commendations.
+- Choices & flags: `b2.plan = bus-first | bike-first` (optional `b2.secret.fast`, `b2.secret.frugal`).
+- Guardrails: Clear labels; readable map; no timers.
+- Assets: BG `core_b2_bg.avif`; bus/bike/crosswalk/pins; UI `ui_route_steps.svg`.
+- Status: Draft.
 
 ## B3 Waste Sorting
 
 - Pack: CORE
-- Goal: Sort common items; learn why contamination matters.
-- Hooks: bins; two ambiguous items (pizza box, plastic clamshell).
-- Beats: drag to bins; view “why” cards; optional no-hints medal.
-- Flags: `b3.noHints = true|false`.
-- Guardrails: Avoid shaming; neutral icons; high contrast.
-- Assets: BG `core_b3_bg.avif`; bins, items; UI sort help.
-- Fact‑check: Vary by region; keep advice generic (e.g., “when clean and dry”).
+- Goal: Sort items correctly with an optional hints toggle.
+- Hooks: recycle/compost/trash bins; items like banana, bottle, paper.
+- Core beats:
+  - Toggle hints on/off; pick correct bins for 3 items.
+  - Reveal/finish when all three are correctly selected.
+- Choices & flags: `b3.hints = true|false`; `b3.result = sorted | sorted-nohints`.
+- Guardrails: Accessible buttons (≥44px), captions for any SFX; reduced motion.
+- Assets: BG `core_b3_bg.avif`; bin and item SVGs; UI `ui_sort_help.svg`.
+- Status: Draft.
 
-## Wrap Little Systems, Big Picture
+## WRAP — Systems Scout
 
 - Pack: CORE
-- Goal: Celebrate systems view; unlock Systems Scout badge and extensions.
+- Goal: Celebrate completion and award the Systems Scout badge.
 - Hooks: codex panel with connected lines animating subtly (stills provided).
-- Beats: recap choices; suggest a new loop to try at home; unlock.
-- Guardrails: Reduced motion friendly; celebratory but calm.
+- Beats: recap B1/B2/B3 choices; suggest a simple loop to try at home; unlock badge.
+- Guardrails: Reduced‑motion friendly; celebratory but calm.
+- Assets: `badge_systems_scout.svg`.
+- Status: Draft.
 
 ## S1 Orbits & Periods
 
@@ -161,8 +182,8 @@ Story Template
 - Goal: Show air path and gas exchange: lungs → alveoli → blood (O2 in, CO2 out).
 - Hooks: airway diagram cards; O2/CO2 icons; calm “breath” meter tick.
 - Core beats:
-    - Order the pathway cards; flip to reveal a short caption per step.
-    - Match O2→blood, CO2→airflow; Homeostasis Meter rises gently when balanced.
+  - Order the pathway cards; flip to reveal a short caption per step.
+  - Match O2→blood, CO2→airflow; Homeostasis Meter rises gently when balanced.
 - Choices & flags: `bod.bb1.route = orderFirst|matchFirst`; `bod.meter += 5` on balanced move.
 - Guardrails: Abstract icons; no gore/anatomy detail; neutral skin tones; reduced‑motion stills.
 - Assets: BG `bod_breath_bb1_bg.avif`; props O2/CO2 cards; airway/lung/alveoli; UI `ui_bod_meter.svg`.
@@ -298,8 +319,37 @@ Story Template
 - Beats: connect helpers to needs; unlock “Care Ally” badge for the sub‑pack.
 - Assets: BG `bod_grow_bg3.avif`.
 
-Suggestions (Additional Scenarios)
+## SD_OUTRO Wrap Hooks
+
+- Pack: CORE
+- Goal: Provide closure and offer replay options without forcing repetition.
+- Beats:
+  - Brief congratulations and recap of B1/B2/B3.
+  - Actions: Replay Core pack; try alternate B2 plan; toggle B3 hints for next run; teaser for Body Systems Pack.
+  - Set `outro.seen=true` when shown the first time; can be opened on demand later.
+- Flags: `outro.seen = true` (persisted in `sysdisc:save:v1`).
+- Copy keys: `sysdisc.outro.*`.
+- Guardrails: Accessible buttons (≥44px), visible focus, reduced motion.
+- Status: Integrated.
+
+## Suggestions (Additional Scenarios)
 
 - CORE: Power at Home; Water In/Out; Community Garden Roles (pollinators, composters, growers).
 - SPACE: Small Worlds; Signals from Space (spectra puzzle).
 - OCEAN: Reef Helpers; Seafloor Builders.
+
+## SD_BOD_GROW_INTRO Title Card
+
+- Pack: BOD‑GROW
+- Goal: Set gentle, age‑appropriate framing.
+- Flags: `flags.bod.grow.intro.seen = true`.
+- Copy keys: `sysdisc.bod.grow.intro.*`.
+- Status: Integrated.
+
+## SD_BOD_GROW_OUTRO Wrap Hooks
+
+- Pack: BOD‑GROW
+- Goal: Close the arc; suggest back to Core.
+- Flags: `flags.bod.grow.outro.seen = true`.
+- Copy keys: `sysdisc.bod.grow.outro.*`.
+- Status: Integrated.

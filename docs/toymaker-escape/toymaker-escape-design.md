@@ -49,6 +49,21 @@ Stack & Architecture
 - Audio: ambient room loops; short SFX with captions and volume control.
 - i18n: EN strings first.
 
+Intro/Outro Beats (implemented)
+
+- Intro scene `TME_INTRO` (title card): sets `intro.seen=true` on first visit, then proceeds to `E1A`. Skipped on
+  subsequent runs.
+- Outro scene `TME_OUTRO` (after E1 DONE): shows medal recap and replay/switch‑route/toggle‑hints hooks; sets
+  `outro.seen=true`. Linked from DONE.
+- Replay hooks (low‑scope): restart Episode 1, start with alternate Workshop route, toggle hints for next run.
+
+Acceptance additions (E1)
+
+- First run shows `TME_INTRO`; subsequent runs skip intro automatically. DONE exposes link to view `TME_OUTRO` once and
+  thereafter on demand.
+- Flags persisted in save: `intro.seen`, `outro.seen`, existing `e1.path`, `e1.helper`, and medal calc stored at
+  `medals.e1`.
+
 Data Model (sketch)
 
 - `EpisodeId = E1|E2|E3`

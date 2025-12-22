@@ -74,6 +74,12 @@ Definition of Done (DoD) — assets
 Scene naming follows the design doc: S1 Night Before, S2 Tooth Tradition, S3 Proof Moment, Epilogue. Each scene lists
 required assets; extras are optional.
 
+Intro/Outro (title cards)
+
+- No new illustration assets are required for `ROD_INTRO`/`ROD_OUTRO`. These are text‑first title cards using existing
+  UI styles. Ensure a readable H1 and two buttons (primary/secondary) with visible focus. Copy keys under `rod.intro.*`
+  and `rod.outro.*`.
+
 Episode MVP backgrounds (choose 1–2 per scene)
 
 - S1 Night Before: `epA_scene1_bg.avif` — living room at night (tree, stockings, cozy lighting).

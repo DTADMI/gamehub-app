@@ -35,6 +35,21 @@ Definition of Done (DoD)
 
 Core Pack — per‑scene asset templates
 
+- Intro/Outro (title cards)
+-
+  - No new illustration assets required for `SD_INTRO`/`SD_OUTRO` (implemented as text-first title cards). Reuse
+    existing UI styles; ensure readable heading and buttons with visible focus. Provide only palette guidance if needed.
+
+Extensions — Space/Ocean/BOD Intro/Outro (title cards)
+
+- Space pack: `SD_SPACE_INTRO`/`SD_SPACE_OUTRO` — text‑first title cards (no new illustration assets required). Copy
+  keys under `sysdisc.space.intro.*` and `sysdisc.space.outro.*`.
+- Ocean pack: `SD_OCEAN_INTRO`/`SD_OCEAN_OUTRO` — text‑first title cards. Keys: `sysdisc.ocean.intro.*` /
+  `sysdisc.ocean.outro.*`.
+- Body Systems sub‑packs (Breath, Fuel, Move, Signal & Defend, Grow): per‑sub‑pack intro/outro are text‑first. Keys:
+  `sysdisc.bod.<sub>.intro.*` / `sysdisc.bod.<sub>.outro.*`. Follow the same accessibility guidance (H1 heading, ≥44px
+  controls, visible focus) and provide reduced‑motion‑friendly designs.
+
 - B1 Food Web at Home
     - BG: `core_b1_bg.avif` (kitchen/herb/compost corner)
     - Props: `core_b1_arrow_[1..5].svg`, `core_b1_sink.svg`, `core_b1_compost.svg`, `core_b1_herb_pot.svg`,
