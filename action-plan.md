@@ -809,6 +809,9 @@ Shipped (already available via manifest and listed under Completed):
   reveal; wires/pipes panel strings moved to i18n.
 - 2025-12-22: TME E1 — added minimal canvas wrapper registering `holdThenDrag` macro; revealing the latch over the
   scuff hotspot now works via canvas or DOM fallback; README updated with E1 Golden Path details.
+- 2025-12-22: Plan updated to proceed with TME E1 polish (rehydration, reduced‑motion parity), tests hardening (gears
+  tolerance edge cases, wires negatives, pipes multi‑source/sink), and docs/credits updates. Next up: ROD/SD smokes and
+  persistence migration stubs.
 - 2025-12-21: Post‑MVP roadmap approved for Rite of Discovery (episodes A–D, systems v2, collectibles/journal) and
   designer asset specs appended. Added 12+ “Thinking Tools” extension plan (rationality & biases) with replayable
   vignettes and mastery.

@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 import {DialogueBox, GameContainer, InventoryBar, versionedLoad, versionedSave} from "@games/shared";
 import {detectLang, effects, ensureCtx, type Lang, nextScene, type Scene,} from "@games/shared/pointclick/engine";
 import {clearKeypad, createKeypadState, pressKey, submitKeypad,} from "@games/shared/pointclick/puzzles/keypad";
@@ -145,13 +145,19 @@ export const ToymakerEscapeGame: React.FC = () => {
         ),
     );
 
+    // Persist with a small idempotency guard to reduce redundant writes
+    const lastSavedRef = useRef<string | null>(null);
     useEffect(() => {
         const data: TmeSaveV1 = {
             sceneId,
             flags: ctx.flags || {},
             inventory: ctx.inventory || [],
         } as any;
-        versionedSave<TmeSaveV1>(SAVE_KEY, 1, data);
+        const payload = JSON.stringify({v: 1, data});
+        if (lastSavedRef.current !== payload) {
+            versionedSave<TmeSaveV1>(SAVE_KEY, 1, data);
+            lastSavedRef.current = payload;
+        }
     }, [sceneId, ctx]);
 
     // Auto-award a simple medal for E1 once a gate is solved and the latch is revealed.
