@@ -1338,6 +1338,11 @@ Notes:
 - When files are missing, you should see at most a single warning per missing key; subsequent calls will be no‑ops.
 - In tests, the manager can be used with a mocked `Audio` implementation (Vitest + jsdom).
 
+Credits
+
+For current placeholder assets and sounds used during development, see `public/credits.md`. This file is kept up to date
+as new placeholders are added and will list final art/audio attributions when they land.
+
 11. Breakout — Boosters & Particles
 
 Boosters (player‑controlled speed burst):

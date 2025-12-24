@@ -812,6 +812,9 @@ Shipped (already available via manifest and listed under Completed):
 - 2025-12-22: Plan updated to proceed with TME E1 polish (rehydration, reduced‑motion parity), tests hardening (gears
   tolerance edge cases, wires negatives, pipes multi‑source/sink), and docs/credits updates. Next up: ROD/SD smokes and
   persistence migration stubs.
+- 2025-12-23: Added Playwright smokes for Rite of Discovery and Systems Discovery (route render + i18n toggle pressed
+  state) — `tests-e2e/rod-smoke.spec.ts`, `tests-e2e/sd-smoke.spec.ts`.
+- 2025-12-23: Linked placeholder assets and sounds credits from README; `public/credits.md` maintained for attribution.
 - 2025-12-21: Post‑MVP roadmap approved for Rite of Discovery (episodes A–D, systems v2, collectibles/journal) and
   designer asset specs appended. Added 12+ “Thinking Tools” extension plan (rationality & biases) with replayable
   vignettes and mastery.

@@ -14,18 +14,27 @@ export const PROJECTS: Project[] = [
         id: "quest-hunt",
         title: "Quest Hunt",
         description:
-            "Mobile-first geocaching with MapLibre and Supabase — create and share location-based treasure hunts.",
-        image: "/images/projects/quest-hunt.jpg",
+            "Mobile-first geocaching — create and share location-based treasure hunts.",
+        image: "https://picsum.photos/seed/quest-hunt/1280/1280",
         url: "https://github.com/DTADMI/quest-hunt",
         featured: true,
     },
     {
-        id: "gamehub-backend",
-        title: "GameHub Backend",
+        id: "story-forge",
+        title: "Story Forge",
         description:
-            "Spring Boot + GraphQL + Postgres — API service powering leaderboards and profiles.",
-        image: "/images/projects/gamehub-backend.jpg",
-        url: "https://github.com/DTADMI/gamehub-backend",
+            "A gamified writing platform that helps writers build consistent habits, craft worlds, and share short stories with privacy controls and social features.",
+        image: "https://picsum.photos/seed/story-forge/1280/1280",
+        url: "https://github.com/DTADMI/story-forge",
+        featured: true,
+    },
+    {
+        id: "velvet-galaxy",
+        title: "Velvet Galaxy",
+        description:
+            "Velvet Galaxy is a modern, full‑stack social application built on Next.js.",
+        image: "https://picsum.photos/seed/velvet-galaxy/1280/1280",
+        url: "https://github.com/DTADMI/velvet-galaxy",
         featured: true,
     },
 ];

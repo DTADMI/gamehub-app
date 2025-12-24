@@ -1,5 +1,18 @@
 {
   "tme": {
+    "intro": {
+      "title": "Toymaker Escape",
+      "prompt": "Choose your approach.",
+      "gears": "Gears",
+      "music": "Music"
+    },
+    "intro2": {
+      "title": "Toymaker Escape",
+      "p1": "A late evening at the atelier.",
+      "p2": "Something is amiss…",
+      "cta": "Begin",
+      "skip": "Skip intro"
+    },
     "e1": {
       "title": "Toymaker Escape — Episode 1",
       "body": "A quiet workshop. Clues hide in plain sight.",

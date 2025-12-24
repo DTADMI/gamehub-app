@@ -2,7 +2,10 @@
   "rod": {
     "intro": {
       "title": "Rite of Discovery",
-      "body": "Begin your journey."
+      "p1": "A curious evening begins.",
+      "p2": "Pay attention to details — they might guide your choices.",
+      "cta": "Begin",
+      "skip": "Skip intro"
     }
   }
 }
