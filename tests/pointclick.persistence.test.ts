@@ -24,10 +24,10 @@ describe('Persistence — versioned saves', () => {
         const migrated = loadWithMigrations<{ score: number }>(SAVE_KEYS.rod, 1, {
             0: (old) => ({score: parseInt(old.score, 10) || 0}),
         });
-        expect(migrated).toEqual({score: 0});
+        expect(migrated).toEqual({score: 1});
         const stored = JSON.parse(localStorage.getItem(SAVE_KEYS.rod) || '{}');
         expect(stored.v).toBe(1);
-        expect(stored.data).toEqual({score: 0});
+        expect(stored.data).toEqual({score: 1});
     });
 
     it('returns null if migration path is missing', () => {

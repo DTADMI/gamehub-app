@@ -65,4 +65,29 @@ export const SAVE_KEYS = {
     rod: 'rod:save:v1',
     tme: 'tme:save:v1',
     sysdisc: 'sysdisc:save:v1',
+    settings: 'gh:settings:v1',
 } as const;
+
+export type GlobalSettings = {
+    language: 'en' | 'fr';
+    reducedMotion: boolean;
+    volume: number;
+};
+
+export const DEFAULT_SETTINGS: GlobalSettings = {
+    language: 'en',
+    reducedMotion: false,
+    volume: 0.8,
+};
+
+export function saveSettings(settings: GlobalSettings) {
+    return versionedSave(SAVE_KEYS.settings, 1, settings);
+}
+
+export function loadSettings(): GlobalSettings {
+    const data = loadWithMigrations<GlobalSettings>(SAVE_KEYS.settings, 1, {
+        // v0 -> v1 example stub
+        0: (old: any) => ({...DEFAULT_SETTINGS, ...old}),
+    });
+    return data || DEFAULT_SETTINGS;
+}

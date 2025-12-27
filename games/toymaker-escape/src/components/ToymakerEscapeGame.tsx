@@ -25,6 +25,7 @@ import {
     type Tile,
     toggleValve
 } from "@games/shared/pointclick/puzzles/pipes";
+import {createSequenceState, pressSequenceKey, type SequenceState} from "@games/shared/pointclick/puzzles/sequence";
 import {E1CabinetCanvas} from "./E1CabinetCanvas";
 
 const SAVE_KEY = "tme:save:v1";
@@ -143,6 +144,10 @@ export const ToymakerEscapeGame: React.FC = () => {
             "out",
             1 / 3,
         ),
+    );
+
+    const [sorter, setSorter] = useState<SequenceState>(() =>
+        createSequenceState(["red", "blue", "green"], ["red", "blue", "green", "red"])
     );
 
     // Persist with a small idempotency guard to reduce redundant writes
@@ -371,6 +376,33 @@ export const ToymakerEscapeGame: React.FC = () => {
                                     {lang === 'fr' ? 'Valider les tuyaux' : 'Confirm pipes'}
                                 </button>
                             )}
+                        </div>
+
+                        {/* Sorter — simple sequence tap/drag */}
+                        <div className="mt-4">
+                            <p className="text-sm mb-2">{t('tme.playroom.colors.hint')}</p>
+                            <div className="flex gap-2">
+                                {["red", "blue", "green"].map(color => (
+                                    <button
+                                        key={color}
+                                        className="w-16 h-16 rounded border flex items-center justify-center capitalize"
+                                        style={{backgroundColor: color, color: color === 'green' ? 'black' : 'white'}}
+                                        onClick={() => {
+                                            const next = pressSequenceKey(sorter, color);
+                                            setSorter(next);
+                                            if (next.solved) {
+                                                setCtx(c => effects.setFlag("sorter.solved", true)(ensureCtx(c)));
+                                            }
+                                        }}
+                                    >
+                                        {color}
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="mt-2 text-sm">
+                                Progress: {sorter.input.length} / {sorter.goal.length}
+                                {ctx.flags["sorter.solved"] && <span className="text-green-500 ml-2">Solved!</span>}
+                            </div>
                         </div>
 
                         {/* Hidden latch — long-press then drag over scuff area (macro mimic) */}

@@ -1,8 +1,60 @@
 "use client";
 import {Scene, SceneController} from "@games/_engine";
-import React from "react";
+import React, {useState} from "react";
 import {t} from "@/lib/i18n";
 import HomeostasisMeter from "@/components/sysdisc/HomeostasisMeter";
+import {
+    createPipesState,
+    evaluatePipes,
+    type PipesState,
+    setTileRotation,
+    toggleValve
+} from "@games/shared/pointclick/puzzles/pipes";
+
+const BreathPuzzle: React.FC<{ onSolved: () => void }> = ({onSolved}) => {
+    const [state, setState] = useState<PipesState>(() =>
+        createPipesState(3, 1, [
+            {type: "straight", rotation: 0, source: true},
+            {type: "valve", rotation: 0, open: false},
+            {type: "straight", rotation: 0, sink: true},
+        ])
+    );
+
+    const rotate = (x: number, y: number) => {
+        const next = evaluatePipes(setTileRotation(state, x, y, (state.grid[y * state.width + x].rotation + 1) % 4));
+        setState(next);
+        if (next.solved) onSolved();
+    };
+
+    const toggle = (x: number, y: number) => {
+        const next = evaluatePipes(toggleValve(state, x, y, !state.grid[y * state.width + x].open));
+        setState(next);
+        if (next.solved) onSolved();
+    };
+
+    return (
+        <div className="bg-blue-50 p-4 rounded-lg mb-4">
+            <p className="text-sm mb-2 text-blue-800 font-medium">Oxygen Flow Simulation</p>
+            <div className="flex gap-4 justify-center items-center">
+                <button className="w-16 h-16 border-2 border-blue-300 rounded bg-white flex items-center justify-center"
+                        onClick={() => rotate(0, 0)}>
+                    {state.grid[0].rotation * 90}°
+                </button>
+                <button
+                    className={`w-16 h-16 border-2 border-blue-300 rounded flex items-center justify-center ${state.grid[1].open ? 'bg-blue-200' : 'bg-white'}`}
+                    onClick={() => toggle(1, 0)}
+                >
+                    {state.grid[1].open ? 'OPEN' : 'CLOSED'}
+                </button>
+                <button className="w-16 h-16 border-2 border-blue-300 rounded bg-white flex items-center justify-center"
+                        onClick={() => rotate(2, 0)}>
+                    {state.grid[2].rotation * 90}°
+                </button>
+            </div>
+            {state.solved && <p className="text-center text-green-600 mt-2 font-bold">Oxygen Flow Restored!</p>}
+        </div>
+    );
+};
 
 const scenes: Scene[] = [
     {
@@ -227,10 +279,14 @@ const scenes: Scene[] = [
         title: t("sysdisc.bod.breath.bb1.title"),
         render: ({go, setFlag, state}) => {
             const meter = Number(state.flags["bod.meter"] ?? 60);
+            const solved = Boolean(state.flags["bod.breath.puzzleSolved"]);
             const clamp = (v: number) => Math.max(0, Math.min(100, v));
             return (
                 <div>
                     <p className="mb-2">{t("sysdisc.bod.breath.bb1.prompt")}</p>
+
+                    <BreathPuzzle onSolved={() => setFlag("bod.breath.puzzleSolved", true)}/>
+
                     <HomeostasisMeter value={meter}/>
                     <div className="mt-2 flex gap-2" role="group" aria-label="Balance nudges">
                         <button className="min-h-[32px] px-2 py-1 rounded border text-sm"
@@ -241,8 +297,13 @@ const scenes: Scene[] = [
                         </button>
                     </div>
                     <div className="mt-3">
-                        <button className="min-h-[44px] px-4 py-2 rounded bg-primary text-primary-foreground"
-                                onClick={() => go("BB2")}>{t("sysdisc.bod.common.continue")}</button>
+                        <button
+                            className="min-h-[44px] px-4 py-2 rounded bg-primary text-primary-foreground disabled:opacity-50"
+                            disabled={!solved}
+                            onClick={() => go("BB2")}
+                        >
+                            {t("sysdisc.bod.common.continue")}
+                        </button>
                     </div>
                 </div>
             );
