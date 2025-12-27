@@ -6,8 +6,8 @@ import {Geist, Geist_Mono} from "next/font/google";
 
 import {Footer} from "@/components/Footer";
 import {Header} from "@/components/Header";
-import {Providers} from "@/components/Providers";
 import {I18nInitializer} from "@/components/I18nInitializer";
+import {Providers} from "@/components/Providers";
 
 const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });

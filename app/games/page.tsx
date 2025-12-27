@@ -4,9 +4,9 @@
 import React from "react";
 
 import GamesList from "@/components/games/GamesList";
+import {useFlags} from "@/contexts/FlagsContext";
 import {listGames} from "@/games/manifest";
 import {getGameById} from "@/lib/games";
-import {useFlags} from "@/contexts/FlagsContext";
 
 export default function GamesPage() {
   const {flags} = useFlags();

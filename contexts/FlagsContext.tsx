@@ -69,7 +69,9 @@ export function FlagsProvider({children}: { children: React.ReactNode }) {
 
 export function useFlags() {
     const ctx = useContext(FlagsContext);
-    if (!ctx) throw new Error("useFlags must be used within FlagsProvider");
+    if (!ctx) {
+        throw new Error("useFlags must be used within FlagsProvider");
+    }
     return ctx;
 }
 

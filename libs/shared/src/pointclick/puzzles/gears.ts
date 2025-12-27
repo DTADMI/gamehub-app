@@ -87,8 +87,12 @@ export function setConnection(state: GearsState, a: string, b: string, on: boole
 function buildGearsGraph(conns: GearConnection[]): Record<string, string[]> {
     const g: Record<string, string[]> = {};
     for (const {a, b} of conns) {
-        if (!g[a]) g[a] = [];
-        if (!g[b]) g[b] = [];
+        if (!g[a]) {
+            g[a] = [];
+        }
+        if (!g[b]) {
+            g[b] = [];
+        }
         g[a].push(b);
         g[b].push(a);
     }
@@ -96,7 +100,9 @@ function buildGearsGraph(conns: GearConnection[]): Record<string, string[]> {
 }
 
 function bfsPath(graph: Record<string, string[]>, start: string, goal: string): string[] | null {
-    if (start === goal) return [start];
+    if (start === goal) {
+        return [start];
+    }
     const queue: string[] = [start];
     const prev = new Map<string, string | null>();
     prev.set(start, null);

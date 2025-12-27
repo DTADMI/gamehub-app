@@ -47,11 +47,12 @@ Notes: Cropped to 16:9; volume normalized to −14 LUFS.
   Notes: Filenames placed under `/sounds/` (e.g., `paddle-hit.wav`, `brick-hit.wav`, `brick-break.wav`, `powerup.wav`,
   `snake-eat.wav`, `snake-gameover.wav`, `portal.wav`, `card-flip.mp3`, `match.mp3`, `win.mp3`, `memory-bg.mp3`).
 
-- Title: Narrative Game Backgrounds (Placeholders)
-  Author: Various (Pixabay / Kenney)
-  Source URL: https://pixabay.com / https://kenney.nl
-  License: Pixabay / CC0
-  Notes: Placed under `/assets/tme/`, `/assets/rod/`, `/assets/sysdisc/`.
+- Title: Narrative Game Assets (Placeholders)
+  Author: Kenney (https://www.kenney.nl) / Pixabay (https://pixabay.com)
+  Source URL: https://www.kenney.nl/assets
+  License: CC0 / Pixabay License
+  Notes: Placeholder backgrounds and UI elements under `/assets/tme/`, `/assets/rod/`, and `/assets/sysdisc/`. Includes
+  `workshop_bg.svg`, `playroom_bg.svg`, `key_fragment_1.svg`, `badge_systems_scout.svg`.
 
 ### Add more as needed
 

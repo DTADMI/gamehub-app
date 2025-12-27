@@ -10,7 +10,9 @@ export function InventoryBar({
     onUse?: (id: string) => void;
     ariaLabel?: string;
 }) {
-    if (!items?.length) return null;
+    if (!items?.length) {
+        return null;
+    }
     return (
         <div
             role="toolbar"

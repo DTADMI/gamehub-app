@@ -39,7 +39,9 @@ export class DialogSystem extends GameObject {
     }
 
     render(ctx: CanvasRenderingContext2D) {
-        if (!this.isVisible) return;
+        if (!this.isVisible) {
+            return;
+        }
 
         // Draw dialog box
         ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';

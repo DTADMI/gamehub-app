@@ -5,9 +5,9 @@ import {useSound} from "@games/shared";
 import {Volume2, VolumeX} from "lucide-react";
 import Link from "next/link";
 
+import {LanguageToggle} from "@/components/LanguageToggle";
 import {Button} from "@/components/ui/button";
 import {useGame} from "@/contexts/GameContext";
-import {LanguageToggle} from "@/components/LanguageToggle";
 
 import {GameProgress} from "./GameProgress";
 

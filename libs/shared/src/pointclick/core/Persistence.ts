@@ -21,9 +21,13 @@ export function versionedSave<T>(key: string, v: number, data: T) {
 export function versionedLoad<T>(key: string): VersionedPayload<T> | null {
     try {
         const raw = localStorage.getItem(key);
-        if (!raw) return null;
+        if (!raw) {
+            return null;
+        }
         const parsed = JSON.parse(raw);
-        if (typeof parsed?.v !== 'number' || !('data' in parsed)) return null;
+        if (typeof parsed?.v !== 'number' || !('data' in parsed)) {
+            return null;
+        }
         return parsed as VersionedPayload<T>;
     } catch (e) {
         console.warn('[Persistence] load parse failed; clearing key', key, e);
@@ -42,9 +46,13 @@ export function loadWithMigrations<T>(
     migrations: MigrationMap<T> = {}
 ): T | null {
     const payload = versionedLoad<T>(key);
-    if (!payload) return null;
+    if (!payload) {
+        return null;
+    }
     let {v, data} = payload as any as { v: number; data: any };
-    if (v === targetVersion) return data as T;
+    if (v === targetVersion) {
+        return data as T;
+    }
     // Forward-only migrations: apply step by step up to target
     while (v < targetVersion) {
         const migrate = migrations[v];
@@ -55,7 +63,9 @@ export function loadWithMigrations<T>(
         data = migrate(data);
         v += 1;
     }
-    if (v !== targetVersion) return null;
+    if (v !== targetVersion) {
+        return null;
+    }
     // Persist upgraded data
     versionedSave<T>(key, targetVersion, data as T);
     return data as T;

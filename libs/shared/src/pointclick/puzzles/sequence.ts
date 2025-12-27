@@ -34,7 +34,9 @@ export function createSequenceState(
 }
 
 export function pressSeq(state: SequenceState, sym: SeqSymbol): SequenceState {
-    if (state.solved || state.failed) return state;
+    if (state.solved || state.failed) {
+        return state;
+    }
     const expected = state.target[state.input.length];
     const input = [...state.input, sym];
     

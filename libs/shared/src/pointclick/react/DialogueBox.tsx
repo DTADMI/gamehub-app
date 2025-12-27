@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+
 import type {Lang, Scene} from "../engine";
 
 export function DialogueBox({

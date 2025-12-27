@@ -1,8 +1,5 @@
 "use client";
 import {Scene, SceneController} from "@games/_engine";
-import React, {useState} from "react";
-import {t} from "@/lib/i18n";
-import HomeostasisMeter from "@/components/sysdisc/HomeostasisMeter";
 import {
     createPipesState,
     evaluatePipes,
@@ -10,6 +7,10 @@ import {
     setTileRotation,
     toggleValve
 } from "@games/shared/pointclick/puzzles/pipes";
+import React, {useState} from "react";
+
+import HomeostasisMeter from "@/components/sysdisc/HomeostasisMeter";
+import {t} from "@/lib/i18n";
 
 const BreathPuzzle: React.FC<{ onSolved: () => void }> = ({onSolved}) => {
     const [state, setState] = useState<PipesState>(() =>
@@ -23,13 +24,17 @@ const BreathPuzzle: React.FC<{ onSolved: () => void }> = ({onSolved}) => {
     const rotate = (x: number, y: number) => {
         const next = evaluatePipes(setTileRotation(state, x, y, (state.grid[y * state.width + x].rotation + 1) % 4));
         setState(next);
-        if (next.solved) onSolved();
+        if (next.solved) {
+            onSolved();
+        }
     };
 
     const toggle = (x: number, y: number) => {
         const next = evaluatePipes(toggleValve(state, x, y, !state.grid[y * state.width + x].open));
         setState(next);
-        if (next.solved) onSolved();
+        if (next.solved) {
+            onSolved();
+        }
     };
 
     return (
@@ -246,7 +251,7 @@ const scenes: Scene[] = [
                     }}>{t("sysdisc.outro.altPlan")}</button>
                     <button className="min-h-[44px] px-3 py-2 rounded border" onClick={() => {
                         setFlag("outro.seen", true);
-                        setFlag("b3.hints", !Boolean(state.flags["b3.hints"]));
+                        setFlag("b3.hints", !state.flags["b3.hints"]);
                     }}>{t("sysdisc.outro.toggleHints")}</button>
                 </div>
             </div>
@@ -625,8 +630,12 @@ const scenes: Scene[] = [
         id: "BOD_MOVE_WRAP",
         title: t("sysdisc.bod.move.outro.title"),
         render: ({state, setFlag, go}) => {
-            if (!state.flags["bod.badges.careAlly"]) setFlag("bod.badges.careAlly", true);
-            if (!state.flags["bod.badges.move"]) setFlag("bod.badges.move", true);
+            if (!state.flags["bod.badges.careAlly"]) {
+                setFlag("bod.badges.careAlly", true);
+            }
+            if (!state.flags["bod.badges.move"]) {
+                setFlag("bod.badges.move", true);
+            }
             return (
                 <div>
                     <p className="mb-2">{t("sysdisc.bod.move.outro.p1")}</p>
@@ -750,8 +759,12 @@ const scenes: Scene[] = [
         id: "BOD_SIGNAL_WRAP",
         title: t("sysdisc.bod.signal.outro.title"),
         render: ({state, setFlag, go}) => {
-            if (!state.flags["bod.badges.careAlly"]) setFlag("bod.badges.careAlly", true);
-            if (!state.flags["bod.badges.signal"]) setFlag("bod.badges.signal", true);
+            if (!state.flags["bod.badges.careAlly"]) {
+                setFlag("bod.badges.careAlly", true);
+            }
+            if (!state.flags["bod.badges.signal"]) {
+                setFlag("bod.badges.signal", true);
+            }
             return (
                 <div>
                     <p className="mb-2">{t("sysdisc.bod.signal.outro.p1")}</p>
@@ -875,8 +888,12 @@ const scenes: Scene[] = [
         id: "BOD_GROW_WRAP",
         title: t("sysdisc.bod.grow.outro.title"),
         render: ({state, setFlag, go}) => {
-            if (!state.flags["bod.badges.careAlly"]) setFlag("bod.badges.careAlly", true);
-            if (!state.flags["bod.badges.grow"]) setFlag("bod.badges.grow", true);
+            if (!state.flags["bod.badges.careAlly"]) {
+                setFlag("bod.badges.careAlly", true);
+            }
+            if (!state.flags["bod.badges.grow"]) {
+                setFlag("bod.badges.grow", true);
+            }
             return (
                 <div>
                     <p className="mb-2">{t("sysdisc.bod.grow.outro.p1")}</p>

@@ -95,7 +95,9 @@ export function hasWiresCrossing(state: WiresState): boolean {
 
     // If right indices are not non-decreasing, there is a crossing
     for (let i = 1; i < pairs.length; i++) {
-        if (pairs[i].ri < pairs[i - 1].ri) return true;
+        if (pairs[i].ri < pairs[i - 1].ri) {
+            return true;
+        }
     }
     return false;
 }

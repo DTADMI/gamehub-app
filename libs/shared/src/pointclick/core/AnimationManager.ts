@@ -27,7 +27,9 @@ export class AnimationManager {
 
     play(name: string, reset: boolean = false): void {
         const animation = this.animations.get(name);
-        if (!animation) return;
+        if (!animation) {
+            return;
+        }
 
         if (reset) {
             animation.currentFrame = 0;
@@ -60,7 +62,9 @@ export class AnimationManager {
 
     update(deltaTime: number): void {
         for (const animation of this.activeAnimations) {
-            if (!animation.isPlaying) continue;
+            if (!animation.isPlaying) {
+                continue;
+            }
 
             animation.frameTime += deltaTime * 1000; // Convert to ms
             const frameDuration = 1000 / animation.frameRate;
@@ -90,7 +94,9 @@ export class AnimationManager {
 
     getCurrentFrame(name: string): any {
         const animation = this.animations.get(name);
-        if (!animation) return null;
+        if (!animation) {
+            return null;
+        }
         return animation.frames[animation.currentFrame];
     }
 

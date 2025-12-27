@@ -24,15 +24,28 @@ type ProfileContextValue = {
     resetAll: () => void;
 };
 
-const DEFAULT_PROFILE: Profile = {nickname: "guest"};
+const DEFAULT_PROFILE: Profile = {nickname: "guest", avatarUrl: "/assets/avatars/default.svg"};
 const LS_PROFILE_KEY = "gh:profile:v1";
 const LS_STATS_KEY = "gh:stats:v1";
+
+export const BUILTIN_AVATARS = [
+    "/assets/avatars/avatar1.svg",
+    "/assets/avatars/avatar2.svg",
+    "/assets/avatars/avatar3.svg",
+    "/assets/avatars/avatar4.svg",
+    "/assets/avatars/avatar5.svg",
+    "/assets/avatars/avatar6.svg",
+    "/assets/avatars/avatar7.svg",
+    "/assets/avatars/avatar8.svg",
+];
 
 const ProfileContext = createContext<ProfileContextValue | undefined>(undefined);
 
 export function ProfileProvider({children}: { children: React.ReactNode }) {
     const [profile, setProfile] = useState<Profile>(() => {
-        if (typeof window === "undefined") return DEFAULT_PROFILE;
+        if (typeof window === "undefined") {
+            return DEFAULT_PROFILE;
+        }
         try {
             const raw = localStorage.getItem(LS_PROFILE_KEY);
             return raw ? {...DEFAULT_PROFILE, ...JSON.parse(raw)} : DEFAULT_PROFILE;
@@ -41,7 +54,9 @@ export function ProfileProvider({children}: { children: React.ReactNode }) {
         }
     });
     const [stats, setStats] = useState<StatsMap>(() => {
-        if (typeof window === "undefined") return {};
+        if (typeof window === "undefined") {
+            return {};
+        }
         try {
             const raw = localStorage.getItem(LS_STATS_KEY);
             return raw ? JSON.parse(raw) : {};
@@ -71,8 +86,22 @@ export function ProfileProvider({children}: { children: React.ReactNode }) {
     const updateStat = useCallback((game: string, patch: Partial<GameStat>) => {
         setStats((prev) => {
             const next: StatsMap = {...prev};
-            const curr = next[game] || {};
-            next[game] = {...curr, ...patch};
+            const curr = next[game] || {sessions: 0, highScore: 0};
+
+            const sessions = patch.sessions !== undefined
+                ? (curr.sessions || 0) + patch.sessions
+                : curr.sessions;
+
+            const highScore = patch.lastScore !== undefined
+                ? Math.max(curr.highScore || 0, patch.lastScore)
+                : curr.highScore;
+
+            next[game] = {
+                ...curr,
+                ...patch,
+                sessions,
+                highScore,
+            };
             return next;
         });
     }, []);
@@ -92,6 +121,8 @@ export function ProfileProvider({children}: { children: React.ReactNode }) {
 
 export function useProfile() {
     const ctx = useContext(ProfileContext);
-    if (!ctx) throw new Error("useProfile must be used within ProfileProvider");
+    if (!ctx) {
+        throw new Error("useProfile must be used within ProfileProvider");
+    }
     return ctx;
 }

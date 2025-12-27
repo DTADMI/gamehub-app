@@ -3,10 +3,10 @@
 import {LogIn} from "lucide-react";
 import Link from "next/link";
 
+import {LanguageToggle} from "@/components/LanguageToggle";
 import {ModeToggle} from "@/components/ModeToggle";
 import {Button} from "@/components/ui/button";
 import {useFeature} from "@/lib/flags";
-import {LanguageToggle} from "@/components/LanguageToggle";
 
 export function Header() {
   const showAdmin = useFeature("ADMIN", false);

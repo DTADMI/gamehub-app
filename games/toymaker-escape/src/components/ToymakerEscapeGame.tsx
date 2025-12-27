@@ -1,22 +1,14 @@
 "use client";
 
-import React, {useEffect, useMemo, useRef, useState} from "react";
 import {DialogueBox, GameContainer, InventoryBar, versionedLoad, versionedSave} from "@games/shared";
 import {detectLang, effects, ensureCtx, type Lang, nextScene, type Scene,} from "@games/shared/pointclick/engine";
-import {clearKeypad, createKeypadState, pressKey, submitKeypad,} from "@games/shared/pointclick/puzzles/keypad";
 import {
     createGearsState,
     evaluateGears,
     type GearsState,
     setGearsTeeth as setGearTeeth,
 } from "@games/shared/pointclick/puzzles/gears";
-import {t} from "@/lib/i18n";
-import {
-    createWiresState,
-    hasWiresCrossing,
-    setWiresConnection,
-    type WiresState
-} from "@games/shared/pointclick/puzzles/wires";
+import {clearKeypad, createKeypadState, pressKey, submitKeypad,} from "@games/shared/pointclick/puzzles/keypad";
 import {
     createPipesState,
     evaluatePipes,
@@ -26,6 +18,16 @@ import {
     toggleValve
 } from "@games/shared/pointclick/puzzles/pipes";
 import {createSequenceState, pressSequenceKey, type SequenceState} from "@games/shared/pointclick/puzzles/sequence";
+import {
+    createWiresState,
+    hasWiresCrossing,
+    setWiresConnection,
+    type WiresState
+} from "@games/shared/pointclick/puzzles/wires";
+import React, {useEffect, useMemo, useRef, useState} from "react";
+
+import {t} from "@/lib/i18n";
+
 import {E1CabinetCanvas} from "./E1CabinetCanvas";
 
 const SAVE_KEY = "tme:save:v1";
@@ -171,7 +173,9 @@ export const ToymakerEscapeGame: React.FC = () => {
         const gateSolved = !!(flags["gears.solved"] || flags["wires.solved"] || flags["pipes.solved"]);
         const latch = !!flags["latch.revealed"];
         const existing = flags?.medals?.e1;
-        if (!gateSolved || !latch || existing) return;
+        if (!gateSolved || !latch || existing) {
+            return;
+        }
         const hintsUsed = [flags?.["seen.posterOrder"], flags?.["seen.ratioPlate"]].filter(Boolean).length;
         const level = hintsUsed === 0 ? 'gold' : hintsUsed === 1 ? 'silver' : 'bronze';
         setCtx((c) => effects.setFlag(`medals.e1`, level)(ensureCtx(c)));
@@ -340,7 +344,9 @@ export const ToymakerEscapeGame: React.FC = () => {
                                     const colorSel = (e.currentTarget.parentElement?.querySelector('[data-testid="wires-color"]') as HTMLSelectElement);
                                     const next = setWiresConnection(wires, (leftSel?.value) || 'A1', (rightSel?.value) || 'B1', (colorSel?.value) || 'red');
                                     setWires(next);
-                                    if (next.solved) setCtx(c => effects.setFlag("wires.solved", true)(ensureCtx(c)));
+                                    if (next.solved) {
+                                        setCtx(c => effects.setFlag("wires.solved", true)(ensureCtx(c)));
+                                    }
                                 }}>{lang === 'fr' ? 'Connecter' : 'Connect'}</button>
                             </div>
                             {hasWiresCrossing(wires) && (
@@ -456,23 +462,21 @@ export default ToymakerEscapeGame;
 
 // --- Internal helper: scuff latch interaction (long-press then drag) ---
 function ScuffLatch({onRevealed, onSeen}: { onRevealed: () => void; onSeen: () => void }) {
-    const [pressStart, setPressStart] = React.useState<number | null>(null);
     const [longPressed, setLongPressed] = React.useState(false);
     const timeoutRef = React.useRef<number | null>(null);
 
     const onPointerDown = () => {
         onSeen();
         setLongPressed(false);
-        const start = Date.now();
-        setPressStart(start);
         timeoutRef.current = window.setTimeout(() => {
             setLongPressed(true);
         }, 800); // match long-press duration from InputManager default
     };
     const onPointerUp = () => {
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
         timeoutRef.current = null;
-        setPressStart(null);
         setLongPressed(false);
     };
     const onPointerMove = () => {
@@ -490,7 +494,9 @@ function ScuffLatch({onRevealed, onSeen}: { onRevealed: () => void; onSeen: () =
             onPointerUp={onPointerUp}
             onPointerMove={onPointerMove}
             onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') onRevealed();
+                if (e.key === 'Enter' || e.key === ' ') {
+                    onRevealed();
+                }
             }}
             className="w-24 h-10 rounded border border-dashed border-muted-foreground/60 bg-muted/50 select-none flex items-center justify-center"
             data-testid="scuff-area"

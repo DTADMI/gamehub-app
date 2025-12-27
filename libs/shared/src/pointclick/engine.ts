@@ -31,11 +31,15 @@ export type SaveState = {
 export function detectLang(): Lang {
     if (typeof navigator !== "undefined") {
         const n = navigator.language.toLowerCase();
-        if (n.startsWith("fr")) return "fr";
+        if (n.startsWith("fr")) {
+            return "fr";
+        }
     }
     if (typeof document !== "undefined") {
         const dl = document.documentElement.lang?.toLowerCase();
-        if (dl?.startsWith("fr")) return "fr";
+        if (dl?.startsWith("fr")) {
+            return "fr";
+        }
     }
     return "en";
 }
@@ -48,10 +52,16 @@ export function nextScene(
 ): { sceneId: string; ctx: EngineCtx } {
     const scene = scenes[currentSceneId];
     const safeCtx = ensureCtx(ctx);
-    if (!scene) return {sceneId: currentSceneId, ctx: safeCtx};
+    if (!scene) {
+        return {sceneId: currentSceneId, ctx: safeCtx};
+    }
     const choice = scene.choices.find((c) => c.id === choiceId);
-    if (!choice) return {sceneId: currentSceneId, ctx: safeCtx};
-    if (choice.guard && !choice.guard(safeCtx)) return {sceneId: currentSceneId, ctx: safeCtx};
+    if (!choice) {
+        return {sceneId: currentSceneId, ctx: safeCtx};
+    }
+    if (choice.guard && !choice.guard(safeCtx)) {
+        return {sceneId: currentSceneId, ctx: safeCtx};
+    }
     const nextCtx = choice.effect ? ensureCtx(choice.effect(safeCtx)) : safeCtx;
     return {sceneId: choice.target, ctx: nextCtx};
 }
@@ -66,7 +76,9 @@ export function save(key: string, state: SaveState) {
 export function load(key: string): SaveState | null {
     try {
         const raw = localStorage.getItem(key);
-        if (!raw) return null;
+        if (!raw) {
+            return null;
+        }
         const parsed = JSON.parse(raw);
         if (parsed && typeof parsed.sceneId === "string") {
             // Defensive normalize of ctx shape
@@ -123,7 +135,9 @@ export type Migrator = (raw: any) => SaveState | null;
 
 export function migrate(raw: any, _migrator?: Migrator): SaveState | null {
     try {
-        if (!raw) return null;
+        if (!raw) {
+            return null;
+        }
         if (raw.v === 1) {
             return {
                 sceneId: String(raw.sceneId || "intro"),

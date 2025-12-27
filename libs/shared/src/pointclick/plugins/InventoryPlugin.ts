@@ -51,7 +51,9 @@ export class InventoryPlugin implements GamePlugin {
 
     removeItem(itemId: string, quantity: number = 1): boolean {
         const item = this.items.get(itemId);
-        if (!item) return false;
+        if (!item) {
+            return false;
+        }
 
         if (item.quantity > quantity) {
             item.quantity -= quantity;

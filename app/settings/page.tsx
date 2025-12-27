@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
 import dynamic from "next/dynamic";
+import React from "react";
 
 const SettingsPanel = dynamic(() => import("@/components/SettingsPanel"), {
     ssr: false,

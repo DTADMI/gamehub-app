@@ -269,7 +269,9 @@ export class InputManager {
     };
 
     private handleKeyDown = (e: KeyboardEvent): void => {
-        if (this.keys.has(e.code)) return;
+        if (this.keys.has(e.code)) {
+            return;
+        }
         this.keys.add(e.code);
         this.emitInputEvent('keydown', undefined, e, undefined, e.code);
         this.feedSequence({type: 'keydown', key: e.code});

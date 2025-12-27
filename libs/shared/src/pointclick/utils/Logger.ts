@@ -56,7 +56,9 @@ export class Logger {
     }
 
     private log(level: string, message: string, ...args: any[]): void {
-        if (!this.enabled) return;
+        if (!this.enabled) {
+            return;
+        }
 
         const timestamp = new Date().toISOString();
         const logMessage = `[${timestamp}] [${this.context}] [${level.toUpperCase()}] ${message}`;

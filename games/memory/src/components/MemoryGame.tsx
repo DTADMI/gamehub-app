@@ -11,28 +11,37 @@ interface Card {
   isMatched: boolean;
 }
 
-const EMOJIS = [
-  "🍎",
-  "🍌",
-  "🍇",
-  "🍉",
-  "🍓",
-  "🍒",
-  "🍍",
-  "🥝",
-  "🍑",
-  "🥥",
-  "🍋",
-  "🫐",
-  "🍊",
-  "🥕",
-  "🌽",
-  "🍆",
-];
+const THEMES = {
+    emojis: {
+        name: "Emojis",
+        assets: [
+            "🍎", "🍌", "🍇", "🍉", "🍓", "🍒", "🍍", "🥝", "🍑", "🥥", "🍋", "🫐", "🍊", "🥕", "🌽", "🍆"
+        ],
+        type: "text" as const
+    },
+    animals: {
+        name: "Animals",
+        assets: [
+            "🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼", "🐻‍❄️", "🐨", "🐯", "🦁", "🐮", "🐷", "🐸", "🐵"
+        ],
+        type: "text" as const
+    },
+    space: {
+        name: "Space",
+        assets: [
+            "🚀", "🛸", "🪐", "🌟", "🌑", "🌞", "☄️", "🌌", "🛰️", "👩‍🚀", "👨‍🚀", "👽", "👾", "🔭", "📡", "🌍"
+        ],
+        type: "text" as const
+    }
+};
+
+type ThemeKey = keyof typeof THEMES;
+
 const MAX_PAIRS = 12; // supports up to hard mode
 const CARD_VALUES = Array.from({length: MAX_PAIRS}, (_, i) => i + 1);
 
 export const MemoryGame: React.FC = () => {
+    const [theme, setTheme] = useState<ThemeKey>("emojis");
   const [cards, setCards] = useState<Card[]>([]);
   const [flippedIndices, setFlippedIndices] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
@@ -160,8 +169,12 @@ export const MemoryGame: React.FC = () => {
       setGameOver(true);
       playSound("win", 200);
       soundManager.stopMusic();
+        // Dispatch gameover event for the page to handle (stats/leaderboard)
+        window.dispatchEvent(new CustomEvent("memory:gameover", {
+            detail: {score: moves}
+        }));
     }
-  }, [cards, playSound]);
+  }, [cards, moves, playSound]);
 
   // Auto-complete UX: when only two unmatched cards remain, auto-flip them and count as one move
   useEffect(() => {
@@ -243,8 +256,15 @@ export const MemoryGame: React.FC = () => {
       [cards.length, difficulty],
   );
 
-  const getEmojiForValue = (value: number) =>
-      EMOJIS[(value - 1) % EMOJIS.length];
+    const getAssetForValue = (value: number) => {
+        const assets = THEMES[theme].assets;
+        return assets[(value - 1) % assets.length];
+    };
+
+    const getA11yLabel = (value: number) => {
+        const asset = getAssetForValue(value);
+        return `Card with ${asset}`;
+    };
 
   return (
     <GameContainer
@@ -254,11 +274,26 @@ export const MemoryGame: React.FC = () => {
       backgroundImage="/images/bg-pastel-pattern.jpg"
       showParticleControls={false}
     >
-      <div className="p-4">
+        <div className="p-4 overflow-hidden">
         {/* Controls */}
         <div className="mb-6 flex flex-col sm:flex-row items-center justify-center gap-4 text-center">
           <div>
             <label className="mr-2 text-gray-700 dark:text-gray-300">
+                Theme:
+            </label>
+              <select
+                  value={theme}
+                  onChange={(e) => setTheme(e.target.value as ThemeKey)}
+                  className="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 focus:border-primary focus:ring-1 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+                  disabled={gameStarted && !gameOver}
+              >
+                  {Object.entries(THEMES).map(([key, t]) => (
+                      <option key={key} value={key}>{t.name}</option>
+                  ))}
+              </select>
+          </div>
+            <div>
+                <label className="mr-2 text-gray-700 dark:text-gray-300">
               Difficulty:
             </label>
             <select
@@ -357,6 +392,10 @@ export const MemoryGame: React.FC = () => {
                       key={card.id}
                       data-testid="memory-card"
                       onClick={() => handleCardClick(index)}
+                      role="button"
+                      tabIndex={card.isMatched || hiddenIds.has(card.id) ? -1 : 0}
+                      aria-label={card.isFlipped ? getA11yLabel(card.value) : "Hidden card"}
+                      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && handleCardClick(index)}
                       className={`
                 aspect-square rounded-xl cursor-pointer transition-transform duration-200
                 [transform-style:preserve-3d] relative shadow-md hover:shadow-lg
@@ -370,6 +409,7 @@ export const MemoryGame: React.FC = () => {
                           : "rotateY(0)",
                   // Shorten spin duration
                   animationDuration: card.isMatched ? "500ms" : undefined,
+                          transition: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "none" : undefined
                       }}
                       aria-hidden={card.isMatched || undefined}
                   >
@@ -381,7 +421,7 @@ export const MemoryGame: React.FC = () => {
                 {/* Front */}
                     <div
                         className="absolute inset-0 rounded-xl bg-white dark:bg-gray-800 flex items-center justify-center text-4xl [transform:rotateY(180deg)] [backface-visibility:hidden]">
-                      <span aria-hidden>{getEmojiForValue(card.value)}</span>
+                        <span aria-hidden>{getAssetForValue(card.value)}</span>
                     </div>
                   </div>
               ),

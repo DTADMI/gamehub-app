@@ -25,17 +25,23 @@ export class TimerService {
     private running = false;
 
     update = (now: number) => {
-        if (!this.running) return;
+        if (!this.running) {
+            return;
+        }
         const toFire: TimerRecord[] = [];
         for (const rec of this.timers.values()) {
-            if (!rec.active) continue;
+            if (!rec.active) {
+                continue;
+            }
             const elapsed = now - rec.lastStart;
             if (elapsed >= rec.remaining) {
                 toFire.push(rec);
             }
         }
         for (const rec of toFire) {
-            if (!this.timers.has(rec.id)) continue;
+            if (!this.timers.has(rec.id)) {
+                continue;
+            }
             try {
                 rec.cb();
             } catch (e) {
@@ -48,7 +54,9 @@ export class TimerService {
                 this.timers.delete(rec.id);
             }
         }
-        if (this.timers.size === 0) this.stop();
+        if (this.timers.size === 0) {
+            this.stop();
+        }
     };
 
     createTimeout(ms: number, cb: () => void): TimerHandle {
@@ -82,38 +90,50 @@ export class TimerService {
 
     private loop = () => {
         this.update(performance.now());
-        if (this.running) this.raf = requestAnimationFrame(this.loop);
+        if (this.running) {
+            this.raf = requestAnimationFrame(this.loop);
+        }
     };
 
     private start() {
-        if (this.running) return;
+        if (this.running) {
+            return;
+        }
         this.running = true;
         this.raf = requestAnimationFrame(this.loop);
     }
 
     private stop() {
         this.running = false;
-        if (this.raf) cancelAnimationFrame(this.raf);
+        if (this.raf) {
+            cancelAnimationFrame(this.raf);
+        }
         this.raf = undefined;
     }
 
     private handle(rec: TimerRecord): TimerHandle {
         return {
             pause: () => {
-                if (!rec.active) return;
+                if (!rec.active) {
+                    return;
+                }
                 const now = performance.now();
                 rec.remaining -= (now - rec.lastStart);
                 rec.active = false;
             },
             resume: () => {
-                if (rec.active) return;
+                if (rec.active) {
+                    return;
+                }
                 rec.lastStart = performance.now();
                 rec.active = true;
                 this.start();
             },
             cancel: () => {
                 this.timers.delete(rec.id);
-                if (this.timers.size === 0) this.stop();
+                if (this.timers.size === 0) {
+                    this.stop();
+                }
             },
             isActive: () => rec.active,
         };
@@ -139,7 +159,9 @@ export class CutsceneRunner {
         this.playing = true;
         this.cancelFlag = false;
         for (const step of steps) {
-            if (this.cancelFlag) break;
+            if (this.cancelFlag) {
+                break;
+            }
             switch (step.type) {
                 case 'say':
                     this.events.emit('cutscene:say', step.payload.text);
@@ -171,7 +193,11 @@ export class CutsceneRunner {
                         const tick = () => {
                             const dt = (performance.now() - start) / 1000;
                             const done = step.payload.run(dt);
-                            if (done || this.cancelFlag) resolve(); else requestAnimationFrame(tick);
+                            if (done || this.cancelFlag) {
+                                resolve();
+                            } else {
+                                requestAnimationFrame(tick);
+                            }
                         };
                         requestAnimationFrame(tick);
                     });
@@ -229,7 +255,9 @@ export class SceneServices {
     destroy() {
         this.timers.clearAll();
         this.blackboard.clear();
-        if (this.cutscenes.isPlaying()) this.cutscenes.cancel();
+        if (this.cutscenes.isPlaying()) {
+            this.cutscenes.cancel();
+        }
     }
 }
 

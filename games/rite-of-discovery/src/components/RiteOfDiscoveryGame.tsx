@@ -1,11 +1,12 @@
 "use client";
 
-import React, {useEffect, useMemo, useState} from "react";
 import {DialogueBox, GameContainer, InventoryBar} from "@games/shared";
-import {detectLang, effects, ensureCtx, type Lang, nextScene, type Scene} from "@games/shared/pointclick/engine";
 import {loadWithMigrations, SAVE_KEYS, versionedSave} from "@games/shared/pointclick/core/Persistence";
+import {detectLang, effects, ensureCtx, type Lang, nextScene, type Scene} from "@games/shared/pointclick/engine";
 import {clearKeypad, createKeypadState, pressKey, submitKeypad} from "@games/shared/pointclick/puzzles/keypad";
 import {createWiresState, setWiresConnection} from "@games/shared/pointclick/puzzles/wires";
+import React, {useEffect, useMemo, useState} from "react";
+
 import {t} from "@/lib/i18n";
 
 const SAVE_KEY = SAVE_KEYS.rod;
@@ -13,9 +14,8 @@ const SAVE_KEY = SAVE_KEYS.rod;
 export const RiteOfDiscoveryGame: React.FC = () => {
     const lang = useMemo<Lang>(() => detectLang(), []);
 
-    // Puzzles state
     const [keypad, setKeypad] = useState(() => createKeypadState());
-    const [wires, setWires] = useState(() => createWiresState(["L1", "L2"], ["R1", "R2"], {
+    useState(() => createWiresState(["L1", "L2"], ["R1", "R2"], {
         red: [{from: "L1", to: "R2"}],
         blue: [{from: "L2", to: "R1"}]
     }));
@@ -177,7 +177,9 @@ export const RiteOfDiscoveryGame: React.FC = () => {
                                             const [l, r] = e.target.value.split("-");
                                             setWires(s => {
                                                 const next = setWiresConnection(s, l, r, color as any);
-                                                if (next.solved) setCtx(c => effects.setFlag("door.wiresSolved", true)(ensureCtx(c)));
+                                                if (next.solved) {
+                                                    setCtx(c => effects.setFlag("door.wiresSolved", true)(ensureCtx(c)));
+                                                }
                                                 return next;
                                             });
                                         }}

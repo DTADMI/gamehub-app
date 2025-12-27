@@ -4,9 +4,9 @@ import {SessionProvider} from "next-auth/react";
 
 import {ThemeProvider} from "@/components/ThemeProvider";
 import {AuthProvider} from "@/contexts/AuthContext";
-import {SubscriptionProvider} from "@/contexts/SubscriptionContext";
 import {FlagsProvider} from "@/contexts/FlagsContext";
 import {ProfileProvider} from "@/contexts/ProfileContext";
+import {SubscriptionProvider} from "@/contexts/SubscriptionContext";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   // In CI/E2E we want to avoid initializing Firebase/Auth and hitting the backend

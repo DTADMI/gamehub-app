@@ -1,5 +1,5 @@
-import {GameEngine} from './Engine';
 import {Scene} from '../types';
+import {GameEngine} from './Engine';
 
 export class SceneManager {
     private scenes: Map<string, Scene> = new Map();

@@ -1,10 +1,11 @@
 "use client";
 
 import {GameContainer, ParticlePool, soundManager, useGameSettings,} from "@games/shared";
-import {getBreakoutSettings, saveBreakoutSettings} from "../settings";
 import React, {useCallback, useEffect, useRef, useState} from "react";
 
 import {submitScore} from "@/lib/graphql/queries";
+
+import {getBreakoutSettings, saveBreakoutSettings} from "../settings";
 
 // Minimal, stable MVP implementation for Breakout
 // Constants (logical canvas size; we apply DPR scaling in a resize handler)

@@ -1,8 +1,9 @@
 "use client";
 
-import * as React from "react";
-import {getLocale, initI18n, setLocale} from "@/lib/i18n";
 import {useRouter} from "next/navigation";
+import * as React from "react";
+
+import {getLocale, initI18n, setLocale} from "@/lib/i18n";
 
 /**
  * Small EN/FR language toggle for the header.
@@ -20,7 +21,9 @@ export function LanguageToggle({className = ""}: { className?: string }) {
     }, []);
 
     const switchTo = (l: "en" | "fr") => {
-        if (l === locale) return;
+        if (l === locale) {
+            return;
+        }
         setLocale(l);
         setLoc(l);
         // Trigger a soft refresh so components reading `t()` re-render

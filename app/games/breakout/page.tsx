@@ -4,8 +4,11 @@ import dynamic from "next/dynamic";
 import {useEffect, useState} from "react";
 
 import {GameShell} from "@/components/games/GameShell";
+import LocalLeaderboard, {submitLocalScore} from "@/components/games/LocalLeaderboard";
+import StatsPanel from "@/components/games/StatsPanel";
 import MiniBoard from "@/components/leaderboards/MiniBoard";
 import {useAuth} from "@/contexts/AuthContext";
+import {useProfile} from "@/contexts/ProfileContext";
 import {submitScore} from "@/lib/graphql/queries";
 
 const BreakoutGame = dynamic(
@@ -21,40 +24,51 @@ const BreakoutGame = dynamic(
 );
 
 export default function BreakoutGamePage() {
+    const {profile, updateStat} = useProfile();
     const [seed, setSeed] = useState(0);
     const {user} = useAuth();
 
-  useEffect(() => {
-      const handler = async (e: Event) => {
-          const detail = (e as CustomEvent).detail as
-              | { score?: number }
-              | undefined;
-          const score = detail?.score ?? 0;
-          if (user && score > 0) {
-              try {
-                  await submitScore({
-                      gameType: "BREAKOUT",
-                      score,
-                      metadata: {client: "web"},
-                  });
-              } catch (err) {
-                  console.warn("submitScore failed (BREAKOUT)", err);
-              }
-      }
-    };
-      window.addEventListener("breakout:gameover", handler as EventListener);
-      window.addEventListener("game:gameover", handler as EventListener);
-    return () => {
-        window.removeEventListener("breakout:gameover", handler as EventListener);
-        window.removeEventListener("game:gameover", handler as EventListener);
-    };
-  }, [user]);
+    useEffect(() => {
+        const handler = async (e: Event) => {
+            const detail = (e as CustomEvent).detail as
+                | { score?: number }
+                | undefined;
+            const score = detail?.score ?? 0;
+
+            // Local stats update
+            updateStat("breakout", {
+                lastScore: score,
+                sessions: 1,
+            });
+            submitLocalScore("breakout", profile.nickname, score);
+
+            if (user && score > 0) {
+                try {
+                    await submitScore({
+                        gameType: "BREAKOUT",
+                        score,
+                        metadata: {client: "web"},
+                    });
+                } catch (err) {
+                    console.warn("submitScore failed (BREAKOUT)", err);
+                }
+            }
+        };
+        window.addEventListener("breakout:gameover", handler as EventListener);
+        window.addEventListener("game:gameover", handler as EventListener);
+        return () => {
+            window.removeEventListener("breakout:gameover", handler as EventListener);
+            window.removeEventListener("game:gameover", handler as EventListener);
+        };
+    }, [user, profile.nickname, updateStat]);
 
     return (
         <GameShell
             ariaLabel="Breakout game"
             tips="Move with mouse or arrows • Space to pause/resume"
-            onRestartAction={() => setSeed((s) => s + 1)}
+            onRestartAction={() => {
+                setSeed((s) => s + 1);
+            }}
             preloadSounds={[
                 {key: "paddle", url: "/sounds/paddle.mp3"},
                 {key: "brickHit", url: "/sounds/brick-hit.mp3"},
@@ -68,8 +82,13 @@ export default function BreakoutGamePage() {
             ]}
         >
             <BreakoutGame key={seed}/>
-            <div className="px-4">
-                <MiniBoard gameType="BREAKOUT" limit={10}/>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 px-4 pb-8 text-foreground">
+                <StatsPanel gameSlug="breakout"/>
+                <div className="flex flex-col gap-4">
+                    <LocalLeaderboard gameSlug="breakout"/>
+                    <MiniBoard gameType="BREAKOUT" limit={10}/>
+                </div>
             </div>
         </GameShell>
     );

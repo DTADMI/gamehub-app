@@ -1,11 +1,11 @@
 // Minimal i18n utility for client components (EN/FR, per-title namespaces)
 // NOTE: Keep lightweight — no heavy runtime libs.
-import tme_en from "../i18n/toymaker-escape/en.json";
-import tme_fr from "../i18n/toymaker-escape/fr.json";
 import rod_en from "../i18n/rite-of-discovery/en.json";
 import rod_fr from "../i18n/rite-of-discovery/fr.json";
 import sys_en from "../i18n/systems-discovery/en.json";
 import sys_fr from "../i18n/systems-discovery/fr.json";
+import tme_en from "../i18n/toymaker-escape/en.json";
+import tme_fr from "../i18n/toymaker-escape/fr.json";
 
 type Dict = Record<string, any>;
 
@@ -31,11 +31,17 @@ const dictionaries: Record<"en" | "fr", Dict> = {
 let currentLocale: keyof typeof dictionaries = "en";
 
 export function detectLang(): "en" | "fr" {
-  if (typeof window === "undefined") return currentLocale;
+  if (typeof window === "undefined") {
+    return currentLocale;
+  }
   const stored = window.localStorage.getItem("lang");
-  if (stored === "en" || stored === "fr") return stored;
+  if (stored === "en" || stored === "fr") {
+    return stored;
+  }
   const nav = (navigator?.language || "en").toLowerCase();
-  if (nav.startsWith("fr")) return "fr";
+  if (nav.startsWith("fr")) {
+    return "fr";
+  }
   return "en";
 }
 

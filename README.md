@@ -495,6 +495,9 @@ Routing and prerendering notes:
 
 ### Game controls (quick reference)
 
+- Profiles: Manage your nickname and avatar in `/settings`. Choice persists locally.
+- Stats: View your high score, last score, and total sessions per game on the respective game pages.
+- Local Leaderboards: Compete with yourself or friends locally. Top 10 scores are saved per game.
 - Snake: Swipe (default on touch), optional Joystick/D‑pad/Taps; Arrows on keyboard; Space to pause/resume; Space after
   Game Over to restart. Swipe/touch events prevent page scroll during interaction.
 - Breakout: Move with Arrow keys by default; optional Mouse control via a toggle under the canvas. Space to

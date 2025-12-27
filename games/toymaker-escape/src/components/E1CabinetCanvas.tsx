@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
 import {GameEngine} from "@games/shared/pointclick/core/Engine";
+import React from "react";
 
 /**
  * Minimal canvas wrapper to exercise InputManager macro registration for TME E1 cabinet wall.
@@ -28,7 +28,9 @@ export function E1CabinetCanvas({
 
     React.useEffect(() => {
         const canvas = canvasRef.current;
-        if (!canvas) return;
+        if (!canvas) {
+            return;
+        }
 
         // Create engine
         const engine = new GameEngine({

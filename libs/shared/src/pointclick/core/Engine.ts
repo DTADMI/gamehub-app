@@ -1,14 +1,14 @@
-import {SceneManager} from './SceneManager';
-import {AssetManager} from './AssetManager';
-import {InputManager} from './InputManager';
-import {StateManager} from './StateManager';
-import {AnimationManager} from './AnimationManager';
-import {EventSystem} from '../utils/EventSystem';
-import {PluginDefinition, PluginManager} from './PluginManager';
+import {AchievementPlugin} from "../plugins/AchievementPlugin";
 import {DialoguePlugin} from "../plugins/DialoguePlugin";
 import {InventoryPlugin} from "../plugins/InventoryPlugin";
-import {AchievementPlugin} from "../plugins/AchievementPlugin";
 import {AssetDefinition} from '../types';
+import {EventSystem} from '../utils/EventSystem';
+import {AnimationManager} from './AnimationManager';
+import {AssetManager} from './AssetManager';
+import {InputManager} from './InputManager';
+import {PluginDefinition, PluginManager} from './PluginManager';
+import {SceneManager} from './SceneManager';
+import {StateManager} from './StateManager';
 
 export class GameEngine {
     // Core systems
@@ -104,7 +104,9 @@ export class GameEngine {
     }
 
     private gameLoop(timestamp: number) {
-        if (!this.isRunning) return;
+        if (!this.isRunning) {
+            return;
+        }
 
         const deltaTime = Math.min((timestamp - this.lastTime) / 1000, 0.1); // Cap delta time
         this.lastTime = timestamp;

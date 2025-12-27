@@ -42,7 +42,9 @@ export function inBounds(x: number, y: number, w: number, h: number) {
 }
 
 export function createPipesState(width: number, height: number, grid: Tile[]): PipesState {
-    if (grid.length !== width * height) throw new Error("grid size mismatch");
+    if (grid.length !== width * height) {
+        throw new Error("grid size mismatch");
+    }
     return evaluatePipes({width, height, grid: grid.map((t) => ({...t})), solved: false});
 }
 
@@ -56,7 +58,9 @@ export function setTileRotation(state: PipesState, x: number, y: number, rotatio
 export function toggleValve(state: PipesState, x: number, y: number, open: boolean): PipesState {
     const idx = indexOf(x, y, state.width);
     const t = state.grid[idx];
-    if (t.type !== "valve") return state;
+    if (t.type !== "valve") {
+        return state;
+    }
     const grid = state.grid.slice();
     grid[idx] = {...t, open};
     return evaluatePipes({...state, grid});
@@ -107,7 +111,9 @@ function sidesFor(tile: Tile): Dir[] {
         }
         case "valve": {
             // behaves like straight with gate; if closed, no sides
-            if (!tile.open) return [];
+            if (!tile.open) {
+                return [];
+            }
             return (rot / 90) % 2 === 0 ? ["left", "right"] : ["up", "down"];
         }
         default:
@@ -153,10 +159,16 @@ export function evaluatePipes(state: PipesState): PipesState {
     const sources: number[] = [];
     const sinks: number[] = [];
     for (let i = 0; i < grid.length; i++) {
-        if (grid[i].source) sources.push(i);
-        if (grid[i].sink) sinks.push(i);
+        if (grid[i].source) {
+            sources.push(i);
+        }
+        if (grid[i].sink) {
+            sinks.push(i);
+        }
     }
-    if (sinks.length === 0 || sources.length === 0) return {...state, solved: false};
+    if (sinks.length === 0 || sources.length === 0) {
+        return {...state, solved: false};
+    }
 
     // BFS from all sources across valid pipe connections
     const visited = new Set<number>();

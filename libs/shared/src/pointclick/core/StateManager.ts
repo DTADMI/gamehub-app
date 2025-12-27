@@ -91,7 +91,9 @@ export class StateManager {
     }
 
     undo(): boolean {
-        if (this.history.length === 0) return false;
+        if (this.history.length === 0) {
+            return false;
+        }
 
         const lastChange = this.history.pop();
         if (lastChange) {
@@ -117,7 +119,9 @@ export class StateManager {
 
     load(slot: string = 'default'): boolean {
         const saveData = localStorage.getItem(`game:state:${slot}`);
-        if (!saveData) return false;
+        if (!saveData) {
+            return false;
+        }
 
         try {
             const {state} = JSON.parse(saveData);
