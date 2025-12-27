@@ -37,6 +37,15 @@ export const PROJECTS: Project[] = [
         url: "https://github.com/DTADMI/velvet-galaxy",
         featured: true,
     },
+    {
+        id: "libra-keeper",
+        title: "LibraKeeper",
+        description:
+            "A personal library management system that helps you track your books and other items, manage lending to friends, and keep your collection organized.",
+        image: "https://picsum.photos/seed/libra-keeper/1280/1280",
+        url: "https://github.com/DTADMI/libra-keeper",
+        featured: true,
+    },
 ];
 
 export const FEATURED_PROJECTS: Project[] = PROJECTS.filter((p) => p.featured);

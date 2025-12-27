@@ -1453,6 +1453,9 @@ Accessibility notes (BOD):
   - Repo: https://github.com/DTADMI/quest-hunt
   - Stack highlights: Next.js 14, TypeScript, Tailwind (shadcn/ui), MapLibre (OpenStreetMap), Supabase (Postgres +
     PostGIS, Auth, Storage, Realtime), Drizzle ORM, REST + WebSockets, Vercel, GitHub Actions, Sentry.
+- LibraKeeper — A personal library management system that helps you track your books and other items, manage lending to
+  friends, and keep your collection organized.
+  - Repo: https://github.com/DTADMI/libra-keeper
 
 Example — Pipes/flow puzzle (logic only)
 
