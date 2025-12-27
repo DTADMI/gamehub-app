@@ -36,9 +36,9 @@ describe("gears puzzle primitive", () => {
         );
         expect(s.solved).toBe(true);
 
-        // Change idler teeth breaks the ratio
+        // Change idler teeth DOES NOT break the ratio in a simple mesh (idler teeth cancel out)
         s = setGearsTeeth(s, "idle", 20);
         s = evaluateGears(s);
-        expect(s.solved).toBe(false);
+        expect(s.solved).toBe(true);
     });
 });

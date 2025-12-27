@@ -1,11 +1,37 @@
 {
   "rod": {
     "intro": {
-      "title": "Rite of Discovery",
-      "p1": "Une soirée curieuse commence.",
+      "title": "Rite of Discovery — Intro",
+      "p1": "Une tradition familiale. Un choix discret. Ce soir, cela commence.",
       "p2": "Soyez attentif aux détails — ils peuvent guider vos choix.",
       "cta": "Commencer",
       "skip": "Passer l'intro"
+    },
+    "hallway": {
+      "title": "Le couloir sombre",
+      "body": "Une lourde porte métallique bloque votre chemin. Un pavé numérique luit faiblement.",
+      "goBack": "Retourner"
+    },
+    "keypad": {
+      "title": "Serrure à code",
+      "body": "Entrez le code à 4 chiffres trouvé sur le vieux parchemin.",
+      "back": "Retour",
+      "input": "Entrée :",
+      "clear": "Effacer",
+      "submit": "Valider",
+      "unlocked": "Déverrouillé"
+    },
+    "wires": {
+      "title": "Panneau de maintenance",
+      "body": "Des fils dénudés bourdonnent d'énergie. Connectez-les correctement pour restaurer la lumière.",
+      "back": "Retour",
+      "solved": "Fils : Résolu",
+      "connect": "Connecter"
+    },
+    "chamber": {
+      "title": "La chambre intérieure",
+      "body": "L'air est immobile ici. Vous avez passé la première épreuve.",
+      "restart": "Recommencer"
     }
   }
 }

@@ -2,7 +2,184 @@
   "sysdisc": {
     "intro": {
       "title": "Systems Discovery",
-      "body": "Explore simple systems."
+      "p1": "Systems are all around us.",
+      "p2": "Explore how parts work together to create a whole.",
+      "cta": "Begin",
+      "skip": "Skip intro"
+    },
+    "b1": {
+      "title": "Closing the Loop",
+      "prompt": "Complete the cycle by activating steps in order.",
+      "hint": "Gentle hint: Kitchen -> Compost -> Soil -> Herbs.",
+      "steps": {
+        "kitchen": "Kitchen Scraps",
+        "compost": "Compost Bin",
+        "soil": "Rich Soil",
+        "herbs": "Fresh Herbs"
+      },
+      "continue": "Continue"
+    },
+    "b2": {
+      "title": "Route Planning",
+      "prompt": "Choose your primary transport mode.",
+      "busFirst": "Bus focus",
+      "bikeFirst": "Bike focus"
+    },
+    "b3": {
+      "title": "Waste Sorting",
+      "prompt": "Sort the items into the correct bins.",
+      "hintsOn": "Hints: ON",
+      "hintsOff": "Hints: OFF",
+      "hintDetail": "Organic goes to green, plastic to blue, paper to yellow.",
+      "items": {
+        "banana": "Banana Peel",
+        "bottle": "Plastic Bottle",
+        "paper": "Newspaper"
+      },
+      "reveal": "Finish Episode"
+    },
+    "wrap": {
+      "title": "Systems Explored",
+      "done": "You've successfully mapped the core systems.",
+      "b1": "Loop",
+      "b2": "Plan",
+      "b3": "Sorting"
+    },
+    "outro": {
+      "title": "Discovery Complete",
+      "p1": "You have a better understanding of how these systems interact.",
+      "recap": "Final choices",
+      "replay": "Replay Episode",
+      "altPlan": "Try alternative plan",
+      "toggleHints": "Toggle hints"
+    },
+    "bod": {
+      "common": {
+        "continue": "Continue",
+        "reveal": "Finish trial",
+        "home": "Back to Hub",
+        "replay": "Replay"
+      },
+      "breath": {
+        "intro": {
+          "title": "Body Systems: Breath",
+          "p1": "Oxygen is the fuel for every cell in your body.",
+          "cta": "Start simulation",
+          "skip": "Skip intro"
+        },
+        "bb1": {
+          "title": "Oxygen Flow",
+          "prompt": "Connect the airway to restore oxygen flow to the tissues."
+        },
+        "bb2": {
+          "title": "Gas Exchange",
+          "prompt": "Monitor homeostasis as gases move across membranes."
+        },
+        "bb3": {
+          "title": "Regulation",
+          "prompt": "Maintain balance under changing conditions."
+        },
+        "outro": {
+          "title": "Respiration Restored",
+          "p1": "The system is stable and oxygenating efficiently."
+        }
+      },
+      "fuel": {
+        "intro": {
+          "title": "Body Systems: Fuel",
+          "p1": "Nutrients must be broken down and transported.",
+          "cta": "Start simulation",
+          "skip": "Skip intro"
+        },
+        "bf1": {
+          "title": "Digestion",
+          "prompt": "Break down complex molecules into simple fuel."
+        },
+        "bf2": {
+          "title": "Absorption",
+          "prompt": "Transport nutrients into the bloodstream."
+        },
+        "bf3": {
+          "title": "Storage",
+          "prompt": "Manage energy reserves for future use."
+        },
+        "outro": {
+          "title": "Fueling Complete",
+          "p1": "The body has the energy it needs to function."
+        }
+      },
+      "move": {
+        "intro": {
+          "title": "Body Systems: Move",
+          "p1": "Muscles and bones work in concert.",
+          "cta": "Start simulation",
+          "skip": "Skip intro"
+        },
+        "bm1": {
+          "title": "Contraction",
+          "prompt": "Coordinate muscle fibers for precise movement."
+        },
+        "bm2": {
+          "title": "Support",
+          "prompt": "Leverage the skeletal structure for strength."
+        },
+        "bm3": {
+          "title": "Locomotion",
+          "prompt": "Achieve complex movement patterns."
+        },
+        "outro": {
+          "title": "Movement Mastered",
+          "p1": "The system is agile and responsive."
+        }
+      },
+      "signal": {
+        "intro": {
+          "title": "Body Systems: Signal & Defend",
+          "p1": "Rapid communication and robust protection.",
+          "cta": "Start simulation",
+          "skip": "Skip intro"
+        },
+        "bsd1": {
+          "title": "Transmission",
+          "prompt": "Send electrical signals across neural pathways."
+        },
+        "bsd2": {
+          "title": "Immunity",
+          "prompt": "Identify and neutralize external threats."
+        },
+        "bsd3": {
+          "title": "Reaction",
+          "prompt": "Coordinate systemic responses to stimuli."
+        },
+        "outro": {
+          "title": "Signals Clear",
+          "p1": "Communication is fast and the body is protected."
+        }
+      },
+      "grow": {
+        "intro": {
+          "title": "Body Systems: Grow",
+          "p1": "Cells divide and specialize over time.",
+          "cta": "Start simulation",
+          "skip": "Skip intro"
+        },
+        "bg1": {
+          "title": "Mitosis",
+          "prompt": "Guide cellular replication for growth and repair."
+        },
+        "bg2": {
+          "title": "Differentiation",
+          "prompt": "Specialized cells form tissues and organs."
+        },
+        "bg3": {
+          "title": "Maturity",
+          "prompt": "Reach optimal systemic complexity."
+        },
+        "outro": {
+          "title": "Growth Sustained",
+          "p1": "The system has developed according to its blueprint."
+        }
+      }
     }
   }
 }

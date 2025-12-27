@@ -1,5 +1,18 @@
 {
   "tme": {
+    "intro": {
+      "title": "Toymaker Escape",
+      "prompt": "Choisissez votre approche.",
+      "gears": "Engrenages",
+      "music": "Musique"
+    },
+    "intro2": {
+      "title": "Toymaker Escape",
+      "p1": "Un soir tard dans l'atelier.",
+      "p2": "Quelque chose cloche…",
+      "cta": "Commencer",
+      "skip": "Passer l'intro"
+    },
     "e1": {
       "title": "Toymaker Escape — Épisode 1",
       "body": "Un atelier silencieux. Les indices se cachent à vue d'œil.",

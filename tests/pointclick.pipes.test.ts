@@ -30,30 +30,38 @@ describe("pipes/flow puzzle", () => {
         expect(s.solved).toBe(true);
     });
 
-    it("detects an open-end leak (elbow pointing to empty/outside)", () => {
+    it("detects an open-end leak (elbow pointing to empty)", () => {
         const grid: Tile[] = [
-            {type: "elbow", rotation: 0, source: true}, // up-right
-            {type: "elbow", rotation: 270, sink: true}, // left-up
+            {type: "elbow", rotation: 90, source: true}, // right-down
+            {type: "elbow", rotation: 270, sink: true}, // left-up (points at 1,0 and 1,-1)
             {type: "empty", rotation: 0},
+            {type: "straight", rotation: 90}, // vertical at 1,1
         ];
-        // 3x1 doesn't make sense for elbows; expect unsolved due to leaks
-        const s = createPipesState(3, 1, grid);
+        // 2x2 grid
+        // (0,0) source elbow RD -> (1,0) sink elbow LU
+        // (0,0) also points down to (0,1) which is empty
+        const s = createPipesState(2, 2, grid);
         expect(s.solved).toBe(false);
     });
 
     it("supports turning tiles to achieve connectivity", () => {
-        // 2x2: source at (0,0) elbow to (1,0) straight down to sink at (1,1)
+        // 2x2: source at (0,0) sink at (1,1)
         const grid: Tile[] = [
-            {type: "elbow", rotation: 0, source: true}, // up-right (need right-down)
-            {type: "straight", rotation: 0}, // up-down
-            {type: "empty", rotation: 0},
-            {type: "endcap", rotation: 0, sink: true}, // needs up
+            {type: "elbow", rotation: 0, source: true}, // (0,0)
+            {type: "elbow", rotation: 0},               // (1,0)
+            {type: "endcap", rotation: 0},              // (0,1)
+            {type: "endcap", rotation: 0, sink: true},  // (1,1)
         ];
         let s = createPipesState(2, 2, grid);
         expect(s.solved).toBe(false);
-        s = setTileRotation(s, 0, 0, 90); // elbow right-down
-        s = setTileRotation(s, 1, 0, 90); // straight left-right
-        s = setTileRotation(s, 1, 1, 270); // endcap 'up'
+
+        // Target Path: (0,0) RD -> (1,0) LD -> (1,1) U
+        // Also (0,0) RD also points D to (0,1) U (endcap)
+        s = setTileRotation(s, 0, 0, 90);  // (0,0) elbow right-down
+        s = setTileRotation(s, 1, 0, 180); // (1,0) elbow down-left
+        s = setTileRotation(s, 1, 1, 0);   // (1,1) endcap up
+        s = setTileRotation(s, 0, 1, 0);   // (0,1) endcap up
+
         s = evaluatePipes(s);
         expect(s.solved).toBe(true);
     });

@@ -1,11 +1,37 @@
 {
   "rod": {
     "intro": {
-      "title": "Rite of Discovery",
-      "p1": "A curious evening begins.",
+      "title": "Rite of Discovery — Intro",
+      "p1": "A family tradition. A quiet choice. Tonight it begins.",
       "p2": "Pay attention to details — they might guide your choices.",
       "cta": "Begin",
       "skip": "Skip intro"
+    },
+    "hallway": {
+      "title": "The Dim Hallway",
+      "body": "A heavy metal door blocks your path. A keypad glows faintly.",
+      "goBack": "Go back"
+    },
+    "keypad": {
+      "title": "Keypad Lock",
+      "body": "Enter the 4-digit code found on the old parchment.",
+      "back": "Back",
+      "input": "Input:",
+      "clear": "Clear",
+      "submit": "Submit",
+      "unlocked": "Unlocked"
+    },
+    "wires": {
+      "title": "Maintenance Panel",
+      "body": "Exposed wires hum with power. Connect them correctly to restore light.",
+      "back": "Back",
+      "solved": "Wires: Solved",
+      "connect": "Connect"
+    },
+    "chamber": {
+      "title": "The Inner Chamber",
+      "body": "The air is still here. You've passed the first trial.",
+      "restart": "Restart"
     }
   }
 }

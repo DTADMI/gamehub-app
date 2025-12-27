@@ -2,7 +2,184 @@
   "sysdisc": {
     "intro": {
       "title": "Systems Discovery",
-      "body": "Explorez des systèmes simples."
+      "p1": "Les systèmes sont tout autour de nous.",
+      "p2": "Découvrez comment les parties travaillent ensemble pour former un tout.",
+      "cta": "Commencer",
+      "skip": "Passer l'intro"
+    },
+    "b1": {
+      "title": "Boucler la boucle",
+      "prompt": "Complétez le cycle en activant les étapes dans l'ordre.",
+      "hint": "Indice : Cuisine -> Compost -> Terreau -> Herbes.",
+      "steps": {
+        "kitchen": "Restes de cuisine",
+        "compost": "Bac à compost",
+        "soil": "Terreau riche",
+        "herbs": "Herbes fraîches"
+      },
+      "continue": "Continuer"
+    },
+    "b2": {
+      "title": "Planification d'itinéraire",
+      "prompt": "Choisissez votre mode de transport principal.",
+      "busFirst": "Priorité bus",
+      "bikeFirst": "Priorité vélo"
+    },
+    "b3": {
+      "title": "Tri des déchets",
+      "prompt": "Triez les articles dans les bons bacs.",
+      "hintsOn": "Indices : OUI",
+      "hintsOff": "Indices : NON",
+      "hintDetail": "L'organique va dans le vert, le plastique dans le bleu, le papier dans le jaune.",
+      "items": {
+        "banana": "Peau de banane",
+        "bottle": "Bouteille en plastique",
+        "paper": "Journal"
+      },
+      "reveal": "Terminer l'épisode"
+    },
+    "wrap": {
+      "title": "Systèmes explorés",
+      "done": "Vous avez cartographié avec succès les systèmes de base.",
+      "b1": "Boucle",
+      "b2": "Plan",
+      "b3": "Tri"
+    },
+    "outro": {
+      "title": "Découverte terminée",
+      "p1": "Vous comprenez mieux comment ces systèmes interagissent.",
+      "recap": "Choix finaux",
+      "replay": "Rejouer l'épisode",
+      "altPlan": "Essayer l'autre plan",
+      "toggleHints": "Afficher/masquer indices"
+    },
+    "bod": {
+      "common": {
+        "continue": "Continuer",
+        "reveal": "Terminer l'épreuve",
+        "home": "Retour au Hub",
+        "replay": "Rejouer"
+      },
+      "breath": {
+        "intro": {
+          "title": "Systèmes du corps : Souffle",
+          "p1": "L'oxygène est le carburant de chaque cellule de votre corps.",
+          "cta": "Lancer simulation",
+          "skip": "Passer l'intro"
+        },
+        "bb1": {
+          "title": "Flux d'oxygène",
+          "prompt": "Reliez les voies respiratoires pour restaurer le flux d'oxygène vers les tissus."
+        },
+        "bb2": {
+          "title": "Échange gazeux",
+          "prompt": "Surveillez l'homéostasie pendant que les gaz traversent les membranes."
+        },
+        "bb3": {
+          "title": "Régulation",
+          "prompt": "Maintenez l'équilibre dans des conditions changeantes."
+        },
+        "outro": {
+          "title": "Respiration restaurée",
+          "p1": "Le système est stable et l'oxygénation est efficace."
+        }
+      },
+      "fuel": {
+        "intro": {
+          "title": "Systèmes du corps : Énergie",
+          "p1": "Les nutriments doivent être décomposés et transportés.",
+          "cta": "Lancer simulation",
+          "skip": "Passer l'intro"
+        },
+        "bf1": {
+          "title": "Digestion",
+          "prompt": "Décomposez les molécules complexes en carburant simple."
+        },
+        "bf2": {
+          "title": "Absorption",
+          "prompt": "Transportez les nutriments dans le sang."
+        },
+        "bf3": {
+          "title": "Stockage",
+          "prompt": "Gérez les réserves d'énergie pour une utilisation future."
+        },
+        "outro": {
+          "title": "Alimentation terminée",
+          "p1": "Le corps a l'énergie dont il a besoin pour fonctionner."
+        }
+      },
+      "move": {
+        "intro": {
+          "title": "Systèmes du corps : Mouvement",
+          "p1": "Les muscles et les os travaillent de concert.",
+          "cta": "Lancer simulation",
+          "skip": "Passer l'intro"
+        },
+        "bm1": {
+          "title": "Contraction",
+          "prompt": "Coordonnez les fibres musculaires pour un mouvement précis."
+        },
+        "bm2": {
+          "title": "Soutien",
+          "prompt": "Exploitez la structure squelettique pour la force."
+        },
+        "bm3": {
+          "title": "Locomotion",
+          "prompt": "Réalisez des schémas de mouvement complexes."
+        },
+        "outro": {
+          "title": "Mouvement maîtrisé",
+          "p1": "Le système est agile et réactif."
+        }
+      },
+      "signal": {
+        "intro": {
+          "title": "Systèmes du corps : Signal & Défense",
+          "p1": "Communication rapide et protection robuste.",
+          "cta": "Lancer simulation",
+          "skip": "Passer l'intro"
+        },
+        "bsd1": {
+          "title": "Transmission",
+          "prompt": "Envoyez des signals électriques via les voies neuronales."
+        },
+        "bsd2": {
+          "title": "Immunité",
+          "prompt": "Identifiez et neutralisez les menaces extérieures."
+        },
+        "bsd3": {
+          "title": "Réaction",
+          "prompt": "Coordonnez les réponses systémiques aux stimuli."
+        },
+        "outro": {
+          "title": "Signaux clairs",
+          "p1": "La communication est rapide et le corps est protégé."
+        }
+      },
+      "grow": {
+        "intro": {
+          "title": "Systèmes du corps : Croissance",
+          "p1": "Les cellules se divisent et se spécialisent avec le temps.",
+          "cta": "Lancer simulation",
+          "skip": "Passer l'intro"
+        },
+        "bg1": {
+          "title": "Mitose",
+          "prompt": "Guidez la réplication cellulaire pour la croissance et la réparation."
+        },
+        "bg2": {
+          "title": "Différenciation",
+          "prompt": "Les cellules spécialisées forment des tissus et des organes."
+        },
+        "bg3": {
+          "title": "Maturité",
+          "prompt": "Atteignez une complexité systémique optimale."
+        },
+        "outro": {
+          "title": "Croissance soutenue",
+          "p1": "Le système s'est développé selon son plan."
+        }
+      }
     }
   }
 }

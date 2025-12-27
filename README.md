@@ -373,10 +373,13 @@ g = setTeeth(g, "out", 30);
 g.solved; // false
 ```
 
-E2E golden path example (Toymaker Escape E1)
+E2E golden path coverage
 
-- A Playwright smoke covers a minimal “golden path” for E1: it opens the pipes valve to solve the gate, then performs a
-  long‑press→drag on the scuff area to reveal the latch. See `tests-e2e/tme-e1-golden.spec.ts`.
+- Toymaker Escape E1: `tests-e2e/tme-e1-golden.spec.ts` covers solving the pipes gate and performing a
+  long‑press→drag on the scuff area to reveal the latch.
+- Rite of Discovery: `tests-e2e/rod-golden.spec.ts` covers the intro, keypad 1234, wires connection, and reaching the
+  Inner Chamber.
+- Systems Discovery: `tests-e2e/sysdisc-golden.spec.ts` covers the Core pack's loop, planning, and sorting.
 
 #### E1 Golden Path (details)
 

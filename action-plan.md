@@ -104,33 +104,33 @@ Legend: ✅ Completed • 🟡 In Progress • 🔜 Next • 🗂️ Backlog
   - ✅ Persistence helpers: versioned save helpers + migration stubs for `rod:save:v1`, `tme:save:v1`,
     `sysdisc:save:v1`. ✓
 
-- 🟡 Game implementation (parallel TME → ROD → SD):
+- ✅ Game implementation (parallel TME → ROD → SD):
   - TME (Episode 1)
     - ✅ Gears mesh mini + medals; inventory use on hotspot ✓
     - ✅ Sorter mini (tap/drag) with reduced‑motion path ✓
-    - [ ] EN/FR final copy pass; captions and a11y review
+    - ✅ EN/FR final copy pass; captions and a11y review ✓
   - ROD
     - ✅ Keypad door + wires/connectors puzzle; guarded choices with flags ✓
-    - [ ] EN/FR strings, inventory 0–3, captions region, reduced‑motion
+    - ✅ EN/FR strings, inventory 0–3, captions region, reduced‑motion ✓
   - SD (Core + Body Systems: Breath, Fuel, Move, Signal, Grow)
     - ✅ Implement simple educational variants using primitives (e.g. Pipes for Breath); EN/FR copy ✓
-    - [ ] Local saves, badges per pack
+    - ✅ Local saves, badges per pack ✓
 
 - ✅ Tests & CI
   - ✅ Unit tests for each puzzle primitive (keypad, sequence, wires, gears, pipes). ✓
   - ✅ Scene graph/progression unit tests (guards/effects) and Scene Services tests (timers/cutscene/blackboard). ✓
-  - [ ] Playwright E2E smokes per title path (one golden path each: ROD, TME, SD).
+  - ✅ Playwright E2E smokes per title path (one golden path each: ROD, TME, SD). ✓
 
-- 🟡 Docs & Assets
-  - [ ] README — engine overview and examples (expand with Scene Services + primitives usage). *
-  - [x] docs/ — per‑game scene & puzzle briefs with steps/hints/assets (TME E1 updated with filenames). ✓
-  - [x] Narrative puzzle cleverness pass (observation, environmental clues) — focus TME E1 first ✓ plan approved ✓
-  - [x] Add designer briefs for TME E1 (scenes, objects, props, audio, VFX) with asset lists + filenames (EN/FR). ✓
+- ✅ Docs & Assets
+  - ✅ README — engine overview and examples (expand with Scene Services + primitives usage). ✓
+  - ✅ docs/ — per‑game scene & puzzle briefs with steps/hints/assets (TME E1 updated with filenames). ✓
+  - ✅ Narrative puzzle cleverness pass (observation, environmental clues) — focus TME E1 first ✓ plan approved ✓
+  - ✅ Add designer briefs for TME E1 (scenes, objects, props, audio, VFX) with asset lists + filenames (EN/FR). ✓
   - [ ] public/credits.md — add placeholder asset credits as needed
 
-- 🟡 Localization & Settings
-  - [x] EN/FR flat JSON per title; tiny i18n helper with persistence in localStorage. ✓
-  - [x] Language switch in header with persistence; in-game header toggle; E2E smoke added. ✓
+- ✅ Localization & Settings
+  - ✅ EN/FR flat JSON per title; tiny i18n helper with persistence in localStorage. ✓
+  - ✅ Language switch in header with persistence; in-game header toggle; E2E smoke added. ✓
 
 Notes: Frontend‑only MVPs; EN/FR localization; accessibility guardrails; mobile‑first ≥44px targets; local saves.
 
@@ -159,16 +159,16 @@ wires, pipes, and gesture macros. Maintain a11y parity and reduced-motion.
 
 ### Implementation tasks
 
-- [ ] Update TME E1 scene data to remove overt keypad hint and add decor-based clues.
+- [x] Update TME E1 scene data to remove overt keypad hint and add decor-based clues. ✓
 - [x] Implement wires/connectors logic integration in TME E1 scene. ✓
 - [x] Implement pipes/flow logic and minimal UI wrapper; add reduced-motion path (static highlight/text). ✓
-- [ ] Extend gears mini with tolerance + decor hint states.
 - [x] Extend gears mini with tolerance + decor hint states. ✓
 - [x] Register input macro `holdThenDrag` to reveal hidden latch hotspot; update blackboard flags. ✓
 - [x] Persist discovered clues/solves in `tme:save:v1`. ✓
 - [x] Unit tests: sequence, wires, gears, pipes; scene progression for TME E1 (logic units added for pipes; others
   present). ✓
-- [x] Playwright smoke (desktop + Pixel 5) golden path solving at least one optional hint. ✓
+- [x] Playwright smoke (desktop + Pixel 5) golden path solving at least one optional hint (added ROD and SD smokes too).
+  ✓
 - [x] Docs: README section "Designing clever puzzles" and `docs/narrative/scene-puzzles.md` with TME E1 briefs. ✓
 
 ### Designer brief — assets & scene description (summary)
