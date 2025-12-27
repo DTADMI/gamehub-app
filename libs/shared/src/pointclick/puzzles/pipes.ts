@@ -72,7 +72,7 @@ function sidesFor(tile: Tile): Dir[] {
             return [];
         case "straight": {
             // up<->down at 0; right<->left at 90
-            return rot % 180 === 0 ? ["up", "down"] : ["left", "right"];
+            return (rot / 90) % 2 === 0 ? ["up", "down"] : ["left", "right"];
         }
         case "elbow": {
             // up-right at 0; rotate accordingly
@@ -103,7 +103,7 @@ function sidesFor(tile: Tile): Dir[] {
         case "valve": {
             // behaves like straight with gate; if closed, no sides
             if (!tile.open) return [];
-            return rot % 180 === 0 ? ["up", "down"] : ["left", "right"];
+            return (rot / 90) % 2 === 0 ? ["up", "down"] : ["left", "right"];
         }
     }
 }

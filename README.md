@@ -138,8 +138,11 @@ Notes:
 - These are Betas: visuals use minimal placeholders; accessibility is implemented (focus/targets, captions region,
   volume control);
   state persists under `rod:save:v1`, `sysdisc:save:v1`, and `tme:save:v1`.
-- Toymaker Escape E1 includes an interactive gears mini and a sorter; medals are awarded per route/hints.
-- Systems Discovery Core includes an ordered loop, a route planner with two solutions, and a waste sorter with hints.
+- [x] Toymaker Escape E1 includes an interactive gears mini and a sorter; medals are awarded per route/hints.
+- [x] Systems Discovery Core includes an ordered loop, a route planner with two solutions, and a waste sorter with
+  hints.
+- [x] Systems Discovery Body Systems (Breath) includes an oxygen flow simulation (Pipes puzzle).
+- [x] Rite of Discovery includes a keypad lock and a maintenance panel (Wires puzzle).
 - The GraphQL client targets `${NEXT_PUBLIC_API_URL.replace(/\/api$/, "")}/graphql` if used by a given screen. Ensure
   your backend serves `/api/*` REST and `/graphql` with CORS allowing `http://localhost:3000`.
 
@@ -167,6 +170,8 @@ Key parts
     during interactions.
   - `StateManager.ts`: observable key–value state with save/load/undo.
   - `AnimationManager.ts`: tiny timeline/animation helpers.
+  - `SceneServices.ts`: high-level APIs for timers, cutscenes, and per-scene blackboards.
+  - `Persistence.ts`: versioned save helpers with migration support and global settings.
 - Declarative helpers:
   - `pointclick/engine.ts`: `EngineCtx` shape (`flags`, `inventory`, `vars`), `guards` (e.g., `hasItem`, `hasFlag`),
     `effects` (e.g., `addItem`, `setFlag`), `nextScene`, `save/load`, and a tiny migration helper.

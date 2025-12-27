@@ -92,34 +92,34 @@ Legend: ✅ Completed • 🟡 In Progress • 🔜 Next • 🗂️ Backlog
 - ✅ Puzzle primitive shipped: `keypad` (+ unit test scaffold).
 - ✅ TME: integrated keypad gate in E1; local save `tme:save:v1`.
 
-- 🟡 Engine improvements to implement now (mobile‑first, complex puzzles):
-  - [x] InputSequenceDetector integration with `InputManager` for gesture macros (tap patterns, hold‑then‑drag). ✓
-  - [ ] Scene Services (API + unit tests): timers (pausable), cutscene runner, and a tiny per‑scene blackboard with
-    typed hooks. *
-  - [ ] Additional puzzle primitives (pure logic + light UI wrappers): *
-    - [ ] sequence/simon (logic, hint playback, strict mode) *
-    - [ ] wires/connectors (no crossings, target mapping, helpers) *
-    - [ ] gears ratio mesh (ratio evaluator, target match, tolerances)
-    - [ ] pipes/flow (grid pathing, leaks, goal constraints)
-  - [ ] Persistence helpers: versioned save helpers + migration stubs for `rod:save:v1`, `tme:save:v1`,
-    `sysdisc:save:v1`. *
+- ✅ Engine improvements to implement now (mobile‑first, complex puzzles):
+  - ✅ InputSequenceDetector integration with `InputManager` for gesture macros (tap patterns, hold‑then‑drag). ✓
+  - ✅ Scene Services (API + unit tests): timers (pausable), cutscene runner, and a tiny per‑scene blackboard with
+    typed hooks. ✓
+  - ✅ Additional puzzle primitives (pure logic + light UI wrappers): ✓
+    - ✅ sequence/simon (logic, hint playback, strict mode) ✓
+    - ✅ wires/connectors (no crossings, target mapping, helpers) ✓
+    - ✅ gears ratio mesh (ratio evaluator, target match, tolerances) ✓
+    - ✅ pipes/flow (grid pathing, leaks, goal constraints) ✓
+  - ✅ Persistence helpers: versioned save helpers + migration stubs for `rod:save:v1`, `tme:save:v1`,
+    `sysdisc:save:v1`. ✓
 
 - 🟡 Game implementation (parallel TME → ROD → SD):
   - TME (Episode 1)
-    - [ ] Gears mesh mini + medals; inventory use on hotspot
-    - [ ] Sorter mini (tap/drag) with reduced‑motion path
+    - ✅ Gears mesh mini + medals; inventory use on hotspot ✓
+    - ✅ Sorter mini (tap/drag) with reduced‑motion path ✓
     - [ ] EN/FR final copy pass; captions and a11y review
   - ROD
-    - [ ] Keypad door + wires/connectors puzzle; guarded choices with flags
+    - ✅ Keypad door + wires/connectors puzzle; guarded choices with flags ✓
     - [ ] EN/FR strings, inventory 0–3, captions region, reduced‑motion
   - SD (Core + Body Systems: Breath, Fuel, Move, Signal, Grow)
-    - [ ] Implement simple educational variants using primitives; EN/FR copy
+    - ✅ Implement simple educational variants using primitives (e.g. Pipes for Breath); EN/FR copy ✓
     - [ ] Local saves, badges per pack
 
-- 🟡 Tests & CI
-  - [ ] Unit tests for each puzzle primitive (keypad, sequence, wires, gears, pipes). *
-  - [ ] Scene graph/progression unit tests (guards/effects) and Scene Services tests (timers/cutscene/blackboard). *
-  - [ ] Playwright E2E smokes per title path (one golden path each: ROD, TME, SD). *
+- ✅ Tests & CI
+  - ✅ Unit tests for each puzzle primitive (keypad, sequence, wires, gears, pipes). ✓
+  - ✅ Scene graph/progression unit tests (guards/effects) and Scene Services tests (timers/cutscene/blackboard). ✓
+  - [ ] Playwright E2E smokes per title path (one golden path each: ROD, TME, SD).
 
 - 🟡 Docs & Assets
   - [ ] README — engine overview and examples (expand with Scene Services + primitives usage). *

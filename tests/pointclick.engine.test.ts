@@ -18,7 +18,7 @@ describe("pointclick engine", () => {
                     id: "guarded",
                     text: {en: "Guarded", fr: "Protégé"},
                     target: "C",
-                    guard: (ctx) => ctx.ok === true,
+                    guard: (ctx) => ctx.flags?.ok === true,
                 },
             ],
         },
@@ -36,7 +36,7 @@ describe("pointclick engine", () => {
     });
 
     it("transitions when guard passes", () => {
-        const res = nextScene("B", scenes, "guarded", {ok: true});
+        const res = nextScene("B", scenes, "guarded", {flags: {ok: true}});
         expect(res.sceneId).toBe("C");
     });
 });

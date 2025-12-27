@@ -124,5 +124,5 @@ function bfsPath(graph: Record<string, string[]>, start: string, goal: string): 
 }
 
 function nearlyEqual(a: number, b: number, eps = 1e-9): boolean {
-    return Math.abs(a - b) <= eps * Math.max(1, Math.abs(a), Math.abs(b));
+    return Math.abs(a - b) <= eps;
 }

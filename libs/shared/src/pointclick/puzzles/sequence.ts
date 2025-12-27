@@ -35,25 +35,28 @@ export function createSequenceState(
 
 export function pressSeq(state: SequenceState, sym: SeqSymbol): SequenceState {
     if (state.solved || state.failed) return state;
-    const next: SequenceState = {...state, input: [...state.input, sym]};
-    const expected = state.target[state.input.length - 1];
+    const expected = state.target[state.input.length];
+    const input = [...state.input, sym];
+    
     if (sym !== expected) {
-        const mistakes = state.mistakes + 1;
         const lives = Math.max(0, state.lives - 1);
         return {
-            ...next,
-            mistakes,
-            lives,
+            ...state,
             input: [],
             step: 0,
+            mistakes: state.mistakes + 1,
+            lives,
             failed: lives === 0,
         };
     }
-    const step = state.step + 1;
-    const solved = step === state.target.length;
+
+    const nextStep = state.input.length + 1;
+    const solved = nextStep === state.target.length;
+    
     return {
-        ...next,
-        step,
+        ...state,
+        input,
+        step: nextStep,
         solved,
     };
 }
