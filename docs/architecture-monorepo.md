@@ -89,8 +89,23 @@ A formalized monorepo using **pnpm workspaces** and **Turborepo**.
     - **Pros**: Phaser is the industry standard for web 2D games.
 - **3D Recommendation**: **Three.js** with **React Three Fiber (R3F)**.
     - **Pros**: Declarative 3D, great ecosystem.
-    - **Cons**: Performance overhead on low-end mobile.
-    - **Alternative**: Babylon.js.
+
+#### Engine Improvements for New Games
+
+To accommodate the upcoming games, the internal `@games/shared` engine requires the following modular improvements via
+plugins:
+
+1. **Time Management Plugin (`TimePlugin`)**:
+    - Required for **ChronoShift Labyrinth**.
+    - Ability to scale `deltaTime`, pause specific systems, and record state history for "time reversal" mechanics.
+2. **Multi-Character Controller**:
+    - Required for **Elemental Conflux**.
+    - Logic to switch between multiple controllable entities, each with its own state and ability set, sharing a unified
+      input stream.
+3. **Observation & State System**:
+    - Required for **Quantum Architect**.
+    - A reactive system where entity properties (quantum states) change based on being "observed" (camera viewport
+      presence or interaction).
 
 ### 5. Feature-Flagging
 

@@ -1,0 +1,233 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+    /*
+     Palette base hues (light theme defaults)
+     Order requested: purple, auburn, royal blue, emerald, royal orange, indigo, royal green, pink, red, salmon, black, white, grey
+     Values use OKLCH for consistent contrast across themes.
+    */
+    --c-purple: oklch(0.60 0.20 310);
+    --c-auburn: oklch(0.62 0.18 30); /* primary on light */
+    --c-royal-blue: oklch(0.62 0.17 265); /* accent on light */
+    --c-emerald: oklch(0.68 0.13 155);
+    --c-royal-orange: oklch(0.78 0.18 55);
+    --c-indigo: oklch(0.54 0.17 282);
+    --c-royal-green: oklch(0.70 0.10 140);
+    --c-pink: oklch(0.78 0.20 345);
+    --c-red: oklch(0.64 0.22 25);
+    --c-salmon: oklch(0.78 0.14 25);
+    --c-black: oklch(0.12 0 0);
+    --c-white: oklch(0.99 0 0);
+    --c-grey-100: oklch(0.97 0 0);
+    --c-grey-200: oklch(0.92 0 0);
+    --c-grey-300: oklch(0.86 0 0);
+    --c-grey-600: oklch(0.45 0 0);
+    --c-grey-800: oklch(0.25 0 0);
+
+    /* Semantic tokens (light) */
+    --background: var(--c-white);
+    --foreground: oklch(0.20 0 0);
+    --card: oklch(0.99 0 0);
+    --card-foreground: oklch(0.20 0 0);
+    --popover: var(--c-white);
+    --popover-foreground: oklch(0.20 0 0);
+    --primary: var(--c-auburn);
+    --primary-foreground: var(--c-white);
+    --secondary: var(--c-purple);
+    --secondary-foreground: var(--c-white);
+    --muted: var(--c-grey-100);
+    --muted-foreground: oklch(0.40 0 0);
+    --accent: var(--c-royal-blue);
+    --accent-foreground: var(--c-white);
+    --destructive: var(--c-red);
+    --destructive-foreground: var(--c-white);
+    --border: var(--c-grey-200);
+    --input: var(--c-white);
+    --ring: color-mix(in oklch, var(--c-royal-blue) 50%, transparent);
+    --chart-1: var(--c-emerald);
+    --chart-2: var(--c-royal-blue);
+    --chart-3: var(--c-indigo);
+    --chart-4: var(--c-royal-orange);
+    --chart-5: var(--c-pink);
+    --radius: 0.5rem;
+    --sidebar: var(--c-white);
+    --sidebar-foreground: oklch(0.20 0 0);
+    --sidebar-primary: var(--c-auburn);
+    --sidebar-primary-foreground: var(--c-white);
+    --sidebar-accent: var(--c-royal-blue);
+    --sidebar-accent-foreground: var(--c-white);
+    --sidebar-border: var(--c-grey-200);
+    --sidebar-ring: color-mix(in oklch, var(--c-auburn) 50%, transparent);
+
+    /* Light theme background — FALLBACK (broad browser support: no oklch/color-mix)
+       Goal: clearer "star-glow" feel while keeping a true light theme. We add a brighter off-screen warm glow,
+       a subtle complementary cool rim to avoid yellow cast, and a gentle vignette to frame content. */
+    --app-bg: /* primary warm glow */ radial-gradient(1200px 800px at 85% 6%, rgba(255, 219, 153, 0.45) 0%, rgba(255, 219, 153, 0) 60%),
+        /* faint cool counter-glow */ radial-gradient(900px 650px at 5% 15%, rgba(180, 205, 255, 0.20) 0%, rgba(180, 205, 255, 0) 65%),
+        /* soft vignette */ radial-gradient(1800px 1200px at 50% 100%, rgba(0, 0, 0, 0.04) 0%, rgba(0, 0, 0, 0.02) 40%, rgba(0, 0, 0, 0) 70%),
+    linear-gradient(180deg, #ffffff 0%, #fbfbfb 100%);
+}
+
+.dark {
+    /* Dark theme mappings — galaxy space */
+    --background: oklch(0.10 0 0);
+    --foreground: oklch(0.96 0 0);
+    --card: oklch(0.14 0 0);
+    --card-foreground: var(--foreground);
+    --popover: oklch(0.12 0 0);
+    --popover-foreground: var(--foreground);
+    /* On dark, primary leans royal blue for clarity; accent uses indigo/purple */
+    --primary: var(--c-royal-blue);
+    --primary-foreground: oklch(0.16 0 0);
+    --secondary: color-mix(in oklch, var(--c-indigo) 70%, var(--c-purple) 30%);
+    --secondary-foreground: var(--foreground);
+    --muted: oklch(0.20 0 0);
+    --muted-foreground: oklch(0.75 0 0);
+    --accent: var(--c-indigo);
+    --accent-foreground: var(--foreground);
+    --destructive: var(--c-red);
+    --destructive-foreground: var(--foreground);
+    --border: oklch(0.22 0 0);
+    --input: oklch(0.18 0 0);
+    --ring: color-mix(in oklch, var(--c-royal-blue) 45%, transparent);
+    --chart-1: var(--c-emerald);
+    --chart-2: var(--c-royal-blue);
+    --chart-3: var(--c-indigo);
+    --chart-4: var(--c-royal-orange);
+    --chart-5: var(--c-pink);
+    --sidebar: oklch(0.14 0 0);
+    --sidebar-foreground: var(--foreground);
+    --sidebar-primary: var(--c-royal-blue);
+    --sidebar-primary-foreground: oklch(0.16 0 0);
+    --sidebar-accent: var(--c-indigo);
+    --sidebar-accent-foreground: var(--foreground);
+    --sidebar-border: oklch(0.22 0 0);
+    --sidebar-ring: color-mix(in oklch, var(--c-indigo) 45%, transparent);
+
+    /* Dark theme background — FALLBACK nebula (reduced noise, smoother gas clouds) */
+    --app-bg: /* nebulae (bigger, smoother, varied hues) */ radial-gradient(1400px 900px at 12% 20%, rgba(76, 81, 191, 0.26) 0%, rgba(76, 81, 191, 0) 70%),
+    radial-gradient(1200px 820px at 86% 16%, rgba(37, 99, 235, 0.22) 0%, rgba(37, 99, 235, 0) 66%),
+    radial-gradient(1000px 760px at 74% 70%, rgba(109, 40, 217, 0.22) 0%, rgba(109, 40, 217, 0) 70%),
+        /* sparse distant stars (reduced density/opacity) */ repeating-radial-gradient(circle at 20% 26%, rgba(255, 255, 255, 0.22) 0 0.5px, rgba(0, 0, 0, 0) 0.5px 3px),
+    repeating-radial-gradient(circle at 78% 18%, rgba(255, 255, 255, 0.14) 0 0.4px, rgba(0, 0, 0, 0) 0.4px 3.2px),
+        /* deep space base */ linear-gradient(180deg, #0c1022 0%, #0a0e1a 60%, #080a10 100%);
+}
+
+/* Prefer advanced color spaces when supported */
+@supports (color: oklch(0.7 0.1 200)) {
+    :root {
+        /* Light theme background — star glow (warm) with oklch/color-mix
+           Stronger but safe intensity + cool rim + vignette */
+        --app-bg: radial-gradient(1300px 900px at 86% 8%, color-mix(in oklch, var(--c-royal-orange) 35%, white 65%) 0%, transparent 60%),
+        radial-gradient(900px 650px at 8% 18%, color-mix(in oklch, var(--c-royal-blue) 18%, transparent) 0%, transparent 68%),
+        radial-gradient(1800px 1200px at 50% 100%, color-mix(in oklch, black 6%, transparent) 0%, transparent 70%),
+        linear-gradient(180deg, oklch(0.99 0 0) 0%, oklch(0.985 0 0) 100%);
+    }
+
+    .dark {
+        /* Dark theme background — CSS‑only nebula (less noise, more cloud structure) */
+        --app-bg: radial-gradient(1400px 900px at 12% 22%, color-mix(in oklch, var(--c-indigo) 30%, transparent) 0%, transparent 72%),
+        radial-gradient(1200px 820px at 84% 14%, color-mix(in oklch, var(--c-royal-blue) 24%, transparent) 0%, transparent 66%),
+        radial-gradient(1000px 760px at 74% 72%, color-mix(in oklch, var(--c-purple) 24%, transparent) 0%, transparent 70%),
+            /* sparser stars */ repeating-radial-gradient(circle at 22% 30%, color-mix(in oklch, var(--c-white) 28%, transparent) 0 0.5px, transparent 0.5px 3px),
+        repeating-radial-gradient(circle at 76% 22%, color-mix(in oklch, var(--c-white) 16%, transparent) 0 0.4px, transparent 0.4px 3.2px),
+        linear-gradient(180deg, oklch(0.13 0.02 270) 0%, oklch(0.095 0 0) 58%, oklch(0.082 0 0) 100%);
+    }
+}
+
+@theme inline {
+    /* Use a robust default stack; we don't rely on next/font variables here. */
+    --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
+    Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+    --radius-sm: calc(var(--radius) - 4px);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) + 4px);
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+    * {
+        @apply border-border outline-ring/50;
+    }
+
+    :root, html, body {
+        /* Mirror body background on the root element to avoid being obscured by full-bleed containers */
+        background-color: var(--background);
+        background-image: var(--app-bg) !important;
+        /* Ensure all layers cover appropriately; extra values ignored when fewer layers present */
+        background-size: cover, cover, cover, auto, auto, cover;
+        background-repeat: no-repeat, no-repeat, no-repeat, repeat, repeat, no-repeat;
+        background-attachment: scroll;
+        min-height: 100%;
+    }
+
+    body {
+        @apply bg-background text-foreground;
+        /* Apply galaxy/star‑glow background image via CSS variables */
+        background-image: var(--app-bg) !important;
+        /* Size/repeat values match the maximum layer count used in dark mode; extra values are ignored in light */
+        background-size: cover, cover, cover, auto, auto, cover;
+        background-repeat: no-repeat, no-repeat, no-repeat, repeat, repeat, no-repeat;
+        /* On mobile, avoid fixed backgrounds for perf; desktop can handle it */
+        background-attachment: scroll;
+        min-height: 100dvh;
+    }
+}
+
+/* Optional: slightly translucent panels over rich backgrounds */
+.surface {
+    /* Lighter translucent panel so backgrounds show through more */
+    background-color: color-mix(in oklch, var(--card) 86%, transparent);
+    backdrop-filter: saturate(1.05) blur(6px);
+}
+
+/* Make default header/footer seamless and translucent, not solid bands */
+header, footer {
+    background-color: color-mix(in oklch, var(--card) 82%, transparent);
+    backdrop-filter: saturate(1.05) blur(8px);
+}
+
+/* Light theme alternatives (commented) — switch by overriding --app-bg in :root if desired */
+/*
+:root { --app-bg: radial-gradient(1000px 700px at 80% 0%, oklch(0.99 0 0) 0%, transparent 60%), linear-gradient(180deg, oklch(0.995 0 0) 0%, oklch(0.985 0 0) 100%); }
+  Pros: maximum readability, neutral. Cons: less character.
+:root { --app-bg: radial-gradient(1200px 900px at 85% 10%, color-mix(in oklch, var(--c-royal-blue) 10%, transparent) 0%, transparent 60%), linear-gradient(180deg, oklch(0.995 0 0) 0%, oklch(0.985 0 0) 100%); }
+  Pros: cooler palette, high contrast. Cons: colder feel.
+*/

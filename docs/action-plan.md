@@ -67,17 +67,20 @@ Legend: ✅ Completed • 🟡 In Progress • 🔜 Next • 🗂️ Backlog
 
     6) Monorepo Transition (Architecture Upgrade)
 
-    - 🗂️ Initialize `pnpm-workspace.yaml` and formalize workspaces
-    - 🗂️ Migrate `libs/shared` to `packages/shared`
-    - 🗂️ Scaffold `apps/api` (Fastify/TypeScript Node.js server)
-    - 🗂️ Setup Turborepo for optimized builds/tasks
+    - ✅ Initialize `pnpm-workspace.yaml` and formalize workspaces
+    - ✅ Migrate `libs/shared` to `packages/shared`
+    - 🔜 Scaffold `apps/api` (Fastify/TypeScript Node.js server)
+    - 🔜 Setup Turborepo for optimized builds/tasks
     - 🗂️ Integrate Prisma/Drizzle ORM with PostgreSQL
 
     7) New Games Pipeline (from Roadmap)
 
-    - 🗂️ ChronoShift Labyrinth: Core mechanic (time manipulation) & Level 1
-    - 🗂️ Elemental Conflux: Multi-character swapping & elemental interaction puzzles
-    - 🗂️ Quantum Architect: Quantum state observation & matter creation mechanics
+    - ✅ ChronoShift Labyrinth: Scaffolded (upcoming)
+    - ✅ Elemental Conflux: Scaffolded (upcoming)
+    - ✅ Quantum Architect: Scaffolded (upcoming)
+    - 🔜 Engine: Implement `TimePlugin` for ChronoShift
+    - 🔜 Engine: Implement `MultiCharacterPlugin` for Elemental Conflux
+    - 🔜 Engine: Implement `ObserverPlugin` for Quantum Architect
 
 4) Tests & CI
 
