@@ -68,12 +68,19 @@ A formalized monorepo using **pnpm workspaces** and **Turborepo**.
 
 ### 2. Backend
 
-- **Recommendation**: **Fastify** or **NestJS** (Node.js + TypeScript)
-    - **Pros**: Fastify is extremely high-performance; NestJS provides excellent structure.
-    - **Cons**: NestJS has a steeper learning curve.
-    - **Alternative**: Next.js API Routes (Serverless).
-- **API Style**: **REST with Zod** or **tRPC**.
-    - **Pros**: tRPC provides end-to-end type safety without code gen.
+- **Recommendation**: **NestJS** (Node.js + TypeScript)
+    - **Pros**:
+        - **Structure**: Highly opinionated and structured, similar to Spring Boot, which is beneficial for developers
+          coming from a Java background.
+        - **Maintainability**: Dependency Injection and modular architecture make it highly scalable for a growing
+          platform.
+        - **Type Safety**: Built-in TypeScript support ensures end-to-end type safety.
+    - **Cons**: Steeper learning curve compared to Express.
+    - **Comparison**:
+        - **Express**: Minimal and fast, but lacks built-in structure, making monorepos harder to manage as they grow.
+        - **Deno**: Modern and secure with built-in TS support, but the ecosystem is still maturing and might lack some
+          specific Node.js library support needed for gaming integrations.
+- **API Style**: **REST with Zod** for validation.
 
 ### 3. Database
 

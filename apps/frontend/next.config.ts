@@ -71,6 +71,7 @@ const nextConfig: NextConfig = {
             "@games/rite-of-discovery": path.resolve(gamesPath, "rite-of-discovery/src"),
             "@games/systems-discovery": path.resolve(gamesPath, "systems-discovery/src"),
             "@games/toymaker-escape": path.resolve(gamesPath, "toymaker-escape/src"),
+            "@games/manifest": path.resolve(gamesPath, "manifest"),
         };
         return config;
     },

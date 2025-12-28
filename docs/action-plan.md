@@ -69,9 +69,11 @@ Legend: ✅ Completed • 🟡 In Progress • 🔜 Next • 🗂️ Backlog
 
     - ✅ Initialize `pnpm-workspace.yaml` and formalize workspaces
     - ✅ Migrate `libs/shared` to `packages/shared`
-    - 🔜 Scaffold `apps/api` (Fastify/TypeScript Node.js server)
+  - ✅ Scaffold `apps/api` (NestJS/TypeScript Node.js server)
     - 🔜 Setup Turborepo for optimized builds/tasks
+  - 🔜 Implement Core Backend Features (Health, Meta, Auth Scaffolding)
     - 🗂️ Integrate Prisma/Drizzle ORM with PostgreSQL
+  - 🗂️ Game Metadata API and Score Service
 
     7) New Games Pipeline (from Roadmap)
 
@@ -256,6 +258,8 @@ Deliverables tracked under Docs & Assets and committed in `docs/narrative/scene-
     - [x] Add React `DialogueBox` and `InventoryBar` for a11y/mobile. ✓
     - [x] Puzzle primitives: `keypad` + unit tests. ✓
     - [ ] Puzzle primitives: `sequence/simon`, `wires/connectors`, `gears` ratio mesh, `pipes/flow`. 🟡
+  - [x] Add `visible: boolean` attribute to game manifest for selective catalog display. ✓
+  - [x] NestJS Backend Scaffolded (`apps/api`). ✓
 - [x] i18n foundation: EN/FR namespaces per title, language switch in header with persistence. ✓
 - [ ] Saves: localStorage with versioned keys `rod:save:v1`, `tme:save:v1`, `sysdisc:save:v1` + migration stubs. 🟡
 - [ ] TME MVP: implement Intro → E1 routes, gears mini, sorter puzzle, medals, wrap; a11y & mobile pass. 🟡

@@ -28,6 +28,7 @@ export type GameEntry = {
     tags: string[];
     image: string;
     upcoming?: boolean;
+    visible?: boolean;
     enabled?: boolean;
     backgroundImage?: string;
     preloadAssets?: { key: string; url: string; loop?: boolean }[];
@@ -44,6 +45,7 @@ export const games: GameManifest = {
         tags: ["Arcade", "Canvas", "Particles"],
         image: "/breakout-game-with-paddle-and-colorful-bricks.jpg",
         enabled: true,
+        visible: true,
         backgroundImage: "/images/bg-neon-grid.jpg",
         preloadAssets: [
             {key: "paddle", url: "/sounds/paddle.mp3"},
@@ -66,6 +68,7 @@ export const games: GameManifest = {
         tags: ["Casual", "Memory", "Puzzle"],
         image: "/colorful-memory-cards-game-interface.jpg",
         enabled: true,
+        visible: true,
         backgroundImage: "/images/bg-pastel-pattern.jpg",
         preloadAssets: [
             {key: "cardFlip", url: "/sounds/card-flip.mp3"},
@@ -82,6 +85,7 @@ export const games: GameManifest = {
         tags: ["Arcade", "Grid", "Swipe"],
         image: "/retro-snake-game-with-neon-colors.jpg",
         enabled: true,
+        visible: true,
         backgroundImage: undefined,
         preloadAssets: [],
         getComponent: () => import("@games/snake").then((m) => m.SnakeGame),
@@ -94,6 +98,7 @@ export const games: GameManifest = {
         tags: ["Puzzle", "Casual", "Mobile"],
         image: "https://picsum.photos/seed/pattern/1280/1280",
         enabled: true,
+        visible: true,
         backgroundImage: "/images/bg-pastel-pattern.jpg",
         preloadAssets: [
             {key: "click", url: "/sounds/click.mp3"},
@@ -109,6 +114,7 @@ export const games: GameManifest = {
         image: "/colorful-knitting-wool-baskets.jpg",
         upcoming: true,
         enabled: false,
+        visible: false,
         backgroundImage: "/images/bg-pastel-pattern.jpg",
         preloadAssets: [],
         // Placeholder component (not used while upcoming). Keeping import signature for future.
@@ -121,6 +127,7 @@ export const games: GameManifest = {
         tags: ["Arcade", "Match-3", "Casual"],
         image: "/soap-bubbles-colorful-nature.jpg",
         enabled: true,
+        visible: true,
         backgroundImage: "/images/bg-abstract-dark.jpg",
         preloadAssets: [
             {key: "pop", url: "/sounds/brick-hit.mp3"},
@@ -136,6 +143,7 @@ export const games: GameManifest = {
         tags: ["Board", "Local 2P", "Strategy"],
         image: "/activity-checkers.jpg",
         enabled: true,
+        visible: true,
         backgroundImage: "https://picsum.photos/seed/bg-checkers/1280/1280",
         preloadAssets: [],
         getComponent: () => import("@games/checkers").then((m) => m.CheckersGame),
@@ -147,6 +155,7 @@ export const games: GameManifest = {
         tags: ["Board", "Local 2P", "Strategy"],
         image: "/king-chess-pieces.jpg",
         enabled: true,
+        visible: true,
         backgroundImage: "https://picsum.photos/seed/bg-chess/1280/1280",
         preloadAssets: [],
         getComponent: () => import("@games/chess").then((m) => m.ChessGame),
@@ -158,6 +167,7 @@ export const games: GameManifest = {
         tags: ["Adventure", "Point & Click", "Story"],
         image: "https://picsum.photos/seed/rod/1280/1280",
         enabled: true,
+        visible: true,
         backgroundImage: "/images/bg-pastel-pattern.jpg",
         preloadAssets: [],
         // Placeholder component (not used while upcoming)
@@ -170,6 +180,7 @@ export const games: GameManifest = {
         tags: ["Adventure", "Point & Click", "Educational"],
         image: "https://picsum.photos/seed/systems-discovery/1280/1280",
         enabled: true,
+        visible: true,
         backgroundImage: "https://picsum.photos/seed/bg-systems-discovery/1280/1280",
         preloadAssets: [],
         getComponent: () => import("@games/systems-discovery").then((m) => m.SystemsDiscoveryGame),
@@ -181,6 +192,7 @@ export const games: GameManifest = {
         tags: ["Escape", "Puzzles", "Story"],
         image: "/patience-games-toys.jpg",
         enabled: true,
+        visible: true,
         backgroundImage: "https://picsum.photos/seed/bg-escape-game/1280/1280",
         preloadAssets: [],
         getComponent: () => import("@games/toymaker-escape").then((m) => m.ToymakerEscapeGame),
@@ -193,6 +205,7 @@ export const games: GameManifest = {
         image: "https://picsum.photos/seed/chrono/1280/1280",
         upcoming: true,
         enabled: false,
+        visible: false,
         getComponent: () => import("@games/chrono-shift").then((m) => m.game),
     },
     "elemental-conflux": {
@@ -203,6 +216,7 @@ export const games: GameManifest = {
         image: "https://picsum.photos/seed/elemental/1280/1280",
         upcoming: true,
         enabled: false,
+        visible: false,
         getComponent: () => import("@games/elemental-conflux").then((m) => m.game),
     },
     "quantum-architect": {
@@ -213,6 +227,7 @@ export const games: GameManifest = {
         image: "https://picsum.photos/seed/quantum/1280/1280",
         upcoming: true,
         enabled: false,
+        visible: false,
         getComponent: () => import("@games/quantum-architect").then((m) => m.game),
     },
 };

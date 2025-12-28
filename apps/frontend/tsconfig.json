@@ -33,6 +33,9 @@
       "@games/*": [
         "../../packages/games/*/src"
       ],
+      "@games/manifest": [
+        "../../packages/games/manifest"
+      ],
       "@games/shared": [
         "../../packages/shared/src"
       ],

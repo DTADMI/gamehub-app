@@ -20,7 +20,7 @@ type HomeGame = {
 
 export default function HomePage() {
     // Build games from manifest; overlay images from lib/games.ts
-    const entries = listGames();
+    const entries = listGames().filter(e => e.visible !== false);
     const allGames: HomeGame[] = entries.map((e) => {
         const lib = getGameById(e.slug);
         return {
