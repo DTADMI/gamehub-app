@@ -1,3 +1,5 @@
+Current deployed url : https://gamehub-app-245231653364.northamerica-northeast1.run.app/
+
 # GameHub — Next.js Frontend
 
 GameHub is a Next.js 16 frontend where you can play my web games and browse my other projects. This repository is
